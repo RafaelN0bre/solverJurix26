@@ -1,0 +1,26 @@
+[project]
+name = "aspic-causation"
+version = "0.1.0"
+description = "ASPIC+ argumentation solver with cause-in-fact detection, adapted from the TCC solver to reproduce the legal-case results of Pisano, Prakken, Sartor & Liepina (ICAIL 2025)."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aspic"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
