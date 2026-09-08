@@ -8,16 +8,16 @@ from .solver import (
     Rule,
     negate_literal,
 )
-from .ness import (
+from .sufficiency import (
     SufficientSet,
     deductive_closure,
-    is_ness_cause,
     is_sufficient,
     necessary_elements,
-    ness_report,
+    sufficiency_report,
     sufficient_sets,
 )
-from .examples import CaseSpec, CausalQuery, LEGAL_CASES, case_by_id
+from .examples import CaseSpec, CausalQuery, LRCLayer, LEGAL_CASES, case_by_id
+from .preferences import Dimension, PreferenceModel, RuleProfile, resolved_conflicts
 from .graph_export import argument_status, render_to_file, render_to_string, to_dot
 from .causal_report import causal_comparison_section, ness_html_table
 
@@ -31,15 +31,19 @@ __all__ = [
     "negate_literal",
     "SufficientSet",
     "deductive_closure",
-    "is_ness_cause",
     "is_sufficient",
     "necessary_elements",
-    "ness_report",
+    "sufficiency_report",
     "sufficient_sets",
     "CaseSpec",
     "CausalQuery",
+    "LRCLayer",
     "LEGAL_CASES",
     "case_by_id",
+    "Dimension",
+    "PreferenceModel",
+    "RuleProfile",
+    "resolved_conflicts",
     "argument_status",
     "render_to_file",
     "render_to_string",

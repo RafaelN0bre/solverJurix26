@@ -1,9 +1,10 @@
-"""HTML rendering of the NESS test and the causal-comparison panel (plain
-NESS vs `is_cause` vs `but_for`) shown below each case's argument graph.
+"""HTML rendering of the causal-comparison panel (NESS vs but-for) and of the
+sufficient-set breakdown, shown below each case's argument graph.
 
-This module formats output from `aspic.ness` (plain NESS sufficiency and
-necessity) and `ArgumentationFramework.is_cause` / `.but_for` (solver.py);
-it does not implement any new causal-reasoning logic of its own.
+This module formats output from `ArgumentationFramework.ness_cause` /
+`.but_for` (solver.py) and from `aspic.sufficiency` (which sets of conditions
+are sufficient, and which members of each are necessary). It implements no
+causal-reasoning logic of its own.
 """
 import html as _html
 
@@ -11,14 +12,17 @@ from typing import List
 
 from .examples import CausalQuery
 from .graph_export import render_to_string, to_dot
-from .ness import is_ness_cause, necessary_elements, sufficient_sets
+from .sufficiency import necessary_elements, sufficient_sets
 from .solver import ArgumentationFramework, negate_literal
 
 
 def ness_html_table(af: ArgumentationFramework, psi: str) -> str:
-    """HTML rendering of what `aspic.ness.ness_report` prints as text: every
-    subset-minimal sufficient set for psi, and which of its elements are
-    individually necessary within that set."""
+    """HTML rendering of what `aspic.sufficiency.sufficiency_report` prints
+    as text: every subset-minimal sufficient set for psi, and which of its
+    elements are individually necessary within that set.
+
+    Explanatory, not decisive: it shows the material behind a NESS verdict,
+    it does not pronounce one."""
     rules = list(af.rules.values())
     sets = sufficient_sets(af, psi)
     if not sets:
@@ -51,25 +55,25 @@ def _verdict_cell(value: bool) -> str:
 
 
 def causal_comparison_section(af: ArgumentationFramework, queries: List[CausalQuery]) -> str:
-    """Table comparing plain NESS, `is_cause` (Definition 4.3) and
-    `but_for` (Definition 3.5) for each (phi, psi) query, followed by one
-    collapsed counterfactual graph per query -- the axiom-expanded
-    framework `is_cause`/`but_for` actually reason over -- so a reader can
-    see, not just read, why the three notions agree or disagree."""
+    """Table comparing the two notions the papers define -- the NESS cause
+    (Definition 4.3 / 3.4) and `but_for` (Definition 3.5) -- for each
+    (phi, psi) query, followed by one collapsed counterfactual graph per
+    query. That graph is the axiom-expanded framework both notions actually
+    reason over, so a reader can see, not just read, why they agree or
+    disagree."""
     if not queries:
         return "<p>No causal queries for this case.</p>"
 
     rows = []
     details = []
     for q in queries:
-        ness = is_ness_cause(af, q.phi, q.psi)
-        cause = af.is_cause(q.phi, q.psi)
+        ness = af.ness_cause(q.phi, q.psi)
         but_for = af.but_for(q.phi, q.psi)
         rows.append(
             "<tr>"
             f"<td><code>{_html.escape(q.phi)}</code></td>"
             f"<td><code>{_html.escape(q.psi)}</code></td>"
-            f"{_verdict_cell(ness)}{_verdict_cell(cause)}{_verdict_cell(but_for)}"
+            f"{_verdict_cell(ness)}{_verdict_cell(but_for)}"
             f'<td class="note">{_html.escape(q.note)}</td>'
             "</tr>"
         )
@@ -77,8 +81,9 @@ def causal_comparison_section(af: ArgumentationFramework, queries: List[CausalQu
 
     table = (
         '<table class="causal-table">'
-        "<thead><tr><th>&phi;</th><th>&psi;</th><th>NESS</th>"
-        "<th>is_cause (Def. 4.3)</th><th>but_for (Def. 3.5)</th><th>Why</th></tr></thead>"
+        "<thead><tr><th>&phi;</th><th>&psi;</th>"
+        "<th>NESS cause (Def. 4.3 / 3.4)</th>"
+        "<th>but_for (Def. 3.5)</th><th>Why</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
     return table + "\n" + "\n".join(details)

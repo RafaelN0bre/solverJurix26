@@ -1,0 +1,234 @@
+{
+  "stage": "atoms",
+  "prompt": {
+    "path": "prompts/formalize/01_atoms.v1.md",
+    "version": 1,
+    "template_sha256": "4bd0107b863144207e571a2954cd452c27bf6d86ac37064dc9e4f6e60fd6a7c0",
+    "rendered_sha256": "9af048634aeaf7321b9371b92f3d980a267b89a30a14f08d0177d11f853685fd",
+    "config": {
+      "model": "gemini-2.5-pro",
+      "temperature": 0
+    },
+    "includes": []
+  },
+  "attempts": 1,
+  "repairs": [],
+  "issues": [],
+  "output": {
+    "case_title": "Caso 005 — Responsabilidade do Estado por sequelas de saúde de preso",
+    "narrative_pt": "Um detento desenvolveu um quadro grave de pneumonia necrosante e insuficiência cardíaca congestiva durante o encarceramento, resultando em sequelas irreversíveis e incapacidade para o trabalho. A família do preso processou o Estado, alegando que o dano foi causado por negligência, especificamente a demora no atendimento médico e as condições desumanas da cela. O Estado se defendeu, argumentando que o atendimento seguiu os protocolos e que o quadro de saúde do preso se devia a fatores de risco pessoais preexistentes, como tabagismo e uso de drogas. A Justiça negou a indenização, por considerar que não havia provas conclusivas da demora no atendimento nem das más condições da cela, e que os fatores de risco pessoais poderiam explicar o ocorrido.",
+    "central_question": "A falha no atendimento médico ou as condições da cela agravaram o quadro de saúde pulmonar e cardíaco de um preso sob custódia do Estado, resultando em sequelas irreversíveis e incapacidade laboral?",
+    "outcome_code": "SeqIrr",
+    "atoms": [
+      {
+        "code": "SeqIrr",
+        "label_pt": "o preso sofreu sequelas irreversíveis e incapacidade laboral",
+        "kind": "resultado",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrente",
+          "recorrido",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_985014a104cf4772"
+        ],
+        "dossier_refs": [
+          "synth_3962fad2aa5f40f2",
+          "prec_56e9132acba948bf",
+          "unit_68719d79246946ff"
+        ],
+        "established": false
+      },
+      {
+        "code": "AgrQuad",
+        "label_pt": "o quadro de saúde do preso (pneumonia necrosante e insuficiência cardíaca congestiva) se agravou",
+        "kind": "intermediario",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrente",
+          "recorrido",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_985014a104cf4772"
+        ],
+        "dossier_refs": [
+          "synth_3962fad2aa5f40f2",
+          "prec_56e9132acba948bf"
+        ],
+        "established": false
+      },
+      {
+        "code": "AtdTemp",
+        "label_pt": "o atendimento médico ao preso foi prestado em tempo adequado",
+        "kind": "fato",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrido",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_f930afb4cd4c4c45"
+        ],
+        "dossier_refs": [
+          "divg_2b91f88eeb094df2",
+          "prec_bf0d1660438d4bad",
+          "prec_20d8b1b9cdac478e"
+        ],
+        "established": true
+      },
+      {
+        "code": "CelHum",
+        "label_pt": "a cela do preso tinha condições humanas",
+        "kind": "fato",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrido",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_c40f876685624014",
+          "src_e87485590fb74cad"
+        ],
+        "dossier_refs": [
+          "divg_7062d5de3309474e",
+          "prec_20d8b1b9cdac478e"
+        ],
+        "established": true
+      },
+      {
+        "code": "FatRisc",
+        "label_pt": "o preso possuía fatores de risco pessoais (tabagismo, etilismo, cocaína, obesidade)",
+        "kind": "fato",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrido",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_91167dafaffc41cc"
+        ],
+        "dossier_refs": [
+          "divg_02f4ab196cea4959",
+          "prec_bf0d1660438d4bad",
+          "prec_20d8b1b9cdac478e"
+        ],
+        "established": true
+      },
+      {
+        "code": "DoePreEx",
+        "label_pt": "o preso tinha doença pré-existente à custódia",
+        "kind": "fato",
+        "status": "rejeitado",
+        "perspectives": [
+          "recorrente",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_ee8a3d7d1c754cbd",
+          "src_0dafcf439b824fa5"
+        ],
+        "dossier_refs": [
+          "divg_02f4ab196cea4959"
+        ],
+        "established": true
+      },
+      {
+        "code": "PerConcDem",
+        "label_pt": "a perícia foi conclusiva quanto à demora no atendimento",
+        "kind": "prova",
+        "status": "rejeitado",
+        "perspectives": [
+          "recorrente",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_36c55aeba6ad4801",
+          "src_01141170d2b74513"
+        ],
+        "dossier_refs": [
+          "divg_2b91f88eeb094df2"
+        ],
+        "established": true
+      },
+      {
+        "code": "ProtSeg",
+        "label_pt": "o atendimento médico seguiu os protocolos de saúde",
+        "kind": "prova",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrido",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_f930afb4cd4c4c45"
+        ],
+        "dossier_refs": [
+          "prec_bf0d1660438d4bad",
+          "prec_20d8b1b9cdac478e"
+        ],
+        "established": true
+      },
+      {
+        "code": "ProvCel",
+        "label_pt": "há prova das condições desumanas da cela",
+        "kind": "prova",
+        "status": "rejeitado",
+        "perspectives": [
+          "recorrente",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_c40f876685624014",
+          "src_e87485590fb74cad"
+        ],
+        "dossier_refs": [
+          "divg_7062d5de3309474e"
+        ],
+        "established": true
+      },
+      {
+        "code": "DevAtdSaude",
+        "label_pt": "o Estado tem o dever de prestar assistência à saúde ao preso",
+        "kind": "dever",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrente",
+          "recorrido",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_985014a104cf4772"
+        ],
+        "dossier_refs": [
+          "prec_56e9132acba948bf",
+          "prec_bf0d1660438d4bad"
+        ],
+        "established": true
+      },
+      {
+        "code": "DevCelHum",
+        "label_pt": "o Estado tem o dever de manter a cela em condições humanas",
+        "kind": "dever",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrente",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_985014a104cf4772"
+        ],
+        "dossier_refs": [
+          "prec_56e9132acba948bf"
+        ],
+        "established": true
+      }
+    ],
+    "open_questions": [
+      "Qual foi o tempo de atendimento?",
+      "Quais eram as condições da cela?",
+      "Qual o peso dos fatores de risco pessoais?"
+    ]
+  }
+}

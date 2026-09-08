@@ -1,0 +1,564 @@
+{
+  "schema_version": "1.0",
+  "case": {
+    "id": "case-003",
+    "title": "Caso 003 — Responsabilidade do Estado por crime de foragido",
+    "annotator": "izabela-melo",
+    "source_file": "data/izabela-melo/case-003-dossie-2026-08-24.json",
+    "source_sha256": "3079e33fe89f1f70af968911ea5b4d2ae50de03898ea333a4f83278a44f72930",
+    "session_id": "evaluation-round-01"
+  },
+  "narrative_pt": "Um detento, que cumpria pena em regime fechado, fugiu do sistema prisional. Três meses depois, em concurso com outros agentes (formação de quadrilha), praticou um latrocínio (roubo seguido de morte). A família da vítima processou o Estado, alegando que a omissão no dever de custódia foi a causa da morte. O Estado (recorrente) argumentou que o lapso temporal de três meses e a formação de uma quadrilha para o novo crime romperam o nexo de causalidade, tratando-se de um fato de terceiro. A discussão central é se a falha inicial do Estado em manter o preso custodiado é a causa juridicamente relevante do dano, ou se eventos supervenientes quebraram essa conexão.",
+  "central_question": "O Estado é responsável pela morte de uma pessoa, vítima de latrocínio praticado por um detento foragido três meses após a fuga e em concurso de agentes?",
+  "atoms": [
+    {
+      "code": "MorteVitima",
+      "label_pt": "a vítima foi morta em decorrência de um latrocínio",
+      "kind": "resultado",
+      "status": "incontroverso",
+      "perspectives": [
+        "recorrente",
+        "recorrido",
+        "relator",
+        "stf_final"
+      ],
+      "evidence": [
+        "src_a5b5c7f3a9ca4d80",
+        "src_d27a4d0db9954fe8"
+      ],
+      "dossier_refs": [
+        "synth_e5a3b70e55fe4afd",
+        "unit_22e8dca47d4045f6",
+        "unit_4d500f0cde7c491e",
+        "unit_3b5cd0d3aee1479e",
+        "unit_d5df39b851574b26",
+        "unit_c2d2a7bbe62647bc",
+        "unit_bd0d5b84cc5e4544"
+      ],
+      "established": false,
+      "favors": "neutro",
+      "abstract_factor": ""
+    },
+    {
+      "code": "FugaPreso",
+      "label_pt": "o detento fugiu do sistema prisional",
+      "kind": "fato",
+      "status": "incontroverso",
+      "perspectives": [
+        "recorrente",
+        "recorrido",
+        "relator",
+        "stf_final"
+      ],
+      "evidence": [
+        "src_3bfb96a17abe4056",
+        "src_e18ee49b97864ccf"
+      ],
+      "dossier_refs": [
+        "synth_e5a3b70e55fe4afd",
+        "unit_22e8dca47d4045f6",
+        "unit_d5df39b851574b26",
+        "unit_bd0d5b84cc5e4544"
+      ],
+      "established": true,
+      "favors": "responsabilizacao",
+      "abstract_factor": "CondutaEstatal"
+    },
+    {
+      "code": "PresoRegFech",
+      "label_pt": "o detento cumpria pena em regime fechado",
+      "kind": "fato",
+      "status": "incontroverso",
+      "perspectives": [
+        "recorrido",
+        "relator"
+      ],
+      "evidence": [
+        "src_4de553dc86c34273",
+        "src_c9ac4600e7a84a96",
+        "src_03d379dcbe9d4160"
+      ],
+      "dossier_refs": [
+        "prec_162ff6b502734337",
+        "divg_bf34619f430e4838"
+      ],
+      "established": true,
+      "favors": "responsabilizacao",
+      "abstract_factor": "CondicoesDaCustodia"
+    },
+    {
+      "code": "CrimeApos3M",
+      "label_pt": "o crime foi praticado três meses após a fuga",
+      "kind": "fato",
+      "status": "incontroverso",
+      "perspectives": [
+        "recorrente",
+        "stf_final"
+      ],
+      "evidence": [
+        "src_2cc2964892904cf2",
+        "src_f2b9e027898b482e"
+      ],
+      "dossier_refs": [
+        "prec_fde2d7ddb4e94671",
+        "unit_3b5cd0d3aee1479e",
+        "divg_6ae0d94b953e43e3"
+      ],
+      "established": true,
+      "favors": "exclusao",
+      "abstract_factor": "NexoCausal"
+    },
+    {
+      "code": "FormacaoQuad",
+      "label_pt": "o crime foi praticado em concurso de agentes (formação de quadrilha)",
+      "kind": "fato",
+      "status": "incontroverso",
+      "perspectives": [
+        "stf_final"
+      ],
+      "evidence": [
+        "src_f2b9e027898b482e"
+      ],
+      "dossier_refs": [
+        "prec_9a3da3e5a15749f4",
+        "unit_4d500f0cde7c491e",
+        "unit_c2d2a7bbe62647bc"
+      ],
+      "established": true,
+      "favors": "exclusao",
+      "abstract_factor": "NexoCausal"
+    },
+    {
+      "code": "Latrocinio",
+      "label_pt": "o foragido cometeu latrocínio contra a vítima",
+      "kind": "intermediario",
+      "status": "incontroverso",
+      "perspectives": [
+        "recorrente",
+        "recorrido",
+        "relator",
+        "stf_final"
+      ],
+      "evidence": [
+        "src_a5b5c7f3a9ca4d80",
+        "src_7adf43487cee456e"
+      ],
+      "dossier_refs": [
+        "prec_162ff6b502734337"
+      ],
+      "established": false,
+      "favors": "neutro",
+      "abstract_factor": ""
+    },
+    {
+      "code": "DeverEspec",
+      "label_pt": "o Estado tinha um dever específico de custódia sobre o preso",
+      "kind": "dever",
+      "status": "controvertido",
+      "perspectives": [
+        "recorrido",
+        "relator"
+      ],
+      "evidence": [
+        "src_4621720adee3413a",
+        "src_c9ac4600e7a84a96",
+        "src_d4430da819554298",
+        "src_72ea31d850704795"
+      ],
+      "dossier_refs": [
+        "divg_bf34619f430e4838",
+        "unit_22e8dca47d4045f6",
+        "unit_bd0d5b84cc5e4544",
+        "synth_e5a3b70e55fe4afd"
+      ],
+      "established": true,
+      "favors": "responsabilizacao",
+      "abstract_factor": "NaturezaDoDever"
+    },
+    {
+      "code": "DeverGener",
+      "label_pt": "o dever do Estado era genérico de segurança pública",
+      "kind": "dever",
+      "status": "controvertido",
+      "perspectives": [
+        "recorrente",
+        "stf_final"
+      ],
+      "evidence": [
+        "src_83aefba652654af9",
+        "src_05026afa6a9d4e08"
+      ],
+      "dossier_refs": [
+        "divg_bf34619f430e4838",
+        "prec_9a3da3e5a15749f4",
+        "synth_e5a3b70e55fe4afd"
+      ],
+      "established": true,
+      "favors": "exclusao",
+      "abstract_factor": "NaturezaDoDever"
+    },
+    {
+      "code": "FatoDeTerc",
+      "label_pt": "o crime do foragido constitui um fato de terceiro que rompe o nexo causal",
+      "kind": "intermediario",
+      "status": "controvertido",
+      "perspectives": [
+        "recorrente",
+        "stf_final"
+      ],
+      "evidence": [
+        "src_aa174d74858e40d2",
+        "src_463968192f4c4384",
+        "src_b08f1a1374b84354"
+      ],
+      "dossier_refs": [
+        "synth_e5a3b70e55fe4afd",
+        "unit_4d500f0cde7c491e",
+        "unit_3b5cd0d3aee1479e",
+        "unit_c2d2a7bbe62647bc"
+      ],
+      "established": false,
+      "favors": "exclusao",
+      "abstract_factor": "RompimentoNexo"
+    },
+    {
+      "code": "ProvaMedidas",
+      "label_pt": "o Estado provou ter adotado as medidas cabíveis e esperáveis para evitar a fuga",
+      "kind": "prova",
+      "status": "controvertido",
+      "perspectives": [],
+      "evidence": [
+        "src_e78c7d363e2f4c61"
+      ],
+      "dossier_refs": [
+        "prec_422650345ecf4faa"
+      ],
+      "established": true,
+      "favors": "exclusao",
+      "abstract_factor": "OnusDaProva"
+    },
+    {
+      "code": "PrvFatoTerc",
+      "label_pt": "o Estado provou que a falha na custódia resultou de fato de terceiro",
+      "kind": "prova",
+      "status": "controvertido",
+      "perspectives": [],
+      "evidence": [
+        "src_7bc6e39b968c4b50"
+      ],
+      "dossier_refs": [
+        "prec_422650345ecf4faa"
+      ],
+      "established": true,
+      "favors": "exclusao",
+      "abstract_factor": "OnusDaProva"
+    }
+  ],
+  "knowledge_base": {
+    "premises": [
+      "FugaPreso",
+      "PresoRegFech",
+      "CrimeApos3M",
+      "FormacaoQuad",
+      "DeverEspec"
+    ],
+    "axioms": []
+  },
+  "causal_model": {
+    "strict_rules": [],
+    "defeasible_rules": [
+      "r0: FugaPreso AND DeverEspec AND PresoRegFech => Latrocinio",
+      "r1: Latrocinio => MorteVitima",
+      "r2: ProvaMedidas => ¬r0",
+      "r3: PrvFatoTerc => ¬r0"
+    ]
+  },
+  "rules_meta": [
+    {
+      "id": "r0",
+      "rule": "r0: FugaPreso AND DeverEspec AND PresoRegFech => Latrocinio",
+      "kind": "causal",
+      "gloss_pt": "A fuga do detento, que estava sob o dever específico de custódia do Estado por cumprir pena em regime fechado, foi a causa do latrocínio.",
+      "perspective": "recorrido",
+      "evidence": [
+        "src_e18ee49b97864ccf",
+        "src_c9ac4600e7a84a96",
+        "src_4de553dc86c34273"
+      ],
+      "dossier_refs": [
+        "unit_bd0d5b84cc5e4544",
+        "unit_d5df39b851574b26",
+        "unit_22e8dca47d4045f6"
+      ]
+    },
+    {
+      "id": "r1",
+      "rule": "r1: Latrocinio => MorteVitima",
+      "kind": "causal",
+      "gloss_pt": "O latrocínio cometido pelo foragido resultou na morte da vítima.",
+      "perspective": "comum",
+      "evidence": [
+        "src_a5b5c7f3a9ca4d80",
+        "src_7adf43487cee456e"
+      ],
+      "dossier_refs": [
+        "synth_e5a3b70e55fe4afd"
+      ]
+    },
+    {
+      "id": "r2",
+      "rule": "r2: ProvaMedidas => ¬r0",
+      "kind": "undercut",
+      "gloss_pt": "Se o Estado provou ter adotado as medidas cabíveis para evitar a fuga, a regra que o responsabiliza pelo crime do foragido não se aplica.",
+      "perspective": "recorrente",
+      "evidence": [
+        "src_e78c7d363e2f4c61"
+      ],
+      "dossier_refs": [
+        "prec_422650345ecf4faa"
+      ]
+    },
+    {
+      "id": "r3",
+      "rule": "r3: PrvFatoTerc => ¬r0",
+      "kind": "undercut",
+      "gloss_pt": "Se o Estado provou que a própria falha na custódia resultou de um fato de terceiro, ele não pode ser responsabilizado pelo crime posterior.",
+      "perspective": "recorrente",
+      "evidence": [
+        "src_7bc6e39b968c4b50"
+      ],
+      "dossier_refs": [
+        "prec_422650345ecf4faa"
+      ]
+    }
+  ],
+  "effect": "MorteVitima",
+  "queries": [
+    {
+      "phi": "FugaPreso",
+      "psi": "MorteVitima",
+      "question_pt": "A fuga do detento do sistema prisional foi causa da morte da vítima?",
+      "court_verdict": "rejeitada",
+      "court_rationale_pt": "A corte entendeu que o nexo de causalidade entre a omissão do Estado (a fuga) e o dano (a morte) foi rompido. O lapso temporal de três meses e a prática do novo crime em concurso de agentes (formação de quadrilha) foram considerados causas supervenientes que iniciaram uma nova cadeia causal, caracterizando o crime como um 'fato de terceiro'.",
+      "evidence": [
+        "src_f2b9e027898b482e",
+        "src_31ffb634f9e04aa5",
+        "src_227a91a9a2a64eb2"
+      ],
+      "solver": {
+        "ness": true,
+        "is_cause": true,
+        "but_for": true
+      },
+      "legally_relevant": false
+    },
+    {
+      "phi": "Latrocinio",
+      "psi": "MorteVitima",
+      "question_pt": "O latrocínio cometido pelo foragido foi causa da morte da vítima?",
+      "court_verdict": "acolhida",
+      "court_rationale_pt": "Foi incontroverso no processo que a morte da vítima foi uma consequência direta do crime de latrocínio (roubo seguido de morte). A discussão judicial não foi sobre este fato, mas sobre a responsabilidade do Estado pelo crime que o antecedeu.",
+      "evidence": [
+        "src_a5b5c7f3a9ca4d80",
+        "src_7adf43487cee456e"
+      ],
+      "solver": {
+        "ness": false,
+        "is_cause": true,
+        "but_for": true
+      },
+      "legally_relevant": true
+    }
+  ],
+  "lrc": {
+    "doctrinal_premises": [
+      {
+        "literal": "Om_FugaPreso",
+        "label_pt": "A fuga do preso é uma omissão do Estado no dever de custódia.",
+        "evidence": [
+          "src_c9ac4600e7a84a96",
+          "src_3bfb96a17abe4056",
+          "src_e18ee49b97864ccf"
+        ],
+        "perspective": "comum",
+        "origin_perspective": "comum"
+      },
+      {
+        "literal": "¬Obl_ManterCustodia",
+        "label_pt": "O dever de manter a custódia do preso tornou-se um dever genérico de segurança pública.",
+        "evidence": [
+          "src_83aefba652654af9",
+          "src_05026afa6a9d4e08",
+          "src_f2b9e027898b482e"
+        ],
+        "perspective": "voto_divergente",
+        "origin_perspective": "recorrente"
+      },
+      {
+        "literal": "After_Latrocinio_FugaPreso",
+        "label_pt": "O latrocínio ocorreu três meses após a fuga do preso.",
+        "evidence": [
+          "src_2cc2964892904cf2",
+          "src_f2b9e027898b482e"
+        ],
+        "perspective": "voto_divergente",
+        "origin_perspective": "recorrente"
+      },
+      {
+        "literal": "Unexpected_Latrocinio",
+        "label_pt": "O latrocínio foi um evento inesperado, dada a formação de quadrilha e o lapso temporal.",
+        "evidence": [
+          "src_f2b9e027898b482e"
+        ],
+        "perspective": "voto_divergente",
+        "origin_perspective": "recorrente"
+      }
+    ],
+    "bridged_premises": [
+      "CaFa_FugaPreso_MorteVitima",
+      "ButFor_FugaPreso_MorteVitima",
+      "CaFa_PresoRegFech_MorteVitima",
+      "ButFor_PresoRegFech_MorteVitima",
+      "CaFa_Latrocinio_MorteVitima",
+      "ButFor_Latrocinio_MorteVitima"
+    ],
+    "scheme_rules": [
+      {
+        "rule": "cf2lrc_FugaPreso: CaFa_FugaPreso_MorteVitima => LeReCa_FugaPreso_MorteVitima",
+        "scheme": "cf2lrc",
+        "gloss_pt": "A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.",
+        "evidence": [],
+        "perspective": "comum",
+        "origin_perspective": ""
+      },
+      {
+        "rule": "cf2lrc_PresoRegFech: CaFa_PresoRegFech_MorteVitima => LeReCa_PresoRegFech_MorteVitima",
+        "scheme": "cf2lrc",
+        "gloss_pt": "O fato de o detento cumprir pena em regime fechado, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.",
+        "evidence": [],
+        "perspective": "comum",
+        "origin_perspective": ""
+      },
+      {
+        "rule": "cf2lrc_Latrocinio: CaFa_Latrocinio_MorteVitima => LeReCa_Latrocinio_MorteVitima",
+        "scheme": "cf2lrc",
+        "gloss_pt": "O latrocínio, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.",
+        "evidence": [],
+        "perspective": "comum",
+        "origin_perspective": ""
+      },
+      {
+        "rule": "unom_FugaPreso: Om_FugaPreso AND ¬Obl_ManterCustodia => ¬cf2lrc_FugaPreso",
+        "scheme": "unom",
+        "gloss_pt": "A omissão do Estado (fuga do preso) não é juridicamente relevante porque o dever de agir (manter a custódia) tornou-se genérico, e não específico.",
+        "evidence": [
+          "src_83aefba652654af9",
+          "src_05026afa6a9d4e08"
+        ],
+        "perspective": "voto_divergente",
+        "origin_perspective": "recorrente"
+      },
+      {
+        "rule": "suca_Latrocinio: CaFa_FugaPreso_MorteVitima AND CaFa_Latrocinio_MorteVitima AND After_Latrocinio_FugaPreso AND Unexpected_Latrocinio AND ButFor_Latrocinio_MorteVitima => SupersedingCause_Latrocinio",
+        "scheme": "suca",
+        "gloss_pt": "O latrocínio é caracterizado como causa superveniente porque foi um evento posterior à fuga, necessário para o dano e inesperado (pelo lapso temporal e formação de quadrilha).",
+        "evidence": [
+          "src_f2b9e027898b482e",
+          "src_aa174d74858e40d2"
+        ],
+        "perspective": "voto_divergente",
+        "origin_perspective": "recorrente"
+      },
+      {
+        "rule": "sc_FugaPreso: SupersedingCause_Latrocinio => ¬cf2lrc_FugaPreso",
+        "scheme": "sc",
+        "gloss_pt": "Sendo o latrocínio uma causa superveniente, ele rompe a relevância jurídica da causa anterior (a fuga do preso).",
+        "evidence": [
+          "src_f2b9e027898b482e",
+          "src_227a91a9a2a64eb2"
+        ],
+        "perspective": "voto_divergente",
+        "origin_perspective": "recorrente"
+      }
+    ],
+    "targets": [
+      "LeReCa_FugaPreso_MorteVitima",
+      "LeReCa_PresoRegFech_MorteVitima",
+      "LeReCa_Latrocinio_MorteVitima"
+    ],
+    "duty_basis_pt": "Art. 37, § 6º, da Constituição Federal. A controvérsia central foi sobre a natureza do dever do Estado: o relator e o recorrido sustentaram um dever específico de custódia do preso em regime fechado, enquanto a tese vencedora (voto divergente e posição final) entendeu que, pelo lapso temporal e modo de execução do novo crime, o dever se tornou genérico de segurança pública, o que rompeu o nexo causal.",
+    "relevance": [
+      {
+        "target": "LeReCa_FugaPreso_MorteVitima",
+        "justified": false,
+        "blocked_by": [
+          {
+            "undercut_rule": "cf2lrc_FugaPreso",
+            "attacker": "A15",
+            "attacker_rules": [
+              "sc_FugaPreso",
+              "suca_Latrocinio"
+            ],
+            "scheme": "sc",
+            "scheme_pt": "Causa superveniente (regra 4): um evento posterior interrompe o nexo de relevância jurídica."
+          },
+          {
+            "undercut_rule": "cf2lrc_FugaPreso",
+            "attacker": "A13",
+            "attacker_rules": [
+              "unom_FugaPreso"
+            ],
+            "scheme": "unom",
+            "scheme_pt": "Omissão sem dever de agir (regra 8): a conduta omitida não era juridicamente obrigatória."
+          }
+        ]
+      },
+      {
+        "target": "LeReCa_PresoRegFech_MorteVitima",
+        "justified": true,
+        "blocked_by": []
+      },
+      {
+        "target": "LeReCa_Latrocinio_MorteVitima",
+        "justified": true,
+        "blocked_by": []
+      }
+    ]
+  },
+  "open_questions": [
+    "O voto convergente de Edson Fachin introduziu a questão do ônus da prova, afirmando que o Estado não demonstrou ter tomado as medidas cabíveis para evitar a fuga nem que a falha resultou de fato de terceiro. Os demais votos não enfrentaram diretamente essa questão, que parece ter sido superada pela tese vencedora focada no rompimento do nexo causal pelo lapso temporal e modo de execução do crime."
+  ],
+  "modelling_notes_pt": "A principal decisão de modelagem foi separar a causalidade fática (esta camada) da imputação jurídica (estágio 4). A tese vencedora do STF, de que o lapso temporal e a formação de quadrilha rompem o nexo causal por 'fato de terceiro', foi tratada como um argumento de imputação. Por isso, a cadeia causal do recorrido (r0, r1) permanece de pé aqui, e os átomos 'CrimeApos3M' e 'FormacaoQuad' são premissas inertes nesta camada, destinadas a fundamentar os esquemas de argumento do estágio 4. O átomo 'DeverGener' foi excluído das premissas por ter a mesma função. Para corrigir o erro de que o resultado não era derivado, os átomos 'ProvaMedidas' e 'PrvFatoTerc' foram removidos das premissas. Embora o catálogo os marque como estabelecidos, o dossiê (voto de Fachin) indica que a decisão se baseou na *ausência* de prova pelo Estado. Manter esses átomos como premissas ativava os ataques (r2, r3) que indevidamente derrotavam a cadeia causal fática nesta camada.",
+  "provenance": {
+    "run_id": "20260828-173601",
+    "created_at": "2026-08-28T17:40:00",
+    "model": "gemini-2.5-pro",
+    "prompts": [
+      {
+        "stage": "atoms",
+        "path": "prompts/formalize/01_atoms.v2.md",
+        "sha256": "e6105055a6eb4768112d3a5b9e8855f00acc24dbcd2c96ddf04870c4ff783caf",
+        "model": "gemini-2.5-pro"
+      },
+      {
+        "stage": "rules",
+        "path": "prompts/formalize/02_rules.v2.md",
+        "sha256": "03c38598f11853f0605c441d7f9bce775accbc1187bdc0bb4070bf58d398b4b7",
+        "model": "gemini-2.5-pro"
+      },
+      {
+        "stage": "queries",
+        "path": "prompts/formalize/03_queries.v2.md",
+        "sha256": "ed6684c4ecdde0afc32d0c290ee89126336449be55209ec59505dc5232a42cc2",
+        "model": "gemini-2.5-pro"
+      },
+      {
+        "stage": "lrc",
+        "path": "prompts/formalize/04_lrc.v3.md",
+        "sha256": "f0235bac158412b5a8d5335df59b48862f80c01c12b0f7f40a098e8821be5193",
+        "model": "gemini-2.5-pro"
+      }
+    ],
+    "pipeline_version": "1.0"
+  }
+}

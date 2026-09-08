@@ -1,12 +1,10 @@
-"""Pins the `expect_ness` / `expect_cause` / `expect_but_for` fields on every
-`CausalQuery` in `aspic.examples.LEGAL_CASES` to what the solver actually
-computes -- these fields are what `scripts/generate_graphs.py` renders in
-each case's causal-comparison table, so they must never silently drift from
-reality."""
+"""Pins the `expect_ness` / `expect_but_for` fields on every `CausalQuery` in
+`aspic.examples.LEGAL_CASES` to what the solver actually computes -- these
+fields are what `scripts/generate_graphs.py` renders in each case's
+causal-comparison table, so they must never silently drift from reality."""
 import pytest
 
 from aspic.examples import LEGAL_CASES
-from aspic.ness import is_ness_cause
 from aspic.solver import ArgumentationFramework
 
 CASES_AND_QUERIES = [
@@ -21,6 +19,5 @@ CASES_AND_QUERIES = [
 def test_causal_query_expectations_match_solver(case, query):
     af = ArgumentationFramework(case.knowledge_base, case.causal_model)
 
-    assert is_ness_cause(af, query.phi, query.psi) is query.expect_ness
-    assert af.is_cause(query.phi, query.psi) is query.expect_cause
+    assert af.ness_cause(query.phi, query.psi) is query.expect_ness
     assert af.but_for(query.phi, query.psi) is query.expect_but_for

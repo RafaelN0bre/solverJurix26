@@ -1,0 +1,476 @@
+# prompts/formalize/03_queries.v1.md (v1, sha caa296035688)
+# config: {'model': 'gemini-2.5-pro', 'temperature': 0}
+
+Você é um especialista em lógica jurídica. O framework de argumentação do caso
+já está construído. Sua tarefa é definir **quais perguntas causais devem ser
+feitas ao solver** e registrar **o que a corte decidiu sobre cada uma**.
+
+Uma pergunta causal é um par (φ, ψ): "φ é causa de ψ?". O solver responderá
+sozinho, por três testes distintos (NESS, causa de fato da Definição 4.3, e
+"não fosse por" da Definição 3.5). **Você não deve prever nem sugerir a
+resposta do solver** — o valor deste trabalho está justamente em comparar,
+depois, o veredito do solver com o veredito da corte.
+
+## Quais pares incluir
+
+- Uma pergunta para cada causa candidata que o dossiê registra, em qualquer
+  perspectiva, tendo como ψ o átomo de resultado.
+- Uma pergunta para cada causa juridicamente relevante alegada (inclusive as
+  rejeitadas pela corte).
+- Se uma causa candidata é uma omissão, φ é o literal **negativo** (`¬AtdTemp`),
+  não o positivo.
+- Não invente pares que o dossiê não discute.
+
+## Campos
+
+- `phi`, `psi`: literais, exatamente como aparecem no catálogo (com `¬` quando
+  for o caso). Nada de códigos novos.
+- `question_pt`: a pergunta em português claro, para leigo. Ex.: "A demora no
+  atendimento médico foi causa das sequelas irreversíveis?"
+- `court_verdict`, lido do dossiê e **só** do dossiê:
+  - `acolhida` — a corte reconheceu essa relação causal;
+  - `rejeitada` — a corte a afastou (aparece entre as causas ou relações
+    rejeitadas, ou a conclusão vencedora a nega);
+  - `nao_decidida` — o dossiê registra a questão como não decidida, ou não há
+    registro do que a corte fez com ela.
+- `court_rationale_pt`: em uma ou duas frases, **a razão de decidir da corte**
+  sobre esse par, em português claro. Este texto aparece na interface como a
+  coluna "Por quê" — escreva-o como explicação para um leitor não jurista.
+- `evidence`: ids `src_…` que sustentam o veredito registrado.
+
+## Átomos
+
+«saída do estágio anterior (preenchida na execução real)»
+
+## Framework já construído
+
+«saída do estágio anterior (preenchida na execução real)»
+
+Átomo de resultado: `«resultado»`
+
+## Dossiê
+
+# Dossiê — Caso 003 (`case-003`)
+
+Anotador: `izabela-melo` · Sessão: `evaluation-round-01`
+
+## Síntese do caso  `synth_e5a3b70e55fe4afd`
+
+**Questão central**: O Estado é responsável pela morte de pessoa vítima de crime praticado por detento foragido, com formação de quadrilha, após 3 meses da fuga?
+
+**Premissas incontroversas afastadas**
+
+Fuga
+Danos
+Responsabilidade objetiva do Estado por omissão (não é subjetiva)
+
+**Premissas incontroversas acolhidas**
+
+Fuga
+Danos
+Responsabilidade objetiva do Estado por omissão (não é subjetiva)
+
+**Premissas controvertidas**
+
+Fuga causa a morte.
+Crime praticado por preso foragido, com formação de quadrilha, após 3 meses da fuga causa a morte.
+O dever jurídico específico é de custódia.
+O dever jurídico genérico é de segurança pública.
+Não há fato de terceiro que interrompe o nexo casual.
+Há fato de terceiro que interrompe o nexo causal.
+
+**Premissas derrotadas**
+
+Fuga causa morte.
+O dever jurídico específico é de custódia.
+Não há fato de terceiro que interrompe o nexo casual.
+
+**Premissas vencedoras**
+
+Crime praticado por preso foragido, com formação de quadrilha, após 3 meses da fuga causa a morte.
+O dever jurídico genérico é de segurança pública.
+Há fato de terceiro que interrompe o nexo causal.
+
+**Questões não decididas**: O voto convergente com fundamento próprio decide que o Estado não demonstrou fato de terceiro ou adoção de medidas cabíveis e esperáveis para evitar a fuga. Os demais votos não atacaram esse argumento e essa questão não foi decidida. Conclui que foi superada pelo voto divergente.
+
+## Reconstrução por perspectiva
+
+### Recorrente  `prec_fde2d7ddb4e94671` (`recorrente`)
+
+**Posição defendida** _(evidência: `src_ef2c1e974e7a4f19`, `src_2cc2964892904cf2`, `src_aa174d74858e40d2`)_: O Estado não responde por crime praticado por preso foragido depois de 3 meses porque houve ruptura do nexo causal entre a fuga e a morte de Vilson Lebtag.
+
+**Fatos relevantes** _(evidência: `src_ef2c1e974e7a4f19`, `src_2cc2964892904cf2`, `src_aa174d74858e40d2`)_
+
+- O crime foi praticado depois de 3 meses da fuga.
+- {'text': 'A morte foi causada por ato de terceiro.', 'is_damage': True}
+
+**Causas candidatas** _(evidência: `src_2cc2964892904cf2`)_: Crime praticado depois de 3 meses da fuga
+
+**Fundamento normativo (dever jurídico de agir)**: Art. 37, § 6º, CF
+
+**Relações causais afirmadas**: O crime praticado após 3 meses da fuga de preso causou a morte de Vilson Lebtag.
+
+**Causas juridicamente relevantes** _(evidência: `src_2cc2964892904cf2`)_: Fato de terceiro
+
+### Recorrido  `prec_39510acdcfd949af` (`recorrido`)
+
+**Posição defendida** _(evidência: `src_e18ee49b97864ccf`)_: O Estado é responsável por omissão no dever de custódia de detento, que foragido praticou novo crime, causando a morte de Vilson Lebtag.
+
+**Fatos relevantes** _(evidência: `src_4621720adee3413a`, `src_a94058bbcc74469d`, `src_5227f184e55d476b`, `src_d27a4d0db9954fe8`)_
+
+- A fuga aconteceu por omissão no dever de custódia.
+- Houve negligência no emprego de medidas de segurança do preso.
+- {'text': 'Danos morais, materiais e morte de Vilson Lebtag.', 'is_damage': True}
+
+**Causas candidatas** _(evidência: `src_3bfb96a17abe4056`)_: Fuga
+
+**Causas juridicamente relevantes** _(evidência: `src_4621720adee3413a`, `src_a94058bbcc74469d`)_
+
+Omissão no dever de custódia (dever de agir específico)
+Negligência no emprego de medidas de segurança (fuga)
+
+**Relações causais afirmadas** _(evidência: `src_e18ee49b97864ccf`, `src_d27a4d0db9954fe8`)_: A fuga por omissão no dever de custódia do Estado propiciou a prática de crime  de preso foragido, que causou a morte de Vilson Lebtag.
+
+### Relator — Marco Aurélio  `prec_162ff6b502734337` (`relator`)
+
+**Causas candidatas** _(evidência: `src_ccf4186c2eb141b5`)_: Fuga
+
+**Causas candidatas rejeitadas** _(evidência: `src_463968192f4c4384`)_: Prática de crime depois de 3 meses da fuga é fato de terceiro
+
+**Causas juridicamente relevantes** _(evidência: `src_c9ac4600e7a84a96`, `src_089cd1c5adec4b47`)_
+
+Omissão do Estado em manter custódia do preso que cumpria pena em regime fechado (dever específico de custódia)
+Se o preso estivesse em regime semiaberto não haveria nexo causal (dever geral de segurança pública)
+
+**Relações causais rejeitadas**: Prática de crime após 3 meses da fuga rompe o nexo causal por fato de terceiro.
+
+**Relações causais afirmadas** _(evidência: `src_7adf43487cee456e`, `src_c9ac4600e7a84a96`)_: A fuga de preso foragido, por omissão do Estado, que pratica novo crime, é a causa da morte de pessoa.
+
+**Fatos relevantes** _(evidência: `src_a5b5c7f3a9ca4d80`, `src_9e33430b21a74c8b`, `src_5a45e1abb79749ea`, `src_4de553dc86c34273`, `src_a6dcf06f364e4214`, `src_7adf43487cee456e`, `src_56def219848a4a51`, `src_4194a0f3e6714188`, `src_ccf4186c2eb141b5`, `src_c9ac4600e7a84a96`, `src_463968192f4c4384`)_
+
+- {'text': 'Chefe de família, de 45 anos, foi vítima de roubo seguido de morte, em sua residência, quando criminosos invadiram o local e anunciaram o assalto.', 'is_damage': True}
+- Detento descumpriu as regras do regime semiaberto.
+- Detento sofreu regressão de regime (do semiaberto para o fechado)
+- Detento estava em regime fechado à época da prática do crime (latrocínio)
+- Alta periculosidade do detento.
+- {'text': 'Detento fugiu e praticou roubo, resultando a morte.', 'is_damage': True}
+- {'text': 'Há nexo causal entre a fuga e a morte', 'is_damage': True}
+- {'text': 'O fato terceiro não exclui o nexo causal entre a fuga e a morte.', 'is_damage': True}
+
+**Razões da rejeição** _(evidência: `src_56def219848a4a51`, `src_463968192f4c4384`)_: Não há argumentação jurídica. Uso de retórica "salta aos olhos"; "óptica impossível".
+
+**Conclusão**: RE improvido
+
+### Posição final da corte  `prec_f58cd2a8038a4f48` (`stf_final`)
+
+**Causas candidatas rejeitadas**: Fuga
+
+**Causas juridicamente relevantes**: Fato de terceiro
+
+**Causas juridicamente relevantes rejeitadas**: Omissão do dever de custódia
+
+**Relações causais afirmadas**: Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga, é causa da morte.
+
+**Questões não decididas**: Ônus da prova do voto convergente com fundamento próprio
+
+**Relações causais rejeitadas**: A fuga por omissão do dever de custódia causou a morte de pessoa.
+
+**Conclusão** _(evidência: `src_31ffb634f9e04aa5`)_: Fixada Tese (Tema 362).
+
+**Causas candidatas**: Crime praticado por preso foragido com formação de quadrilha após 3 meses da fuga.
+
+### convergente — Edson Fachin  `prec_422650345ecf4faa` (`convergente`)
+
+**Conclusão** _(evidência: `src_7ef2705ff3fc4077`)_: RE improvido.
+
+**Fundamento próprio** _(evidência: `src_d4430da819554298`, `src_76a8c74c50704dbb`, `src_e989b7ae0fad42d3`, `src_7bc6e39b968c4b50`, `src_e78c7d363e2f4c61`, `src_72ea31d850704795`)_
+
+1. A fuga causou a morte (dever específico de custódia)
+2. O Estado não demonstrou que adotou medidas cabíveis e esperáveis para evitar a fuga (ônus da prova)
+3. O Estado não demonstrou porque a falha do dever de custódia resultou de fato de terceiro (ônus da prova).
+
+**Causas candidatas** _(evidência: `src_b98f2c4331034f79`)_: Fuga
+
+**Causas juridicamente relevantes** _(evidência: `src_7bc6e39b968c4b50`, `src_e78c7d363e2f4c61`, `src_72ea31d850704795`)_
+
+Omissão no dever de custódia.
+Ausência de prova de omissão do dever de custódia resultou de fato de terceiro.
+Ausência de prova da adoção de medidas cabíveis e esperáveis.
+
+**Relações causais afirmadas** _(evidência: `src_03d379dcbe9d4160`)_: A fuga por omissão no dever de custódia de detento, que praticou crime, causou a morte de pessoa.
+
+**Ponto de aproximação** _(evidência: `src_089cd1c5adec4b47`, `src_a47cb28b16b14a81`, `src_72ea31d850704795`)_: Reconhecimento da causa candidata (fuga) e a causa juridicamente relevante (falha no dever específico de custódia do Estado) como geradoras da responsabilidade objetiva do Estado por omissão.
+
+**Ponto de distinção** _(evidência: `src_7bc6e39b968c4b50`, `src_e78c7d363e2f4c61`, `src_72ea31d850704795`)_: O Ministro Edson Fachin analisou e decidiu sobre a distribuição do ônus da prova: porque o Estado não demonstrou que a falha no dever de custódia resultou de fato de terceiro e porque o Estado não demonstrou que adotou as medidas cabíveis e esperáveis para evitar a fuga, concluiu que houve falha no dever específico de custódia.
+
+### divergente — Alexandre de Moraes  `prec_9a3da3e5a15749f4` (`divergente`)
+
+**Conclusão** _(evidência: `src_6cd586b519fb4b8b`)_: RE provido.
+
+**Fundamentos** _(evidência: `src_a30a80e07114404d`, `src_6a17d44cbc3d44d9`, `src_83aefba652654af9`, `src_f2b9e027898b482e`, `src_05026afa6a9d4e08`)_
+
+1. A prática de crime após 3 meses da fuga com formação de quadrilha interrompe o nexo causal entre a fuga e a morte e inicia nova cadeia causal.
+2. O dever de agir do Estado é genérico (dever de segurança pública).
+3. Fato de terceiro (latrocínio praticado por quadrilha) causa a morte.
+
+**Causas candidatas** _(evidência: `src_f2b9e027898b482e`)_: Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga.
+
+**Causas juridicamente relevantes** _(evidência: `src_b08f1a1374b84354`)_: Fato de terceiro
+
+**Relações causais afirmadas** _(evidência: `src_f2b9e027898b482e`)_: Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga, é causa da morte.
+
+**Ponto de divergência** _(evidência: `src_f2b9e027898b482e`, `src_05026afa6a9d4e08`)_: Causa candidata (prática de crime em quadrilha após 3 meses da fuga - fato de terceiro) e Causa Juridicamente Relevante (dever genérico de agir do Estado).
+
+**Razão da divergência** _(evidência: `src_78a567cf58524873`, `src_227a91a9a2a64eb2`)_
+
+Fato
+Nexo causal
+
+**Argumentos enfrentados**
+
+1. Fuga (Causa candidata)
+2. Dever específico de custódia (Causa Juridicamente Relevante)
+3. Rompimento da relação causal por fato de terceiro (Nexo causal)
+
+## Divergências
+
+### D1 — O dever jurídico de agir é genérico de segurança pública e não específico de custódia.  `divg_bf34619f430e4838`
+
+**Lados**
+
+- {'perspective_id': 'prec_162ff6b502734337', 'perspective_label': 'Relator — Marco Aurélio', 'support': 'O dever jurídico é específico porque o preso foragido cumpria pena em regime fechado.'}
+- {'perspective_id': 'prec_422650345ecf4faa', 'perspective_label': 'Voto convergente com fundamento próprio — Edson Fachin', 'support': 'O dever jurídico é específico porque o preso foragido cumpria pena em regime fechado.'}
+- {'perspective_id': 'prec_9a3da3e5a15749f4', 'perspective_label': 'Voto divergente — Alexandre de Moraes', 'support': 'Após 3 meses de fuga e formação de quadrilha, o dever jurídico passa a ser genérico de segurança pública.'}
+- {'perspective_id': 'prec_f58cd2a8038a4f48', 'perspective_label': 'STF - posição final', 'support': 'Após 3 meses de fuga e formação de quadrilha, o dever jurídico passa a ser genérico de segurança pública.'}
+- {'perspective_id': 'prec_39510acdcfd949af', 'perspective_label': 'Recorrido', 'support': 'O dever jurídico é específico de custódia.'}
+
+**Perspectiva 1**: Relator — Marco Aurélio
+
+**Perspectiva 2**: Voto convergente com fundamento próprio — Edson Fachin
+
+**Apoio da perspectiva 1**: O dever jurídico é específico porque o preso foragido cumpria pena em regime fechado.
+
+**Apoio da perspectiva 2**: O dever jurídico é específico porque o preso foragido cumpria pena em regime fechado.
+
+**Origem**: livre
+
+### D2 — A causa da morte é o crime praticado por preso foragido com formação de quadrilha após 3 meses e não a fuga por omissão no dever de custódia.  `divg_6ae0d94b953e43e3`
+
+**Lados**
+
+- {'perspective_id': 'prec_39510acdcfd949af', 'perspective_label': 'Recorrido', 'support': 'A causa da morte é a fuga por omissão no dever de custódia.'}
+- {'perspective_id': 'prec_fde2d7ddb4e94671', 'perspective_label': 'Recorrente', 'support': 'A causa da morte é a prática de crime após 3 meses da fuga (fato de terceiro).'}
+- {'perspective_id': 'prec_162ff6b502734337', 'perspective_label': 'Relator — Marco Aurélio', 'support': 'A causa da morte é a fuga por omissão no dever de custódia.'}
+- {'perspective_id': 'prec_422650345ecf4faa', 'perspective_label': 'Voto convergente com fundamento próprio — Edson Fachin', 'support': 'A causa da morte é a fuga por omissão no dever de custódia.\nO lapso temporal de 3 meses, por si só, não interrompe o nexo causal.'}
+- {'perspective_id': 'prec_9a3da3e5a15749f4', 'perspective_label': 'Voto divergente — Alexandre de Moraes', 'support': 'A causa da morte é a prática de crime com formação de quadrilha após 3 meses da fuga (fato de terceiro).'}
+- {'perspective_id': 'prec_f58cd2a8038a4f48', 'perspective_label': 'STF - posição final', 'support': 'A causa da morte é a prática de crime com formação de quadrilha após 3 meses da fuga (fato de terceiro).'}
+
+**Perspectiva 1**: Recorrido
+
+**Perspectiva 2**: Recorrente
+
+**Apoio da perspectiva 1**: A causa da morte é a fuga por omissão no dever de custódia.
+
+**Apoio da perspectiva 2**: A causa da morte é a prática de crime após 3 meses da fuga (fato de terceiro).
+
+**Origem**: livre
+
+## Unidades causais
+
+### U1 — Fuga  `unit_22e8dca47d4045f6`
+
+**Resultado**: Materiais, morais e morte
+
+**Causa juridicamente relevante**: Omissão do Estado em manter custódia do preso que cumpria pena em regime fechado (dever específico de custódia)
+
+**Relação causal**: A fuga de preso foragido, por omissão do Estado, que pratica novo crime, é a causa da morte de pessoa.
+
+**Conclusão sustentada**: O Estado responde pela morte praticada por preso foragido por omissão no dever específico de custódia.
+
+**Perspectiva de origem**
+
+Recorrido
+Voto convergente com fundamento próprio
+
+**Status no julgamento**: Rejeitada
+
+**Origem**: derivada
+
+**Origin refs**
+
+- {'perspective_id': 'prec_162ff6b502734337', 'perspective_type': 'relator', 'perspective_label': 'Relator — Marco Aurélio', 'field_key': 'causas_candidatas', 'field_label': 'Causas candidatas consideradas', 'entry': 'Fuga', 'slot': 'candidate_cause'}
+- {'perspective_id': 'prec_162ff6b502734337', 'perspective_type': 'relator', 'perspective_label': 'Relator — Marco Aurélio', 'field_key': 'causas_juridicamente_relevantes', 'field_label': 'Causas juridicamente relevantes consideradas', 'entry': 'Omissão do Estado em manter custódia do preso que cumpria pena em regime fechado (dever específico de custódia)', 'slot': 'legally_relevant_cause'}
+- {'perspective_id': 'prec_162ff6b502734337', 'perspective_type': 'relator', 'perspective_label': 'Relator — Marco Aurélio', 'field_key': 'relacoes_causais', 'field_label': 'Relações causais consideradas', 'entry': 'A fuga de preso foragido, por omissão do Estado, que pratica novo crime, é a causa da morte de pessoa.', 'slot': 'causal_relation'}
+
+### U2 — Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga.  `unit_4d500f0cde7c491e`
+
+**Resultado**: Morais, materiais e morte.
+
+**Causa juridicamente relevante**: Fato de terceiro
+
+**Relação causal**: Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga, é causa da morte.
+
+**Conclusão sustentada**: O Estado não responde pela morte de pessoa praticada por preso foragido após 3 meses da fuga e com formação de quadrilha porque o nexo causal é interrompido.
+
+**Perspectiva de origem**: STF - Posição final
+
+**Status no julgamento**: Acolhida.
+
+**Origem**: derivada
+
+**Origin refs**
+
+- {'perspective_id': 'prec_9a3da3e5a15749f4', 'perspective_type': 'divergente', 'perspective_label': 'Voto divergente — Alexandre de Moraes', 'field_key': 'causas_candidatas', 'field_label': 'Causas candidatas consideradas', 'entry': 'Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga.', 'slot': 'candidate_cause'}
+- {'perspective_id': 'prec_9a3da3e5a15749f4', 'perspective_type': 'divergente', 'perspective_label': 'Voto divergente — Alexandre de Moraes', 'field_key': 'causas_juridicamente_relevantes', 'field_label': 'Causa juridicamente relevante considerada', 'entry': 'Fato de terceiro', 'slot': 'legally_relevant_cause'}
+- {'perspective_id': 'prec_9a3da3e5a15749f4', 'perspective_type': 'divergente', 'perspective_label': 'Voto divergente — Alexandre de Moraes', 'field_key': 'relacoes_causais', 'field_label': 'Relação causal considerada', 'entry': 'Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga, é causa da morte.', 'slot': 'causal_relation'}
+
+### U3 — Crime praticado depois de 3 meses da fuga  `unit_3b5cd0d3aee1479e`
+
+**Resultado**: Morais, materiais e morte.
+
+**Causa juridicamente relevante**: Fato de terceiro
+
+**Relação causal**: O crime praticado após 3 meses da fuga de preso causou a morte de Vilson Lebtag.
+
+**Conclusão sustentada**: O Estado não responde pela morte de pessoa praticada por preso foragido após 3 meses da fuga porque houve ruptura do nexo causal.
+
+**Perspectiva de origem**
+
+Recorrente
+Voto divergente
+STF - posição final
+
+**Status no julgamento**: Acolhida.
+
+**Origem**: derivada
+
+**Origin refs**
+
+- {'perspective_id': 'prec_fde2d7ddb4e94671', 'perspective_type': 'recorrente', 'perspective_label': 'Recorrente', 'field_key': 'causas_candidatas', 'field_label': 'Causas candidatas contestadas', 'entry': 'Crime praticado depois de 3 meses da fuga', 'slot': 'candidate_cause'}
+- {'perspective_id': 'prec_fde2d7ddb4e94671', 'perspective_type': 'recorrente', 'perspective_label': 'Recorrente', 'field_key': 'causas_juridicamente_relevantes', 'field_label': 'Causas juridicamente relevantes contestadas', 'entry': 'Fato de terceiro', 'slot': 'legally_relevant_cause'}
+- {'perspective_id': 'prec_fde2d7ddb4e94671', 'perspective_type': 'recorrente', 'perspective_label': 'Recorrente', 'field_key': 'relacoes_causais', 'field_label': 'Relações causais contestadas', 'entry': 'O crime praticado após 3 meses da fuga de preso causou a morte de Vilson Lebtag.', 'slot': 'causal_relation'}
+
+### U4 — Fuga  `unit_d5df39b851574b26`
+
+**Resultado**: Morais, materiais e morte.
+
+**Causa juridicamente relevante**: Omissão no dever de custódia.
+
+**Relação causal**: A fuga por omissão no dever de custódia de detento, que praticou crime, causou a morte de pessoa.
+
+**Conclusão sustentada**: O Estado responde pela morte de pessoa praticada por preso foragido por omissão no dever específico de custódia.
+
+**Perspectiva de origem**
+
+Recorrido
+Relator
+
+**Status no julgamento**: Rejeitada.
+
+**Origem**: derivada
+
+**Origin refs**
+
+- {'perspective_id': 'prec_422650345ecf4faa', 'perspective_type': 'convergente', 'perspective_label': 'Voto convergente com fundamento próprio — Edson Fachin', 'field_key': 'causas_candidatas', 'field_label': 'Causas candidatas consideradas', 'entry': 'Fuga', 'slot': 'candidate_cause'}
+- {'perspective_id': 'prec_422650345ecf4faa', 'perspective_type': 'convergente', 'perspective_label': 'Voto convergente com fundamento próprio — Edson Fachin', 'field_key': 'causas_juridicamente_relevantes', 'field_label': 'Causa juridicamente relevante considerada', 'entry': 'Omissão no dever de custódia.', 'slot': 'legally_relevant_cause'}
+- {'perspective_id': 'prec_422650345ecf4faa', 'perspective_type': 'convergente', 'perspective_label': 'Voto convergente com fundamento próprio — Edson Fachin', 'field_key': 'relacoes_causais', 'field_label': 'Relação causal considerada', 'entry': 'A fuga por omissão no dever de custódia de detento, que praticou crime, causou a morte de pessoa.', 'slot': 'causal_relation'}
+
+### U5 — Crime praticado por preso foragido com formação de quadrilha após 3 meses da fuga.  `unit_c2d2a7bbe62647bc`
+
+**Resultado**: Morais, materiais e morte.
+
+**Causa juridicamente relevante**: Fato de terceiro
+
+**Relação causal**: Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga, é causa da morte.
+
+**Conclusão sustentada**: O Estado não responde pela morte de pessoa praticada por preso foragido com formação de quadrilha e após 3 meses da fuga porque houve rompimento do nexo causal.
+
+**Perspectiva de origem**
+
+Recorrente
+Voto divergente
+STF - posição final
+
+**Status no julgamento**: Acolhida
+
+**Origem**: derivada
+
+**Origin refs**
+
+- {'perspective_id': 'prec_f58cd2a8038a4f48', 'perspective_type': 'stf_final', 'perspective_label': 'STF - posição final', 'field_key': 'causas_candidatas', 'field_label': 'Causas candidatas reconhecidas', 'entry': 'Crime praticado por preso foragido com formação de quadrilha após 3 meses da fuga.', 'slot': 'candidate_cause'}
+- {'perspective_id': 'prec_f58cd2a8038a4f48', 'perspective_type': 'stf_final', 'perspective_label': 'STF - posição final', 'field_key': 'causas_juridicamente_relevantes', 'field_label': 'Causas juridicamente relevantes reconhecidas', 'entry': 'Fato de terceiro', 'slot': 'legally_relevant_cause'}
+- {'perspective_id': 'prec_f58cd2a8038a4f48', 'perspective_type': 'stf_final', 'perspective_label': 'STF - posição final', 'field_key': 'relacoes_causais', 'field_label': 'Relações causais reconhecidas', 'entry': 'Crime praticado por preso foragido com formação de quadrilha, após 3 meses da fuga, é causa da morte.', 'slot': 'causal_relation'}
+
+### U6 — Fuga  `unit_bd0d5b84cc5e4544`
+
+**Resultado**: Morais, materiais e morte.
+
+**Causa juridicamente relevante**: Omissão no dever de custódia (dever de agir específico)
+
+**Relação causal**: A fuga por omissão no dever de custódia do Estado propiciou a prática de crime  de preso foragido, que causou a morte de Vilson Lebtag.
+
+**Conclusão sustentada**: O Estado responde pela morte de pessoa praticada por preso foragido por omissão no dever específico de custódia.
+
+**Perspectiva de origem**
+
+Recorrido
+Relator
+Voto convergente com fundamento próprio
+Voto Carmen Lúcia
+Voto Rosa Weber
+
+**Status no julgamento**: Rejeitada.
+
+**Origem**: derivada
+
+**Origin refs**
+
+- {'perspective_id': 'prec_39510acdcfd949af', 'perspective_type': 'recorrido', 'perspective_label': 'Recorrido', 'field_key': 'causas_candidatas', 'field_label': 'Causas candidatas afirmadas', 'entry': 'Fuga', 'slot': 'candidate_cause'}
+- {'perspective_id': 'prec_39510acdcfd949af', 'perspective_type': 'recorrido', 'perspective_label': 'Recorrido', 'field_key': 'causas_juridicamente_relevantes', 'field_label': 'Causas juridicamente relevantes afirmadas', 'entry': 'Omissão no dever de custódia (dever de agir específico)', 'slot': 'legally_relevant_cause'}
+- {'perspective_id': 'prec_39510acdcfd949af', 'perspective_type': 'recorrido', 'perspective_label': 'Recorrido', 'field_key': 'relacoes_causais', 'field_label': 'Relações causais afirmadas', 'entry': 'A fuga por omissão no dever de custódia do Estado propiciou a prática de crime  de preso foragido, que causou a morte de Vilson Lebtag.', 'slot': 'causal_relation'}
+
+## Passagens de origem (cite pelo id)
+
+Trechos literais do acórdão. Use estes ids no campo `evidence`.
+
+- `src_4621720adee3413a` (p. 4): “a omissão na vigilância implica a responsabilidade objetiva do Estado. Enfatizou a incumbência de manter-se a custódia”
+- `src_a94058bbcc74469d` (p. 4): “negligência da Administração Pública no emprego de medidas de segurança carcerária”
+- `src_d27a4d0db9954fe8` (p. 4): “dever de indenizar a família da vítima pelos danos materiais e morais.”
+- `src_e18ee49b97864ccf` (p. 4): “ente federativo responsável ante morte por ato de detento que, cumprindo pena em regime fechado, empreendeu fuga”
+- `src_3bfb96a17abe4056` (p. 5): “detento descumpriu as regras do regime semiaberto de cumprimento de pena, tendo fugido e delinquido, demonstrados o dano, bem como o fato administrativo e o nexo de causalidade, referindo-se à conduta omissiva do Estado que deixou de exercer vigilância de preso sob sua custódia”
+- `src_5227f184e55d476b` (p. 5): “impõe a sua condenação ao pagamento de indenização por danos morais, materiais e pensão”
+- `src_ef2c1e974e7a4f19` (p. 5): “nexistir liame entre a fuga do apenado e o ato”
+- `src_2cc2964892904cf2` (p. 6): “evadiu do presídio em 10 de novembro de 1999, e, depois de transcorridos três meses – em 28 de fevereiro de 2000 –, praticou o crime”
+- `src_aa174d74858e40d2` (p. 6): “o Estado não é responsável por ato de terceiro”
+- `src_4de553dc86c34273` (p. 9): “Estava ele preso em regime fechado”
+- `src_5a45e1abb79749ea` (p. 9): “cometeu novo delito, sendo preso novamente; em março de 1999, o juiz concedeu a comutação da pena pelo Decreto de 1998, sendo que regrediu de regime”
+- `src_9e33430b21a74c8b` (p. 9): “recapturado em 25-6- 1998; em 4-8-1998, foi colocado no regime semiaberto, devendo pernoitar na Depol;”
+- `src_a5b5c7f3a9ca4d80` (p. 9): “um chefe de família, contando 45 anos de idade, veio a ser vítima de roubo seguido de morte, configurada a figura do latrocínio. Encontrava-se na residência, com a família, quando criminosos encapuzados e armados invadiram o local, anunciando o assalto. Dispararam tiros contra a vítima e subtraíram valor em espécie e talão de cheque. A vítima, mortalmente ferida, foi conduzida por terceiros ao hospital, não resistindo aos ferimentos.”
+- `src_a6dcf06f364e4214` (p. 9): “cometimento de novo crime, mais grave do que os anteriores, fato a ressaltar a periculosidade”
+- `src_089cd1c5adec4b47` (p. 10): “Não se trata de saída do presídio, considerado o regime semiaberto, quando, então, inexistente seria o nexo de causalidade”
+- `src_4194a0f3e6714188` (p. 10): “Falhou, em ato de serviço”
+- `src_463968192f4c4384` (p. 10): “óptica impossível de conceber-se como respaldada na ordem jurídica – a existência de ato de terceiro”
+- `src_56def219848a4a51` (p. 10): “Salta aos olhos o nexo de causalidade”
+- `src_7adf43487cee456e` (p. 10): “Havendo empreendido fuga, veio o detento a incidir em nova prática criminosa, resultando, do assalto, do roubo implementado, a morte de cidadão chefe de família”
+- `src_c9ac4600e7a84a96` (p. 10): “A causa remota do dano, indireta, está na omissão do Estado, no que lhe cabe a manutenção da custódia de preso a cumprir pena em regime fechado”
+- `src_ccf4186c2eb141b5` (p. 10): “Eis a origem da responsabilidade. Salta aos olhos o nexo de causalidade”
+- `src_76a8c74c50704dbb` (p. 12): “manter o condenado especificamente segregado do convívio social”
+- `src_d4430da819554298` (p. 12): “dever estatal específico de,”
+- `src_e989b7ae0fad42d3` (p. 15): “cautelas necessárias e indispensáveis para evitar o dano”
+- `src_a47cb28b16b14a81` (p. 17): “a responsabilidade civil objetiva do Estado diante de omissão própria em face do dever de manter segregado em regime fechad”
+- `src_b98f2c4331034f79` (p. 17): “No presente caso, porém, trata-se de nítida hipótese de omissão própria, tendo em vista que o Estado ao chamar para si a persecução penal e, por conseguinte, a aplicação da pena privativa de liberdade a ser cumprida em regime fechad”
+- `src_03d379dcbe9d4160` (p. 19): “o Estado pode ser objetivamente responsabilizado por dano decorrente de crime praticado por preso foragido que cumpria pena em regime fechado (art. 5º, XLVI, a, primeira parte, CRFB; art. 32, I, CP) por inobservância do seu dever específico de manter o condenado devidamente segregado do convívio social”
+- `src_72ea31d850704795` (p. 19): “há que prevalecer a compreensão de que houve uma falha estatal de seu dever próprio e específico de manter condenado devidamente custodiado”
+- `src_7bc6e39b968c4b50` (p. 19): “o Estado não demonstrou o porque seu dever, próprio e específico, de manter a segregação do preso que cumpre pena em regime fechado, teria resultado de fato de terceiro”
+- `src_e78c7d363e2f4c61` (p. 19): “não demonstrou que, não obstante tenha adotado todas as medidas cabíveis e dele razoavelmente expectáveis para evitar a fuga do autor do crime”
+- `src_7ef2705ff3fc4077` (p. 20): “Quanto à solução do caso concreto, voto pela negativa de provimento ao Recurso Extraordinário.”
+- `src_a30a80e07114404d` (p. 25): “o conjunto dos fatos e das provas sedimentado nas instâncias ordinárias não permite imputar responsabilidade por omissão ao Estado pela conduta levada a cabo por terceiros que deveriam estar sob sua custódia”
+- `src_6a17d44cbc3d44d9` (p. 27): “não há causalidade direta para fins de atribuição de responsabilidade civil extracontratual do Poder Público”
+- `src_83aefba652654af9` (p. 28): “Não há, portanto, como reconhecer nexo causal entre uma suposta omissão genérica do Poder Público e o dano causad”
+- `src_b08f1a1374b84354` (p. 29): “a responsabilidade civil só se estabelece em relação aos efeitos diretos e imediatos causados pela conduta do agente.”
+- `src_f2b9e027898b482e` (p. 29): “Infere-se que (i) o intervalo entre fato administrativo e o fato típico (critério cronológico) e (ii) o surgimento de causas supervenientes independentes (v.g., formação de quadrilha), que deram origem a novo nexo causal, contribuíram para suprimir a relação de causa (evasão do apenado do sistema penal) e efeito (fato criminoso).”
+- `src_05026afa6a9d4e08` (p. 33): “omissão genérica não é, portanto, liame necessário ou mesmo determinante ao resultado, por não ser, via de regra, um acontecimento anterior ou concomitante que se aderiu à cadeia causal em direção ao evento danoso (”
+- `src_6cd586b519fb4b8b` (p. 33): “DOU PROVIMENTO ao recurso extraordinário para julgar improcedentes os pedidos iniciais,”
+- `src_78a567cf58524873` (p. 33): “Nos termos do artigo 37 §6º da Constituição Federal, não se caracteriza a responsabilidade civil objetiva do Estado por danos decorrentes de crime praticado por pessoa foragida do sistema prisional, quando não demonstrado o”
+- `src_227a91a9a2a64eb2` (p. 34): “nexo causal direto entre o momento da fuga e a conduta praticada.”
+- `src_31ffb634f9e04aa5` (p. 35): “Nos termos do artigo 37, § 6º, da Constituição Federal, não se caracteriza a responsabilidade civil objetiva do Estado por danos decorrentes de crime praticado por pessoa foragida do sistema prisional, quando não demonstrado o nexo causal direto entre o momento da fuga e a conduta praticada””

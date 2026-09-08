@@ -1,0 +1,63 @@
+{
+  "stage": "lrc",
+  "prompt": {
+    "path": "prompts/formalize/04_lrc.v1.md",
+    "version": 1,
+    "template_sha256": "8ce324769848e9a9cc4ee208603987b0af853e73a1298f6f2d35d575a5183cb5",
+    "rendered_sha256": "46995b9b4b2cd6598e8c78e56bfce34b66e0cea47f452314f88625f9f90a9041",
+    "config": {
+      "model": "gemini-2.5-pro",
+      "temperature": 0
+    },
+    "includes": [
+      "_shared/lrc_schemes.md"
+    ]
+  },
+  "attempts": 1,
+  "repairs": [],
+  "issues": [],
+  "output": {
+    "doctrinal_premises": [
+      {
+        "literal": "¬Tortious_FatRisc",
+        "label_pt": "O fato de o preso possuir fatores de risco pessoais (tabagismo, etilismo, cocaína, obesidade) não constitui um ato ilícito.",
+        "evidence": [
+          "src_91167dafaffc41cc"
+        ]
+      }
+    ],
+    "scheme_rules": [
+      {
+        "rule": "cf2lrc_FatRisc: CaFa_FatRisc_SeqIrr => LeReCa_FatRisc_SeqIrr",
+        "scheme": "cf2lrc",
+        "gloss_pt": "Por padrão, os fatores de risco do preso, sendo causa de fato das sequelas, são considerados juridicamente relevantes.",
+        "evidence": [
+          "src_91167dafaffc41cc",
+          "prec_20d8b1b9cdac478e"
+        ]
+      },
+      {
+        "rule": "cf2lrc_AgrQuad: CaFa_AgrQuad_SeqIrr => LeReCa_AgrQuad_SeqIrr",
+        "scheme": "cf2lrc",
+        "gloss_pt": "Por padrão, o agravamento da saúde do preso, sendo causa de fato das sequelas, é considerado juridicamente relevante.",
+        "evidence": [
+          "src_985014a104cf4772"
+        ]
+      },
+      {
+        "rule": "nwo_AgrQuad: CaFa_FatRisc_SeqIrr AND ¬Tortious_FatRisc => ¬cf2lrc_AgrQuad",
+        "scheme": "nwo",
+        "gloss_pt": "A relevância jurídica do agravamento da saúde é afastada, pois os fatores de risco pessoais do preso são uma causa suficiente e não-ilícita para o mesmo dano, o que interrompe o nexo causal que poderia ser atribuído a outras fontes.",
+        "evidence": [
+          "src_91167dafaffc41cc",
+          "prec_20d8b1b9cdac478e"
+        ]
+      }
+    ],
+    "targets": [
+      "LeReCa_FatRisc_SeqIrr",
+      "LeReCa_AgrQuad_SeqIrr"
+    ],
+    "duty_basis_pt": "O dever jurídico do Estado de prestar assistência à saúde ao preso está fundamentado no art. 5º, XLIX, da Constituição Federal, e nos arts. 10, 11 e 14 da Lei de Execuções Penais."
+  }
+}

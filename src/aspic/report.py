@@ -37,7 +37,7 @@ def technical_section_html(case: CaseSpec, graph_svg: str, ness_table: str,
   <h3>NESS analysis for <code>{html.escape(case.effect)}</code></h3>
   {ness_table}
 
-  <h3>Causal comparison: NESS vs is_cause vs but_for</h3>
+  <h3>Causal comparison: NESS cause vs but-for</h3>
   {causal_section}
 """
 
@@ -49,7 +49,8 @@ def render_case(case: CaseSpec, *, figures_dir=None) -> str:
     figures there (for the static bundle / the paper's LaTeX); the live API
     never passes it, since a request shouldn't have file-system side effects.
     """
-    af = ArgumentationFramework(case.knowledge_base, case.causal_model)
+    af = ArgumentationFramework(case.knowledge_base, case.causal_model,
+                                preferences=case.preferences)
     extension, _ = af.compute_grounded_extension()
 
     dot = to_dot(af, extension, title=case.title)
@@ -100,8 +101,6 @@ nav.toc { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin: 1.5rem 0;
   padding: 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
 nav.toc a { color: var(--accent); text-decoration: none; }
 nav.toc a:hover { text-decoration: underline; }
-select#case-select { font-size: 1rem; padding: .4rem .6rem; border-radius: 6px;
-  border: 1px solid var(--border); background: var(--card); color: var(--fg); }
 section.case { margin: 3rem 0; padding-bottom: 1rem; }
 .graph-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px;
   padding: .5rem; background: var(--card); }
@@ -154,12 +153,45 @@ details.arg-card summary { cursor: pointer; }
 .attack-list { margin: 0 0 .4rem; padding-left: 1.2rem; }
 .attack-list li { margin: .3rem 0; }
 .attacks-out { color: var(--muted); font-size: .85rem; }
-.tech-note { margin: .5rem 0 0; }
+.paths { font-size: .85rem; color: var(--muted); margin: .4rem 0 0; }
+.tech-note { margin: .5rem 0 0; display: flex; flex-wrap: wrap; gap: .3rem; }
 .tech-note code { font-size: .8rem; color: var(--muted); }
 .tech-ref { color: var(--muted); font-weight: 400; font-size: .78rem; }
 details.technical-toggle { margin-top: 1.5rem; border: 1px solid var(--border);
   border-radius: 8px; padding: .6rem .9rem; background: var(--card); }
 details.technical-toggle summary { cursor: pointer; font-weight: 600; }
+
+/* legal-relevance layer (ICAIL 2026) and the formalization fiche */
+.lrc-intro { color: var(--muted); font-size: .9rem; }
+.duty-basis { background: var(--card); border-left: 4px solid var(--accent);
+  padding: .5rem .8rem; border-radius: 0 6px 6px 0; font-size: .9rem; }
+.case-origin { display: inline-block; font-size: .72rem; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase; border-radius: 999px;
+  padding: .1rem .55rem; margin-left: .5rem; vertical-align: middle;
+  background: var(--card); border: 1px solid var(--border); color: var(--muted); }
+.fiche h4 { margin: 1.4rem 0 .3rem; }
+.fiche p.lead { color: var(--muted); font-size: .9rem; margin-top: .2rem; }
+.fiche .passage { color: var(--muted); font-size: .8rem; display: block;
+  margin-top: .25rem; font-style: italic; }
+.fiche td.mono, .fiche th.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .8rem; white-space: nowrap; }
+.agreement { font-weight: 700; text-align: center; }
+.agreement.match { color: var(--accent); }
+.agreement.mismatch { color: #c0392b; }
+.agreement.indefinido { color: var(--muted); }
+.provenance { font-size: .82rem; color: var(--muted); }
+.provenance code { font-size: .78rem; }
+.open-questions { font-size: .88rem; }
+
+/* hover glossary (see annotateTerms/showTip in the page script) */
+.term { border-bottom: 1px dotted currentColor; cursor: help; }
+.term:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 2px; }
+#term-tip { position: absolute; z-index: 50; max-width: min(46ch, calc(100vw - 2rem));
+  background: var(--card); color: var(--fg); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent); border-radius: 6px; padding: .45rem .7rem;
+  font-size: .85rem; line-height: 1.4; box-shadow: 0 4px 14px rgba(0, 0, 0, .18);
+  opacity: 0; visibility: hidden; transition: opacity .12s; pointer-events: none; }
+#term-tip.visible { opacity: 1; visibility: visible; }
 
 /* click-to-highlight (see bindGraphInteractivity in the page script) */
 .graph-wrap.has-selection .argnode,
@@ -167,6 +199,188 @@ details.technical-toggle summary { cursor: pointer; font-weight: 600; }
 .graph-wrap.has-selection .argnode.hl-related,
 .graph-wrap.has-selection .argedge.hl-related { opacity: 1; }
 .argnode { cursor: pointer; }
+
+/* ==================================================================
+   The explorer shell: sidebar of cases, tabbed panels per case.
+   Everything below is used only by `aspic.api`'s page; the static
+   bundle keeps rendering as a plain document.
+   ================================================================== */
+.app { display: grid; grid-template-columns: minmax(230px, 300px) 1fr; gap: 2rem;
+  align-items: start; }
+@media (max-width: 900px) { .app { grid-template-columns: 1fr; } }
+
+.sidebar { position: sticky; top: 1rem; border: 1px solid var(--border);
+  border-radius: 10px; background: var(--card); padding: .8rem; max-height: calc(100vh - 2rem);
+  overflow-y: auto; }
+@media (max-width: 900px) { .sidebar { position: static; max-height: none; } }
+.sidebar input[type="search"] { width: 100%; padding: .45rem .6rem; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--fg); font-size: .9rem; }
+.group-label { font-size: .72rem; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--muted); margin: 1rem 0 .35rem; }
+.case-list { list-style: none; margin: 0; padding: 0; display: flex;
+  flex-direction: column; gap: .15rem; }
+.case-list button { display: block; width: 100%; text-align: left; cursor: pointer;
+  font: inherit; font-size: .88rem; line-height: 1.35; color: var(--fg);
+  background: none; border: 0; border-left: 3px solid transparent; border-radius: 0 6px 6px 0;
+  padding: .4rem .55rem; }
+.case-list button:hover { background: var(--bg); }
+.case-list button[aria-current="true"] { background: var(--bg); font-weight: 600;
+  border-left-color: var(--accent); }
+.case-list .case-sub { display: block; font-size: .74rem; color: var(--muted);
+  font-weight: 400; }
+
+details.how-to-read { margin: .5rem 0 1.5rem; font-size: .9rem; max-width: 78ch; }
+details.how-to-read summary { cursor: pointer; color: var(--accent); }
+details.how-to-read ul { margin: .6rem 0; padding-left: 1.2rem; }
+details.how-to-read li { margin: .25rem 0; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: .3rem; border-bottom: 2px solid var(--border);
+  margin: 0 0 1.2rem; }
+.tabs button { font: inherit; font-size: .92rem; cursor: pointer; color: var(--muted);
+  background: none; border: 0; border-bottom: 3px solid transparent;
+  padding: .5rem .85rem; margin-bottom: -2px; border-radius: 6px 6px 0 0; }
+.tabs button:hover { color: var(--fg); background: var(--card); }
+.tabs button[aria-selected="true"] { color: var(--fg); font-weight: 650;
+  border-bottom-color: var(--accent); }
+.main { min-width: 0; }   /* let the grid column shrink so wide tables scroll */
+.table-wrap { overflow-x: auto; margin: .75rem 0 1.25rem; }
+.table-wrap table { margin: 0; }
+.panel h3 { margin-top: 0; }
+.panel h4 { margin: 1.8rem 0 .35rem; }
+.panel h5 { margin: 1.1rem 0 .35rem; font-size: .95rem; }
+.panel > section > p.lead:first-of-type { margin-top: .2rem; }
+p.lead { color: var(--muted); font-size: .9rem; max-width: 68ch; }
+.muted, .muted code { color: var(--muted); }
+
+/* Score tiles and stat strips ------------------------------------- */
+.score-row { display: flex; flex-wrap: wrap; gap: .7rem; margin: .9rem 0 1.4rem; }
+.score { flex: 1 1 190px; border: 1px solid var(--border); border-left-width: 4px;
+  border-radius: 8px; padding: .7rem .9rem; background: var(--card); }
+.score-value { display: block; font-size: 1.7rem; font-weight: 700; line-height: 1.1; }
+.score-label { display: block; font-size: .82rem; color: var(--muted); margin-top: .2rem; }
+.score-detail { display: block; font-size: .75rem; color: var(--muted); margin-top: .3rem;
+  font-style: italic; }
+.score.good { border-left-color: var(--accent); }
+.score.good .score-value { color: var(--accent); }
+.score.warn { border-left-color: #d17a00; }
+.score.warn .score-value { color: #d17a00; }
+.score.bad { border-left-color: #c0392b; }
+.score.bad .score-value { color: #c0392b; }
+.score.neutral { border-left-color: var(--border); }
+
+.stat-row { display: flex; flex-wrap: wrap; gap: 1.4rem; margin: .8rem 0 1.4rem;
+  padding: .7rem .9rem; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--card); }
+.stat-value { font-size: 1.2rem; font-weight: 700; margin-right: .35rem; }
+.stat-label { font-size: .82rem; color: var(--muted); }
+
+/* Notices ---------------------------------------------------------- */
+.notice { font-size: .88rem; background: var(--card); border-left: 4px solid #d17a00;
+  padding: .55rem .8rem; border-radius: 0 6px 6px 0; }
+.ok-note { font-size: .88rem; background: var(--card); border-left: 4px solid var(--accent);
+  padding: .55rem .8rem; border-radius: 0 6px 6px 0; }
+ul.id-list { columns: 2 18rem; font-size: .84rem; }
+ul.id-list code { font-size: .78rem; }
+ul.issues { font-size: .86rem; }
+ul.issues.errors li { color: #c0392b; }
+
+/* Dossier ---------------------------------------------------------- */
+.dossier-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: .9rem; margin: .8rem 0 1.4rem; }
+.dossier-card { border: 1px solid var(--border); border-radius: 10px; padding: .8rem 1rem;
+  background: var(--card); }
+.dossier-card h5 { margin: 0 0 .6rem; font-size: 1rem; }
+.card-index { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 4px; padding: 0 .3rem; margin-right: .4rem; }
+.card-who { display: block; font-size: .8rem; font-weight: 400; color: var(--muted); }
+.unit-status { display: inline-block; font-size: .72rem; text-transform: uppercase;
+  letter-spacing: .04em; border: 1px solid var(--border); border-radius: 999px;
+  padding: .05rem .5rem; margin-left: .5rem; color: var(--muted); }
+.arrow { color: var(--muted); }
+.dossier-field { margin: 0 0 .7rem; }
+.field-label { font-size: .74rem; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--muted); }
+.field-value p { margin: .2rem 0; }
+.field-value ul { margin: .2rem 0; padding-left: 1.1rem; }
+.flag { display: inline-block; font-size: .68rem; text-transform: uppercase;
+  letter-spacing: .04em; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0 .4rem; margin-left: .3rem; color: var(--muted); }
+table.sides { font-size: .85rem; margin: .2rem 0 .8rem; }
+table.sides td:first-child { width: 38%; color: var(--muted); }
+
+details.evidence { margin: .25rem 0 .5rem; }
+details.evidence summary { cursor: pointer; font-size: .78rem; color: var(--accent); }
+ul.passage-list { list-style: none; margin: .4rem 0; padding: 0; display: flex;
+  flex-direction: column; gap: .5rem; }
+ul.passage-list li { border-left: 3px solid var(--border); padding-left: .7rem; }
+.passage-where { display: block; font-size: .72rem; color: var(--muted); }
+.passage-text { display: block; font-size: .85rem; font-style: italic; }
+.passage-meta { display: block; font-size: .72rem; color: var(--muted); margin-top: .2rem; }
+.passage-uses { margin-left: .5rem; }
+.passage-uses.none { color: #d17a00; }
+.page-block { margin-bottom: 1.2rem; }
+.brief h3 { font-size: 1.15rem; }
+.brief h4 { margin: 1.4rem 0 .3rem; }
+.brief h5 { margin: 1rem 0 .25rem; color: var(--muted); }
+.brief p, .brief li { font-size: .9rem; }
+
+/* Disputes, glossary ----------------------------------------------- */
+table.disputes td:first-child { width: 34%; }
+.dispute-why { display: block; font-size: .78rem; color: var(--muted); margin-top: .3rem; }
+.dispute-outcome.kept strong { color: #c0392b; }
+.dispute-outcome.failed strong { color: var(--muted); }
+.dispute-note { display: block; font-size: .76rem; color: var(--muted); font-weight: 400;
+  margin-top: .15rem; }
+table.glossary td:first-child { width: 8rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .82rem; }
+table.glossary td:last-child { width: 1%; }
+.role-tag { display: inline-block; font-size: .72rem; border-radius: 999px;
+  padding: .05rem .5rem; border: 1px solid var(--border); color: var(--muted);
+  white-space: nowrap; }
+.role-tag.effect { border-color: var(--accent); color: var(--accent); }
+
+/* Adjudication ----------------------------------------------------- */
+.turning { display: inline-block; font-size: .7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .04em; border-radius: 999px;
+  padding: .05rem .5rem; background: #f6d6d6; color: #7a1414; margin-left: .4rem; }
+tr.turning-row td { background: color-mix(in srgb, #c0392b 7%, transparent); }
+ul.delta { margin: 0; padding-left: 1.1rem; font-size: .8rem; }
+ul.delta code { font-size: .75rem; }
+.perspectives p.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .8rem; word-break: break-word; }
+
+.factor { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .76rem; border-radius: 4px; padding: .05rem .35rem; margin: .1rem .15rem .1rem 0;
+  border: 1px solid var(--border); cursor: help; }
+.factor.pro { border-color: var(--accent); color: var(--accent); }
+.factor.contra { border-color: #c0392b; color: #c0392b; }
+.factor.neutro { color: var(--muted); }
+tr.case-row td { font-weight: 600; background: var(--card); }
+
+/* Conference ------------------------------------------------------- */
+.mismatch-card { border: 1px solid var(--border); border-left: 4px solid #c0392b;
+  border-radius: 8px; padding: .7rem 1rem; background: var(--card); margin: .7rem 0; }
+.mismatch-card h5 { margin: 0 0 .5rem; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+.col-label { font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--muted); }
+.two-col p { margin: .2rem 0; font-size: .88rem; }
+
+/* Overview --------------------------------------------------------- */
+table.overview-table { font-size: .86rem; }
+table.overview-table td.num { text-align: center; }
+button.case-link { font: inherit; font-weight: 600; color: var(--accent); background: none;
+  border: 0; padding: 0; cursor: pointer; text-align: left; }
+button.case-link:hover { text-decoration: underline; }
+.bar { display: block; height: .4rem; border-radius: 999px; background: var(--border);
+  overflow: hidden; margin-bottom: .2rem; }
+.bar-fill { display: block; height: 100%; background: var(--muted); }
+.bar-fill.good { background: var(--accent); }
+.bar-fill.warn { background: #d17a00; }
+.bar-fill.bad { background: #c0392b; }
+.agreement-text { font-size: .78rem; color: var(--muted); }
+td.verdict.warn { color: #d17a00; }
 """
 
 # `bindGraphInteractivity(root)` wires up click-to-highlight for every

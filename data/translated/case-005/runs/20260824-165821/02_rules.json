@@ -1,0 +1,141 @@
+{
+  "stage": "rules",
+  "prompt": {
+    "path": "prompts/formalize/02_rules.v1.md",
+    "version": 1,
+    "template_sha256": "d969f2aba44f2d7e5da7cbb94a73ee2979ad52f39cfb140c885a2da3fec38710",
+    "rendered_sha256": "98c29e4aad5fbffaae011c1f6ac71b5da86a3b116afa8f7d2cb2bde07a7d8122",
+    "config": {
+      "model": "gemini-2.5-pro",
+      "temperature": 0
+    },
+    "includes": [
+      "_shared/grammar"
+    ]
+  },
+  "attempts": 1,
+  "repairs": [],
+  "issues": [],
+  "output": {
+    "premises": [
+      "AtdTemp",
+      "CelHum",
+      "FatRisc",
+      "DoePreEx",
+      "PerConcDem",
+      "ProtSeg",
+      "ProvCel",
+      "DevAtdSaude",
+      "DevCelHum"
+    ],
+    "axioms": [],
+    "strict_rules": [],
+    "defeasible_rules": [
+      {
+        "rule": "r0: PerConcDem AND DevAtdSaude => AgrQuad",
+        "kind": "causal",
+        "gloss_pt": "A alegação de que a perícia foi conclusiva sobre a demora, somada ao dever de cuidado do Estado, levaria à conclusão de que a conduta estatal agravou o quadro de saúde do preso.",
+        "perspective": "recorrente",
+        "evidence": [
+          "src_985014a104cf4772",
+          "src_36c55aeba6ad4801"
+        ],
+        "dossier_refs": [
+          "prec_56e9132acba948bf",
+          "unit_68719d79246946ff"
+        ]
+      },
+      {
+        "rule": "r1: ProvCel AND DevCelHum => AgrQuad",
+        "kind": "causal",
+        "gloss_pt": "A alegação de que havia prova das condições desumanas da cela, juntamente com o dever do Estado de mantê-la, levaria à conclusão de que tais condições agravaram o quadro de saúde.",
+        "perspective": "recorrente",
+        "evidence": [
+          "src_985014a104cf4772"
+        ],
+        "dossier_refs": [
+          "prec_56e9132acba948bf",
+          "unit_68719d79246946ff"
+        ]
+      },
+      {
+        "rule": "r2: AgrQuad => SeqIrr",
+        "kind": "causal",
+        "gloss_pt": "O agravamento do quadro de saúde do preso (pneumonia e insuficiência cardíaca) foi o que causou as sequelas irreversíveis e a incapacidade para o trabalho.",
+        "perspective": "comum",
+        "evidence": [
+          "src_985014a104cf4772"
+        ],
+        "dossier_refs": [
+          "synth_3962fad2aa5f40f2"
+        ]
+      },
+      {
+        "rule": "r3: ProtSeg => ¬r0",
+        "kind": "undercut",
+        "gloss_pt": "A corte entendeu que, como os protocolos de saúde foram seguidos, a inferência da perícia sobre um tempo 'não ideal' não é suficiente para concluir que o atendimento agravou o quadro.",
+        "perspective": "stf_final",
+        "evidence": [
+          "src_f930afb4cd4c4c45",
+          "src_01141170d2b74513"
+        ],
+        "dossier_refs": [
+          "prec_20d8b1b9cdac478e",
+          "divg_2b91f88eeb094df2"
+        ]
+      },
+      {
+        "rule": "r4: CelHum => ¬r1",
+        "kind": "undercut",
+        "gloss_pt": "A corte afastou a responsabilidade pelas condições da cela por considerar que não havia provas de que fossem desumanas, estabelecendo o contrário como fato.",
+        "perspective": "stf_final",
+        "evidence": [
+          "src_c40f876685624014",
+          "src_e87485590fb74cad"
+        ],
+        "dossier_refs": [
+          "prec_20d8b1b9cdac478e",
+          "divg_7062d5de3309474e"
+        ]
+      },
+      {
+        "rule": "r5: FatRisc => AgrQuad",
+        "kind": "causal",
+        "gloss_pt": "Os fatores de risco pessoais do preso (tabagismo, uso de drogas, obesidade) são uma causa alternativa que explica o agravamento de seu quadro de saúde.",
+        "perspective": "stf_final",
+        "evidence": [
+          "src_91167dafaffc41cc"
+        ],
+        "dossier_refs": [
+          "prec_bf0d1660438d4bad",
+          "prec_20d8b1b9cdac478e"
+        ]
+      },
+      {
+        "rule": "r6: FatRisc => ¬r0",
+        "kind": "undercut",
+        "gloss_pt": "A corte considerou que os fatores de risco pessoais do preso poderiam, por si sós, explicar o dano, rompendo o nexo causal com a conduta estatal referente ao atendimento médico.",
+        "perspective": "stf_final",
+        "evidence": [
+          "src_91167dafaffc41cc"
+        ],
+        "dossier_refs": [
+          "prec_20d8b1b9cdac478e"
+        ]
+      },
+      {
+        "rule": "r7: FatRisc => ¬r1",
+        "kind": "undercut",
+        "gloss_pt": "A corte considerou que os fatores de risco pessoais do preso poderiam, por si sós, explicar o dano, rompendo o nexo causal com a conduta estatal referente às condições da cela.",
+        "perspective": "stf_final",
+        "evidence": [
+          "src_91167dafaffc41cc"
+        ],
+        "dossier_refs": [
+          "prec_20d8b1b9cdac478e"
+        ]
+      }
+    ],
+    "modelling_notes_pt": "A modelagem representa as alegações do recorrente sobre a prova (PerConcDem, ProvCel) como premissas que fundamentam suas regras causais (r0, r1). A decisão da corte é modelada por meio de regras de 'undercut' (r3, r4, r6, r7) que atacam e derrotam as regras do recorrente, com base nas premissas que representam as conclusões fáticas do tribunal (ProtSeg, CelHum, FatRisc). Os fatores de risco pessoais (FatRisc) atuam tanto como causa alternativa para o dano (r5) quanto como interruptores do nexo causal alegado pelo recorrente (r6, r7). O átomo 'DoePreEx' (doença pré-existente) consta como premissa por ter 'established: true', apesar de seu status 'rejeitado' indicar uma inconsistência no catálogo; ele permanece inerte no modelo."
+  }
+}

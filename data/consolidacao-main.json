@@ -1,0 +1,749 @@
+{
+  "case_id": "case-003",
+  "anotadores": [
+    "andressa-bissolotti",
+    "izabela-melo",
+    "vitor-melo"
+  ],
+  "perspectivas": [
+    "Recorrente",
+    "Recorrido",
+    "Marco Aurélio",
+    "Edson Fachin",
+    "Alexandre de Moraes"
+  ],
+  "resumo": {
+    "celulas": 32,
+    "divergiam_nas_propostas": 23,
+    "divergencia_substantiva": 3,
+    "vazias": 4
+  },
+  "notas_gerais": "A consolidação revela alta concordância entre os anotadores na maioria das seções. A principal divergência substantiva está na qualificação do nexo causal como 'direto' ou 'indireto' no voto do Min. Marco Aurélio (§5). As seções 6 (Cenários Causais) e 7.1 (Pontos de Divergência) estão totalmente em branco e precisam de atenção. A seção 4 (Teoria Jurídica) foi preenchida por apenas uma anotadora, o que requer validação. Recomenda-se revisar esses pontos e preencher as seções vazias.",
+  "celulas": [
+    {
+      "secao_id": "1",
+      "secao": "FATOS RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrente",
+      "perspectiva_pipeline": "recorrente",
+      "valor": "Fuga do preso / Lapso temporal de 3 meses / Ato de terceiro / Latrocínio",
+      "itens": [
+        "Fuga do preso",
+        "Lapso temporal de 3 meses",
+        "Ato de terceiro",
+        "Latrocínio"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "A consolidação reúne os fatos mencionados por todos os anotadores, utilizando os termos mais específicos disponíveis (Latrocínio, 3 meses) e alinhados ao vocabulário.",
+      "propostas": {
+        "andressa-bissolotti": "Fuga do preso, com prática de crime pelo foragido após lapso temporal de 3 meses da fuga (ato de terceiro)",
+        "izabela-melo": "Fuga do preso / Lapso temporal de 3 meses / Ato de terceiro / Morte da Vítima / Danos à vítima/familia",
+        "vitor-melo": "Fuga do preso / Lapso temporal / Ato de terceiro / Latrocínio"
+      }
+    },
+    {
+      "secao_id": "1",
+      "secao": "FATOS RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrido",
+      "perspectiva_pipeline": "recorrido",
+      "valor": "Fuga do preso / Regime prisional / Latrocínio / Morte da vítima / Danos à vítima/família",
+      "itens": [
+        "Fuga do preso",
+        "Regime prisional",
+        "Latrocínio",
+        "Morte da vítima",
+        "Danos à vítima/família"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "A consolidação agrega os fatos mencionados nas três propostas, que são complementares. A proposta de Andressa foi a mais completa e serviu de base.",
+      "propostas": {
+        "andressa-bissolotti": "Fuga do preso de regime prisional fechado, com prática de crime de latrocínio pelo foragido que resultou em morte da vítima, com danos à vítima/família",
+        "izabela-melo": "Fuga do preso / Danos à vítima/família",
+        "vitor-melo": "Fuga do preso / Latrocínio"
+      }
+    },
+    {
+      "secao_id": "1",
+      "secao": "FATOS RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Marco Aurélio",
+      "perspectiva_pipeline": "relator",
+      "valor": "Fuga do preso / Nova fuga / Regime prisional / Latrocínio / Morte da vítima / Danos à vítima/família",
+      "itens": [
+        "Fuga do preso",
+        "Nova fuga",
+        "Regime prisional",
+        "Latrocínio",
+        "Morte da vítima",
+        "Danos à vítima/família"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "A consolidação combina os fatos apontados por todos, incluindo a \"Nova fuga\" mencionada por Vitor, que é um detalhe fático relevante destacado no voto.",
+      "propostas": {
+        "andressa-bissolotti": "Fuga do preso de regime prisional fechado, com prática de crime de latrocínio pelo foragido, resultando em morte da vítima com danos à vítima/família",
+        "izabela-melo": "Latrocínio / Regime prisional / Prática de crime / Morte da vítima / Dano / Ato de terceiro",
+        "vitor-melo": "Histórico do preso / Fuga do preso / Regime prisional / Nova fuga / Latrocínio / Danos à vítima/família"
+      }
+    },
+    {
+      "secao_id": "1",
+      "secao": "FATOS RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Edson Fachin",
+      "perspectiva_pipeline": "voto_convergente",
+      "valor": "",
+      "itens": [],
+      "sustentada_por": [],
+      "divergencia_substantiva": false,
+      "justificativa": "Todas as propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "1",
+      "secao": "FATOS RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Alexandre de Moraes",
+      "perspectiva_pipeline": "voto_divergente",
+      "valor": "",
+      "itens": [],
+      "sustentada_por": [],
+      "divergencia_substantiva": false,
+      "justificativa": "Todas as propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "2",
+      "secao": "CAUSAS FÁTICAS CANDIDATAS",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrente",
+      "perspectiva_pipeline": "recorrente",
+      "valor": "Ato de terceiro / Lapso temporal de 3 meses",
+      "itens": [
+        "Ato de terceiro",
+        "Lapso temporal de 3 meses"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "A consolidação adota os elementos centrais das propostas, \"Ato de terceiro\" e \"Lapso temporal\", que representam a causa fática na perspectiva do Recorrente. A proposta de Vitor foi parcialmente descartada por incluir a fuga, que é o antecedente, e não a causa preponderante apontada.",
+      "propostas": {
+        "andressa-bissolotti": "Crime cometido por terceiro (detento/preso) após lapso temporal da fuga (do detento/preso)",
+        "izabela-melo": "Prática de crime / Lapso temporal de 3 meses",
+        "vitor-melo": "Fuga do preso / Lapso temporal / Latrocínio"
+      }
+    },
+    {
+      "secao_id": "2",
+      "secao": "CAUSAS FÁTICAS CANDIDATAS",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrido",
+      "perspectiva_pipeline": "recorrido",
+      "valor": "Fuga do preso",
+      "itens": [],
+      "sustentada_por": [
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Adotada a proposta de Izabela e Vitor por ser mais precisa e alinhada ao comando da seção, que pede a causa fática preponderante. A proposta de Andressa mistura a causa jurídica (omissão) e o resultado (latrocínio).",
+      "propostas": {
+        "andressa-bissolotti": "Omissão do Estado possibilitou fuga do preso. Detento foragido praticou crime de latrocínio.",
+        "izabela-melo": "Fuga do preso",
+        "vitor-melo": "Fuga do preso"
+      }
+    },
+    {
+      "secao_id": "2",
+      "secao": "CAUSAS FÁTICAS CANDIDATAS",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Marco Aurélio",
+      "perspectiva_pipeline": "relator",
+      "valor": "Fuga do preso",
+      "itens": [],
+      "sustentada_por": [
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": true,
+      "justificativa": "Adotou-se a proposta de Izabela, que identifica a \"Fuga do preso\" como a causa fática central. A proposta de Andressa inclui a causa jurídica, e a de Vitor inclui \"Ato de terceiro\", que é a causa fática rechaçada pelo ministro nesta perspectiva.",
+      "propostas": {
+        "andressa-bissolotti": "Omissão do Estado possibilitou fuga de preso em regime fechado. Detento foragido praticou crime de latrocínio.",
+        "izabela-melo": "Fuga do preso",
+        "vitor-melo": "Nova fuga / Ato de terceiro"
+      }
+    },
+    {
+      "secao_id": "2",
+      "secao": "CAUSAS FÁTICAS CANDIDATAS",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Edson Fachin",
+      "perspectiva_pipeline": "voto_convergente",
+      "valor": "Omissão estatal / Fuga do preso",
+      "itens": [
+        "Omissão estatal",
+        "Fuga do preso"
+      ],
+      "sustentada_por": [
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "A proposta de Vitor foi adotada por equilibrar a causa fática (\"Fuga do preso\") com a sua qualificação (\"Omissão estatal\"), que é central na perspectiva do ministro. A proposta de Izabela é muito concisa e a de Andressa é excessivamente detalhada.",
+      "propostas": {
+        "andressa-bissolotti": "Estado possui dever específico de vigilância em relação a detentos em regime fechado. Omissão estatal em relação a esse dever (omissão própria) possibilitou fuga do preso. Prática de crime de latrocínio enquanto foragido o detento.",
+        "izabela-melo": "Fuga do preso",
+        "vitor-melo": "Omissão estatal / Fuga do preso / Lapso temporal"
+      }
+    },
+    {
+      "secao_id": "2",
+      "secao": "CAUSAS FÁTICAS CANDIDATAS",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Alexandre de Moraes",
+      "perspectiva_pipeline": "voto_divergente",
+      "valor": "Fuga do preso / Lapso temporal de 3 meses / Formação de quadrilha / Prática de crime",
+      "itens": [
+        "Fuga do preso",
+        "Lapso temporal de 3 meses",
+        "Formação de quadrilha",
+        "Prática de crime"
+      ],
+      "sustentada_por": [
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "A consolidação combina as propostas de Izabela e Vitor, que corretamente identificam os fatos que, na perspectiva do ministro, enfraquecem o nexo com a omissão estatal inicial: o lapso temporal e a formação de quadrilha.",
+      "propostas": {
+        "andressa-bissolotti": "Omissão genérica do Estado possibilitou fuga do preso. O detento foragido cometeu a prática de crime de latrocínio (ato de terceiro).",
+        "izabela-melo": "Fuga do preso / Prática de crime / Lapso temporal de 3 meses / Formação de quadrilha",
+        "vitor-melo": "Fuga do preso / Lapso temporal / Formação de quadrilha"
+      }
+    },
+    {
+      "secao_id": "3",
+      "secao": "CAUSAS JURIDICAMENTE RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrente",
+      "perspectiva_pipeline": "recorrente",
+      "valor": "Ato de terceiro (Excludente do nexo)",
+      "itens": [],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Adotou-se a proposta de Izabela, complementada com a qualificação \"Excludente do nexo\" conforme o vocabulário e o conteúdo da proposta de Andressa, para maior precisão.",
+      "propostas": {
+        "andressa-bissolotti": "O Estado não responde por ato de terceiro.",
+        "izabela-melo": "Ato de terceiro",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "3",
+      "secao": "CAUSAS JURIDICAMENTE RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrido",
+      "perspectiva_pipeline": "recorrido",
+      "valor": "Omissão estatal / Dever específico de custódia",
+      "itens": [
+        "Omissão estatal",
+        "Dever específico de custódia"
+      ],
+      "sustentada_por": [
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "As propostas de Izabela e Vitor foram unificadas por serem idênticas em conteúdo e utilizarem o vocabulário da seção.",
+      "propostas": {
+        "andressa-bissolotti": "A fuga do preso decorreu de omissão estatal",
+        "izabela-melo": "Omissão estatal / Dever específico de custódia",
+        "vitor-melo": "Dever específico de custódia / Omissão estatal"
+      }
+    },
+    {
+      "secao_id": "3",
+      "secao": "CAUSAS JURIDICAMENTE RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Marco Aurélio",
+      "perspectiva_pipeline": "relator",
+      "valor": "Omissão estatal / Dever específico de custódia",
+      "itens": [
+        "Omissão estatal",
+        "Dever específico de custódia"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": true,
+      "justificativa": "A consolidação combina as propostas de Andressa e Izabela, que apontam a omissão no dever de custódia como causa juridicamente relevante. A proposta de Vitor foi descartada por incluir \"Ato de terceiro\", que é o elemento que o voto afasta como excludente.",
+      "propostas": {
+        "andressa-bissolotti": "Omissão estatal em relação a custódia de preso cumprindo pena em regime fechado",
+        "izabela-melo": "Omissão estatal / Dever específico de custódia / Nexo casual",
+        "vitor-melo": "Omissão estatal / Ato de terceiro"
+      }
+    },
+    {
+      "secao_id": "3",
+      "secao": "CAUSAS JURIDICAMENTE RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Edson Fachin",
+      "perspectiva_pipeline": "voto_convergente",
+      "valor": "Omissão estatal / Dever específico de custódia",
+      "itens": [
+        "Omissão estatal",
+        "Dever específico de custódia"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Adotou-se a síntese de Izabela, que corresponde ao conteúdo de Andressa. O \"Lapso temporal\" adicionado por Vitor é um elemento fático considerado, mas não a causa jurídica da responsabilidade.",
+      "propostas": {
+        "andressa-bissolotti": "Omissão estatal em relação a seu dever específico de vigilância e custódia de presos em regime fechado",
+        "izabela-melo": "Omissão estatal / Dever específico de custódia",
+        "vitor-melo": "Dever específico de custódia / Omissão estatal / Lapso temporal"
+      }
+    },
+    {
+      "secao_id": "3",
+      "secao": "CAUSAS JURIDICAMENTE RELEVANTES",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Alexandre de Moraes",
+      "perspectiva_pipeline": "voto_divergente",
+      "valor": "Ato de terceiro / Interrupção do nexo / Nova cadeia causal / Dever geral de segurança pública",
+      "itens": [
+        "Ato de terceiro",
+        "Interrupção do nexo",
+        "Nova cadeia causal",
+        "Dever geral de segurança pública"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "A consolidação combina as propostas, pois são complementares. \"Ato de terceiro\" é a causa, e \"Dever geral de segurança pública\" é o enquadramento jurídico que leva à \"Interrupção do nexo\" e a uma \"Nova cadeia causal\".",
+      "propostas": {
+        "andressa-bissolotti": "Danos decorrem de ato de terceiro.",
+        "izabela-melo": "Ato de terceiro",
+        "vitor-melo": "Dever geral de segurança pública / Excludente do nexo / Nova cadeia causal"
+      }
+    },
+    {
+      "secao_id": "4",
+      "secao": "TEORIA JURÍDICA",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrente",
+      "perspectiva_pipeline": "recorrente",
+      "valor": "Responsabilidade objetiva",
+      "itens": [],
+      "sustentada_por": [
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Apenas a anotadora Izabela Melo apresentou proposta para esta célula, que foi adotada integralmente. As demais propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "Responsabilidade objetiva",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "4",
+      "secao": "TEORIA JURÍDICA",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrido",
+      "perspectiva_pipeline": "recorrido",
+      "valor": "Responsabilidade objetiva / Ato de serviço",
+      "itens": [
+        "Responsabilidade objetiva",
+        "Ato de serviço"
+      ],
+      "sustentada_por": [
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Apenas a anotadora Izabela Melo apresentou proposta para esta célula, que foi adotada integralmente. As demais propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "Responsabilidade objetiva / Ato de serviço",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "4",
+      "secao": "TEORIA JURÍDICA",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Marco Aurélio",
+      "perspectiva_pipeline": "relator",
+      "valor": "Responsabilidade objetiva / Ato de serviço",
+      "itens": [
+        "Responsabilidade objetiva",
+        "Ato de serviço"
+      ],
+      "sustentada_por": [
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Apenas a anotadora Izabela Melo apresentou proposta para esta célula, que foi adotada integralmente. As demais propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "Responsabilidade objetiva / Ato de serviço",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "4",
+      "secao": "TEORIA JURÍDICA",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Edson Fachin",
+      "perspectiva_pipeline": "voto_convergente",
+      "valor": "Responsabilidade objetiva / Omissão própria",
+      "itens": [
+        "Responsabilidade objetiva",
+        "Omissão própria"
+      ],
+      "sustentada_por": [
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Apenas a anotadora Izabela Melo apresentou proposta para esta célula, que foi adotada integralmente. As demais propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "Responsabilidade objetiva / Omissão própria",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "4",
+      "secao": "TEORIA JURÍDICA",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Alexandre de Moraes",
+      "perspectiva_pipeline": "voto_divergente",
+      "valor": "Responsabilidade objetiva / Teoria do dano direto e imediato",
+      "itens": [
+        "Responsabilidade objetiva",
+        "Teoria do dano direto e imediato"
+      ],
+      "sustentada_por": [
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Apenas a anotadora Izabela Melo apresentou proposta para esta célula, que foi adotada integralmente. As demais propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "Responsabilidade objetiva / Teoria do dano direto e imediato",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "5",
+      "secao": "NEXO CAUSAL",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrente",
+      "perspectiva_pipeline": "recorrente",
+      "valor": "Ausência de nexo causal / Interrupção do nexo causal",
+      "itens": [
+        "Ausência de nexo causal",
+        "Interrupção do nexo causal"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "A consolidação unifica as propostas, que são convergentes ao apontar a quebra do nexo causal, utilizando os termos de todos os anotadores.",
+      "propostas": {
+        "andressa-bissolotti": "Ausência do nexo causal (ato de terceiro)",
+        "izabela-melo": "Interrupção do nexo causal / Novo nexo causal",
+        "vitor-melo": "Ausência de nexo causal"
+      }
+    },
+    {
+      "secao_id": "5",
+      "secao": "NEXO CAUSAL",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrido",
+      "perspectiva_pipeline": "recorrido",
+      "valor": "Nexo causal / Nexo causal direto",
+      "itens": [
+        "Nexo causal",
+        "Nexo causal direto"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "As propostas são convergentes. Adotou-se a especificação \"Nexo causal direto\" de Izabela, que é compatível com as demais.",
+      "propostas": {
+        "andressa-bissolotti": "Nexo causal entre a fuga e o latrocínio",
+        "izabela-melo": "Nexo causal / Nexo causal direto",
+        "vitor-melo": "Nexo causal / Ausência de excludentes"
+      }
+    },
+    {
+      "secao_id": "5",
+      "secao": "NEXO CAUSAL",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Marco Aurélio",
+      "perspectiva_pipeline": "relator",
+      "valor": "Nexo causal / Nexo causal indireto",
+      "itens": [
+        "Nexo causal",
+        "Nexo causal indireto"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti"
+      ],
+      "divergencia_substantiva": true,
+      "justificativa": "Há divergência substantiva entre \"Nexo causal indireto\" (Andressa) e \"Nexo causal direto\" (Izabela). Optou-se pela proposta de Andressa, pois a relação entre a omissão estatal na custódia e o crime cometido pelo foragido é mais bem descrita como indireta.",
+      "propostas": {
+        "andressa-bissolotti": "Nexo causal indireto entre a fuga e o latrocínio",
+        "izabela-melo": "Nexo causal / Nexo causal direto",
+        "vitor-melo": "Nexo causal / Ausência de excludentes"
+      }
+    },
+    {
+      "secao_id": "5",
+      "secao": "NEXO CAUSAL",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Edson Fachin",
+      "perspectiva_pipeline": "voto_convergente",
+      "valor": "Nexo causal / Nexo causal direto",
+      "itens": [
+        "Nexo causal",
+        "Nexo causal direto"
+      ],
+      "sustentada_por": [
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "As propostas são convergentes. Adotou-se a especificação \"Nexo causal direto\" de Izabela, que reflete a ideia de omissão própria (descumprimento de dever específico) central no voto.",
+      "propostas": {
+        "andressa-bissolotti": "Nexo causal entre a fuga e o latrocínio",
+        "izabela-melo": "Nexo causal / Nexo causal direto",
+        "vitor-melo": "Nexo causal / Ausência de excludentes"
+      }
+    },
+    {
+      "secao_id": "5",
+      "secao": "NEXO CAUSAL",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Alexandre de Moraes",
+      "perspectiva_pipeline": "voto_divergente",
+      "valor": "Rompimento do nexo causal / Novo nexo causal",
+      "itens": [
+        "Rompimento do nexo causal",
+        "Novo nexo causal"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "As propostas são convergentes. A consolidação unifica os termos utilizados por todos os anotadores para descrever a quebra do nexo causal.",
+      "propostas": {
+        "andressa-bissolotti": "Rompimento do nexo causal (ato de terceiro)",
+        "izabela-melo": "Interrupção do nexo causal / Novo nexo causal",
+        "vitor-melo": "Ausência de nexo causal direto e imediato / Rompimento do nexo causal / Novo nexo causal"
+      }
+    },
+    {
+      "secao_id": "6",
+      "secao": "CENÁRIOS CAUSAIS",
+      "tipo": "campo_livre",
+      "perspectiva": null,
+      "perspectiva_pipeline": null,
+      "valor": "",
+      "itens": [],
+      "sustentada_por": [],
+      "divergencia_substantiva": false,
+      "justificativa": "Todas as propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "7.1",
+      "secao": "DIVERGÊNCIAS — Pontos de divergência",
+      "tipo": "campo_livre",
+      "perspectiva": null,
+      "perspectiva_pipeline": null,
+      "valor": "",
+      "itens": [],
+      "sustentada_por": [],
+      "divergencia_substantiva": false,
+      "justificativa": "Todas as propostas estavam vazias.",
+      "propostas": {
+        "andressa-bissolotti": "",
+        "izabela-melo": "",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "7.2",
+      "secao": "DIVERGÊNCIAS — Posturas",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrente",
+      "perspectiva_pipeline": "recorrente",
+      "valor": "Ausência de responsabilidade do Estado / Ato de terceiro como causa do resultado / Rompimento do nexo causal",
+      "itens": [
+        "Ausência de responsabilidade do Estado",
+        "Ato de terceiro como causa do resultado",
+        "Rompimento do nexo causal"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Adotou-se a proposta de Izabela, que utiliza o vocabulário mínimo e corresponde em conteúdo à proposta de Andressa.",
+      "propostas": {
+        "andressa-bissolotti": "O ato de terceiro é a causa do resultado, com ausência de responsabilidade do Estado",
+        "izabela-melo": "Ausência de responsabilidade do Estado / Ato de terceiro como causa do resultado / Rompimento do nexo causal",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "7.2",
+      "secao": "DIVERGÊNCIAS — Posturas",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Recorrido",
+      "perspectiva_pipeline": "recorrido",
+      "valor": "Responsabilidade do Estado / Responsabilidade por omissão específica / Manutenção do nexo causal",
+      "itens": [
+        "Responsabilidade do Estado",
+        "Responsabilidade por omissão específica",
+        "Manutenção do nexo causal"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Adotou-se a proposta de Izabela, que utiliza o vocabulário mínimo e corresponde em conteúdo à proposta de Andressa.",
+      "propostas": {
+        "andressa-bissolotti": "Há responsabilidade do Estado por crimes cometidos por presos foragidos",
+        "izabela-melo": "Responsabilidade do Estado / Responsabilidade por omissão específica / Manutenção do nexo causal",
+        "vitor-melo": ""
+      }
+    },
+    {
+      "secao_id": "7.2",
+      "secao": "DIVERGÊNCIAS — Posturas",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Marco Aurélio",
+      "perspectiva_pipeline": "relator",
+      "valor": "Responsabilidade do Estado / Responsabilidade por omissão específica / Manutenção do nexo causal",
+      "itens": [
+        "Responsabilidade do Estado",
+        "Responsabilidade por omissão específica",
+        "Manutenção do nexo causal"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "As propostas são convergentes. Adotou-se a versão de Izabela por ser a mais completa e específica (\"omissão específica\"), o que é um ponto central do voto.",
+      "propostas": {
+        "andressa-bissolotti": "Há responsabilidade do Estado por crimes cometidos por presos foragidos",
+        "izabela-melo": "Responsabilidade do Estado / Responsabilidade por omissão específica / Manutenção do nexo causal",
+        "vitor-melo": "Responsabilidade do Estado / Responsabilidade por omissão / Manutenção do nexo causal"
+      }
+    },
+    {
+      "secao_id": "7.2",
+      "secao": "DIVERGÊNCIAS — Posturas",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Edson Fachin",
+      "perspectiva_pipeline": "voto_convergente",
+      "valor": "Responsabilidade do Estado / Responsabilidade por omissão específica / Manutenção do nexo causal",
+      "itens": [
+        "Responsabilidade do Estado",
+        "Responsabilidade por omissão específica",
+        "Manutenção do nexo causal"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "Todas as propostas são idênticas em conteúdo. A consolidação adota a formulação em lista, que é mais clara e utiliza o vocabulário mínimo.",
+      "propostas": {
+        "andressa-bissolotti": "Há responsabilidade do Estado por crimes cometidos por presos foragidos, tratando-se de responsabilidade por omissão específica",
+        "izabela-melo": "Responsabilidade do Estado / Responsabilidade por omissão específica / Manutenção do nexo causal",
+        "vitor-melo": "Responsabilidade do Estado / Responsabilidade por omissão específica / Manutenção do nexo causal"
+      }
+    },
+    {
+      "secao_id": "7.2",
+      "secao": "DIVERGÊNCIAS — Posturas",
+      "tipo": "tabela_por_perspectiva",
+      "perspectiva": "Alexandre de Moraes",
+      "perspectiva_pipeline": "voto_divergente",
+      "valor": "Ausência de responsabilidade do Estado / Ato de terceiro como causa do resultado / Rompimento do nexo causal",
+      "itens": [
+        "Ausência de responsabilidade do Estado",
+        "Ato de terceiro como causa do resultado",
+        "Rompimento do nexo causal"
+      ],
+      "sustentada_por": [
+        "andressa-bissolotti",
+        "izabela-melo",
+        "vitor-melo"
+      ],
+      "divergencia_substantiva": false,
+      "justificativa": "As propostas são convergentes. A consolidação adota a proposta de Izabela, que é a mais completa e alinhada ao vocabulário, e cujo conteúdo é sustentado por todos os anotadores.",
+      "propostas": {
+        "andressa-bissolotti": "Ausência de responsabilidade do Estado pelo crime de latrocínio cometido por detento foragido, tendo em vista rompimento do nexo causal em razão do lapso temporal e outras causas supervenientes",
+        "izabela-melo": "Ausência de responsabilidade do Estado / Ato de terceiro como causa do resultado / Rompimento do nexo causal",
+        "vitor-melo": "Ausência de responsabilidade do Estado / Rompimento do nexo causal"
+      }
+    }
+  ],
+  "proveniencia": {
+    "prompt": "prompts/consolidacao/00_main.v1.md",
+    "prompt_versao": 1,
+    "template_sha256": "0174c4d78923e2d7508de920b72f7037d1196d0f773dab663c146ef5e3353dc2",
+    "rendered_sha256": "6b27ab0b3c21abf7c863baed36afa2d831aae6431f79da5df05dd6c591e45c2a"
+  }
+}

@@ -6,7 +6,7 @@ and adapted ASPIC+ solver.
 Each test builds the argumentation theory exactly as given in the paper
 (atoms, rules, knowledge base) and checks two things per case:
 1. The grounded extension matches the paper's stated justified conclusions.
-2. is_cause(phi, psi) matches the paper's explicit cause / non-cause claims.
+2. ness_cause(phi, psi) matches the paper's explicit cause / non-cause claims.
 
 The five cases' knowledge bases/rule models live in `aspic.examples` --
 the same source `scripts/generate_graphs.py` uses to render their argument
@@ -27,9 +27,9 @@ def test_asbestos_overdetermination():
     af = ArgumentationFramework(case.knowledge_base, case.causal_model)
 
     assert "Di" in af.justified_conclusions()
-    assert af.is_cause("Ex1", "Di") is True
-    assert af.is_cause("Ex2", "Di") is True
-    assert af.is_cause("Ex3", "Di") is True
+    assert af.ness_cause("Ex1", "Di") is True
+    assert af.ness_cause("Ex2", "Di") is True
+    assert af.ness_cause("Ex3", "Di") is True
 
 
 def test_double_shooting_preemption():
@@ -43,8 +43,8 @@ def test_double_shooting_preemption():
     # Dlugash's argument chain is undercut, so DlKi should not be justified.
     assert "DlKi" not in af.justified_conclusions()
 
-    assert af.is_cause("BuSh", "GeDi") is True
-    assert af.is_cause("DlSh", "GeDi") is False
+    assert af.ness_cause("BuSh", "GeDi") is True
+    assert af.ness_cause("DlSh", "GeDi") is False
 
 
 def test_childhood_leukaemia_omission():
@@ -56,8 +56,8 @@ def test_childhood_leukaemia_omission():
     af = ArgumentationFramework(case.knowledge_base, case.causal_model)
 
     assert "ChDi" in af.justified_conclusions()
-    assert af.is_cause("ChLe", "ChDi") is True
-    assert af.is_cause("¬PaCo", "ChDi") is True
+    assert af.ness_cause("ChLe", "ChDi") is True
+    assert af.ness_cause("¬PaCo", "ChDi") is True
 
 
 def test_car_accident_preemptive_negative_causation():
@@ -68,8 +68,8 @@ def test_car_accident_preemptive_negative_causation():
     af = ArgumentationFramework(case.knowledge_base, case.causal_model)
 
     assert "AcHa" in af.justified_conclusions()
-    assert af.is_cause("¬DrPu", "AcHa") is True
-    assert af.is_cause("BrMa", "AcHa") is False
+    assert af.ness_cause("¬DrPu", "AcHa") is True
+    assert af.ness_cause("BrMa", "AcHa") is False
 
 
 def test_war_crime_ennoblement():
@@ -79,10 +79,10 @@ def test_war_crime_ennoblement():
     shoots = case_by_id("war_crime_soldier_shoots")
     soldier_shoots = ArgumentationFramework(shoots.knowledge_base, shoots.causal_model)
     assert "PrDi" in soldier_shoots.justified_conclusions()
-    assert soldier_shoots.is_cause("SoSh", "PrDi") is True
+    assert soldier_shoots.ness_cause("SoSh", "PrDi") is True
 
     refuses = case_by_id("war_crime_soldier_refuses")
     soldier_refuses = ArgumentationFramework(refuses.knowledge_base, refuses.causal_model)
     assert "SeSh" in soldier_refuses.justified_conclusions()
     assert "PrDi" in soldier_refuses.justified_conclusions()
-    assert soldier_refuses.is_cause("¬SoSh", "PrDi") is True
+    assert soldier_refuses.ness_cause("¬SoSh", "PrDi") is True

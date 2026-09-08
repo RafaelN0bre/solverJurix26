@@ -1,0 +1,77 @@
+{
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "comparison": [
+    {
+      "phi": "¬AtdTemp",
+      "psi": "SeqIrr",
+      "question_pt": "A demora no atendimento médico foi causa das sequelas irreversíveis do preso?",
+      "ness": false,
+      "is_cause": false,
+      "but_for": false,
+      "legally_relevant": null,
+      "solver_label_pt": "não é causa de fato",
+      "solver_verdict": "rejeitada",
+      "court_verdict": "rejeitada",
+      "court_rationale_pt": "A corte rejeitou esta relação causal por entender que a perícia não foi conclusiva sobre a demora e que, de todo modo, o atendimento seguiu os protocolos de saúde aplicáveis.",
+      "agreement": "match"
+    },
+    {
+      "phi": "¬CelHum",
+      "psi": "SeqIrr",
+      "question_pt": "As condições desumanas da cela foram causa das sequelas irreversíveis do preso?",
+      "ness": false,
+      "is_cause": false,
+      "but_for": false,
+      "legally_relevant": null,
+      "solver_label_pt": "não é causa de fato",
+      "solver_verdict": "rejeitada",
+      "court_verdict": "rejeitada",
+      "court_rationale_pt": "A corte afastou esta causa por falta de provas, afirmando que a alegação sobre as condições da cela não foi acompanhada de evidência técnica ou documental que estabelecesse a relação causal.",
+      "agreement": "match"
+    },
+    {
+      "phi": "FatRisc",
+      "psi": "SeqIrr",
+      "question_pt": "Os fatores de risco pessoais do preso foram causa de suas sequelas irreversíveis?",
+      "ness": true,
+      "is_cause": true,
+      "but_for": true,
+      "legally_relevant": true,
+      "solver_label_pt": "é causa de fato e juridicamente relevante",
+      "solver_verdict": "acolhida",
+      "court_verdict": "acolhida",
+      "court_rationale_pt": "A corte considerou que os fatores de risco pessoais do preso, como tabagismo e uso de cocaína no passado, eram uma explicação plausível para o dano, o que serviu para interromper o nexo causal com a conduta do Estado.",
+      "agreement": "match"
+    },
+    {
+      "phi": "AgrQuad",
+      "psi": "SeqIrr",
+      "question_pt": "O agravamento do quadro de saúde do preso foi a causa de suas sequelas irreversíveis?",
+      "ness": false,
+      "is_cause": true,
+      "but_for": true,
+      "legally_relevant": false,
+      "solver_label_pt": "é causa de fato, mas não juridicamente relevante",
+      "solver_verdict": "rejeitada",
+      "court_verdict": "acolhida",
+      "court_rationale_pt": "Foi um ponto incontroverso no processo que as sequelas e a incapacidade laboral resultaram diretamente do agravamento do quadro de pneumonia e insuficiência cardíaca do preso.",
+      "agreement": "mismatch"
+    }
+  ],
+  "summary": {
+    "case_id": "case-005",
+    "atoms": 11,
+    "premises": 9,
+    "rules": 8,
+    "queries": 4,
+    "has_lrc": true,
+    "agreement": {
+      "match": 3,
+      "mismatch": 1,
+      "indefinido": 0
+    },
+    "agreement_rate": 0.75
+  }
+}

@@ -1,0 +1,303 @@
+{
+  "stage": "atoms",
+  "prompt": {
+    "path": "prompts/formalize/01_atoms.v1.md",
+    "version": 1,
+    "template_sha256": "4bd0107b863144207e571a2954cd452c27bf6d86ac37064dc9e4f6e60fd6a7c0",
+    "rendered_sha256": "e62218d5451aaaab4abe43caead7166c3759de466425ef9af01613da1d460d07",
+    "config": {
+      "model": "gemini-2.5-pro",
+      "temperature": 0
+    },
+    "includes": []
+  },
+  "attempts": 2,
+  "repairs": [
+    [
+      "O código do átomo 'DeverCustodia' foi alterado para 'DevCustodia' para respeitar o limite de 12 caracteres.",
+      "O código do átomo 'OmissaoEstado' foi alterado para 'OmisEstado' para respeitar o limite de 12 caracteres."
+    ]
+  ],
+  "issues": [],
+  "output": {
+    "case_title": "Caso 003 — Responsabilidade do Estado por crime de foragido",
+    "narrative_pt": "Um detento em regime fechado fugiu da prisão. Três meses depois, em conjunto com uma quadrilha, ele cometeu um latrocínio (roubo seguido de morte). A família da vítima processou o Estado, alegando que a omissão no dever de custódia foi a causa da morte. O Estado (recorrente) argumentou que o longo período de tempo e a formação de uma nova quadrilha para o crime romperam o nexo causal, tratando-se de um fato de terceiro. A discussão central é se a falha inicial do Estado em prevenir a fuga é a causa juridicamente relevante do dano, ou se eventos supervenientes interromperam essa cadeia causal.",
+    "central_question": "A omissão do Estado em seu dever de custódia, que resulta na fuga de um detento, é causa direta da morte de uma vítima de latrocínio cometido pelo foragido três meses depois e em concurso de agentes?",
+    "outcome_code": "MorteVitima",
+    "atoms": [
+      {
+        "code": "MorteVitima",
+        "label_pt": "a vítima Vilson Lebtag morreu em decorrência do crime",
+        "kind": "resultado",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrente",
+          "recorrido",
+          "relator",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_a5b5c7f3a9ca4d80",
+          "src_d27a4d0db9954fe8"
+        ],
+        "dossier_refs": [
+          "prec_fde2d7ddb4e94671",
+          "prec_39510acdcfd949af",
+          "prec_162ff6b502734337",
+          "unit_22e8dca47d4045f6",
+          "unit_4d500f0cde7c491e",
+          "unit_3b5cd0d3aee1479e",
+          "unit_d5df39b851574b26",
+          "unit_c2d2a7bbe62647bc",
+          "unit_bd0d5b84cc5e4544"
+        ],
+        "established": false
+      },
+      {
+        "code": "FugaPreso",
+        "label_pt": "o detento fugiu do sistema prisional",
+        "kind": "fato",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrente",
+          "recorrido",
+          "relator",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_3bfb96a17abe4056",
+          "src_ef2c1e974e7a4f19",
+          "src_7adf43487cee456e",
+          "src_2cc2964892904cf2"
+        ],
+        "dossier_refs": [
+          "synth_e5a3b70e55fe4afd",
+          "prec_39510acdcfd949af",
+          "prec_162ff6b502734337",
+          "unit_22e8dca47d4045f6",
+          "unit_d5df39b851574b26",
+          "unit_bd0d5b84cc5e4544"
+        ],
+        "established": true
+      },
+      {
+        "code": "CrimeLatroc",
+        "label_pt": "o foragido cometeu um crime de latrocínio contra a vítima",
+        "kind": "intermediario",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrente",
+          "recorrido",
+          "relator",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_a5b5c7f3a9ca4d80",
+          "src_7adf43487cee456e"
+        ],
+        "dossier_refs": [
+          "prec_162ff6b502734337"
+        ],
+        "established": false
+      },
+      {
+        "code": "Crime3Meses",
+        "label_pt": "o crime foi praticado três meses após a fuga",
+        "kind": "fato",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrente",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_2cc2964892904cf2",
+          "src_f2b9e027898b482e"
+        ],
+        "dossier_refs": [
+          "prec_fde2d7ddb4e94671",
+          "prec_9a3da3e5a15749f4",
+          "unit_4d500f0cde7c491e",
+          "unit_3b5cd0d3aee1479e",
+          "unit_c2d2a7bbe62647bc",
+          "divg_6ae0d94b953e43e3"
+        ],
+        "established": true
+      },
+      {
+        "code": "CrimeQuadr",
+        "label_pt": "o crime foi praticado em concurso de agentes (formação de quadrilha)",
+        "kind": "fato",
+        "status": "incontroverso",
+        "perspectives": [
+          "stf_final"
+        ],
+        "evidence": [
+          "src_f2b9e027898b482e"
+        ],
+        "dossier_refs": [
+          "prec_9a3da3e5a15749f4",
+          "prec_f58cd2a8038a4f48",
+          "unit_4d500f0cde7c491e",
+          "unit_c2d2a7bbe62647bc",
+          "divg_6ae0d94b953e43e3"
+        ],
+        "established": true
+      },
+      {
+        "code": "RegimeFech",
+        "label_pt": "o detento cumpria pena em regime fechado",
+        "kind": "fato",
+        "status": "incontroverso",
+        "perspectives": [
+          "recorrido",
+          "relator"
+        ],
+        "evidence": [
+          "src_4de553dc86c34273",
+          "src_c9ac4600e7a84a96",
+          "src_03d379dcbe9d4160",
+          "src_e18ee49b97864ccf"
+        ],
+        "dossier_refs": [
+          "prec_162ff6b502734337",
+          "divg_bf34619f430e4838"
+        ],
+        "established": true
+      },
+      {
+        "code": "DevCustodia",
+        "label_pt": "o Estado tinha o dever específico de custódia sobre o preso",
+        "kind": "dever",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrido",
+          "relator"
+        ],
+        "evidence": [
+          "src_4621720adee3413a",
+          "src_c9ac4600e7a84a96",
+          "src_d4430da819554298",
+          "src_72ea31d850704795"
+        ],
+        "dossier_refs": [
+          "synth_e5a3b70e55fe4afd",
+          "prec_39510acdcfd949af",
+          "prec_162ff6b502734337",
+          "prec_422650345ecf4faa",
+          "divg_bf34619f430e4838",
+          "unit_22e8dca47d4045f6",
+          "unit_d5df39b851574b26",
+          "unit_bd0d5b84cc5e4544"
+        ],
+        "established": true
+      },
+      {
+        "code": "DeverSegPub",
+        "label_pt": "o dever do Estado no caso era o genérico de segurança pública",
+        "kind": "dever",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrente",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_05026afa6a9d4e08",
+          "src_83aefba652654af9"
+        ],
+        "dossier_refs": [
+          "synth_e5a3b70e55fe4afd",
+          "prec_9a3da3e5a15749f4",
+          "divg_bf34619f430e4838"
+        ],
+        "established": true
+      },
+      {
+        "code": "FatoTerceiro",
+        "label_pt": "a ação do foragido constituiu fato de terceiro, rompendo o nexo causal",
+        "kind": "intermediario",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrente",
+          "stf_final"
+        ],
+        "evidence": [
+          "src_aa174d74858e40d2",
+          "src_a30a80e07114404d",
+          "src_b08f1a1374b84354"
+        ],
+        "dossier_refs": [
+          "synth_e5a3b70e55fe4afd",
+          "prec_fde2d7ddb4e94671",
+          "prec_f58cd2a8038a4f48",
+          "prec_9a3da3e5a15749f4",
+          "unit_4d500f0cde7c491e",
+          "unit_3b5cd0d3aee1479e",
+          "unit_c2d2a7bbe62647bc",
+          "divg_6ae0d94b953e43e3"
+        ],
+        "established": false
+      },
+      {
+        "code": "OmisEstado",
+        "label_pt": "houve omissão do Estado no dever de vigilância do preso",
+        "kind": "fato",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrido",
+          "relator"
+        ],
+        "evidence": [
+          "src_4621720adee3413a",
+          "src_a94058bbcc74469d",
+          "src_3bfb96a17abe4056",
+          "src_4194a0f3e6714188"
+        ],
+        "dossier_refs": [
+          "prec_39510acdcfd949af",
+          "prec_162ff6b502734337",
+          "unit_22e8dca47d4045f6",
+          "unit_d5df39b851574b26",
+          "unit_bd0d5b84cc5e4544"
+        ],
+        "established": true
+      },
+      {
+        "code": "AusProvMed",
+        "label_pt": "o Estado não provou ter adotado as medidas cabíveis e esperadas para evitar a fuga",
+        "kind": "prova",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrido",
+          "relator"
+        ],
+        "evidence": [
+          "src_e78c7d363e2f4c61"
+        ],
+        "dossier_refs": [
+          "prec_422650345ecf4faa"
+        ],
+        "established": true
+      },
+      {
+        "code": "AusProvFuga3",
+        "label_pt": "o Estado não provou que a falha no dever de custódia resultou de fato de terceiro",
+        "kind": "prova",
+        "status": "controvertido",
+        "perspectives": [
+          "recorrido",
+          "relator"
+        ],
+        "evidence": [
+          "src_7bc6e39b968c4b50"
+        ],
+        "dossier_refs": [
+          "prec_422650345ecf4faa"
+        ],
+        "established": true
+      }
+    ],
+    "open_questions": [
+      "O voto convergente de Edson Fachin, que se baseia no ônus da prova do Estado em demonstrar que tomou as medidas cabíveis para evitar a fuga, não foi enfrentado pelos demais votos. A perspectiva 'convergente' não está no schema, então o argumento foi atribuído às perspectivas com conclusão idêntica (recorrido, relator), mas isso é uma simplificação da estrutura argumentativa do acórdão."
+    ]
+  }
+}

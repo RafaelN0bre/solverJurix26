@@ -1,0 +1,82 @@
+{
+  "run_id": "20260828-165337",
+  "created_at": "2026-08-28T16:54:30",
+  "case_id": "case-003",
+  "annotator": "izabela-melo",
+  "source_file": "data/izabela-melo/case-003-dossie-2026-08-24.json",
+  "source_sha256": "3079e33fe89f1f70af968911ea5b4d2ae50de03898ea333a4f83278a44f72930",
+  "dossier_stats": {
+    "divergences": 2,
+    "causal_units": 6,
+    "perspective_reconstructions": 6,
+    "source_passages": 41,
+    "source_links": 69,
+    "annotations": 0,
+    "assertions": 0,
+    "connections": 0,
+    "timeline": 0,
+    "perspectives": 0,
+    "facts": 0,
+    "clarifications": 0,
+    "canonical_concepts": 0,
+    "canonical_connections": 0,
+    "synthesis": 1
+  },
+  "model": "gemini-2.5-pro",
+  "usage": {
+    "prompt_tokens": 18999,
+    "candidates_tokens": 1925,
+    "thoughts_tokens": 5000,
+    "total_tokens": 25924
+  },
+  "llm_calls": 6,
+  "stages": [
+    {
+      "stage": "atoms",
+      "prompt": "prompts/formalize/01_atoms.v1.md",
+      "prompt_version": 1,
+      "template_sha256": "4bd0107b863144207e571a2954cd452c27bf6d86ac37064dc9e4f6e60fd6a7c0",
+      "attempts": 2,
+      "warnings": 0
+    },
+    {
+      "stage": "rules",
+      "prompt": "prompts/formalize/02_rules.v2.md",
+      "prompt_version": 2,
+      "template_sha256": "03c38598f11853f0605c441d7f9bce775accbc1187bdc0bb4070bf58d398b4b7",
+      "attempts": 2,
+      "warnings": 4
+    },
+    {
+      "stage": "queries",
+      "prompt": "prompts/formalize/03_queries.v2.md",
+      "prompt_version": 2,
+      "template_sha256": "ed6684c4ecdde0afc32d0c290ee89126336449be55209ec59505dc5232a42cc2",
+      "attempts": 1,
+      "warnings": 0
+    },
+    {
+      "stage": "lrc",
+      "prompt": "prompts/formalize/04_lrc.v3.md",
+      "prompt_version": 3,
+      "template_sha256": "f0235bac158412b5a8d5335df59b48862f80c01c12b0f7f40a098e8821be5193",
+      "attempts": 1,
+      "warnings": 0
+    }
+  ],
+  "validation": {
+    "case_id": "case-003",
+    "atoms": 12,
+    "premises": 6,
+    "rules": 3,
+    "queries": 3,
+    "has_lrc": true,
+    "agreement": {
+      "match": 3,
+      "mismatch": 0,
+      "indefinido": 0
+    },
+    "agreement_rate": 1.0
+  },
+  "ok": true
+}

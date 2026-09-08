@@ -1,0 +1,108 @@
+{
+  "stage": "rules",
+  "prompt": {
+    "path": "prompts/formalize/02_rules.v2.md",
+    "version": 2,
+    "template_sha256": "03c38598f11853f0605c441d7f9bce775accbc1187bdc0bb4070bf58d398b4b7",
+    "rendered_sha256": "ff6cc75d5ec0b221ed3eacd08254034300ce2abf982cd33e85650005d4c55be5",
+    "config": {
+      "model": "gemini-2.5-pro",
+      "temperature": 0
+    },
+    "includes": [
+      "_shared/grammar"
+    ]
+  },
+  "attempts": 2,
+  "repairs": [
+    [
+      "Removi as regras r3, r4 e r5, que modelavam a tese de 'fato de terceiro'. Conforme as instruções, essa tese de rompimento de nexo causal é uma questão de imputação jurídica a ser tratada no estágio 4, e não um ataque à cadeia causal fática.",
+      "Removi os átomos 'Crime3Meses' e 'CrimeQuadr' da lista de premissas, pois eles são os fatos que sustentam a tese de 'fato de terceiro', agora adiada para o estágio 4.",
+      "Atualizei as notas de modelagem para refletir que a remoção do argumento de 'fato de terceiro' desta camada corrige o erro de validação, permitindo que a cadeia causal da parte vencida seja estabelecida para análise no estágio seguinte."
+    ]
+  ],
+  "issues": [
+    {
+      "code": "rules.orphan_atom",
+      "severity": "warning",
+      "where": "Crime3Meses",
+      "message": "o átomo Crime3Meses não aparece em nenhuma premissa nem regra."
+    },
+    {
+      "code": "rules.orphan_atom",
+      "severity": "warning",
+      "where": "CrimeQuadr",
+      "message": "o átomo CrimeQuadr não aparece em nenhuma premissa nem regra."
+    },
+    {
+      "code": "rules.orphan_atom",
+      "severity": "warning",
+      "where": "DeverSegPub",
+      "message": "o átomo DeverSegPub não aparece em nenhuma premissa nem regra."
+    },
+    {
+      "code": "rules.orphan_atom",
+      "severity": "warning",
+      "where": "FatoTerceiro",
+      "message": "o átomo FatoTerceiro não aparece em nenhuma premissa nem regra."
+    }
+  ],
+  "output": {
+    "premises": [
+      "FugaPreso",
+      "RegimeFech",
+      "DevCustodia",
+      "OmisEstado",
+      "AusProvMed",
+      "AusProvFuga3"
+    ],
+    "axioms": [],
+    "strict_rules": [],
+    "defeasible_rules": [
+      {
+        "rule": "r0: OmisEstado AND DevCustodia AND FugaPreso AND RegimeFech => CrimeLatroc",
+        "kind": "causal",
+        "gloss_pt": "A omissão do Estado em seu dever específico de custódia de um preso em regime fechado, que resultou na fuga, é a causa do latrocínio que ele cometeu.",
+        "perspective": "recorrido",
+        "evidence": [
+          "src_c9ac4600e7a84a96",
+          "src_e18ee49b97864ccf",
+          "src_3bfb96a17abe4056"
+        ],
+        "dossier_refs": [
+          "prec_39510acdcfd949af",
+          "prec_162ff6b502734337",
+          "unit_bd0d5b84cc5e4544"
+        ]
+      },
+      {
+        "rule": "r1: AusProvMed AND AusProvFuga3 AND DevCustodia AND FugaPreso AND RegimeFech => CrimeLatroc",
+        "kind": "causal",
+        "gloss_pt": "Como o Estado não provou ter tomado as medidas para evitar a fuga nem que a falha resultou de fato de terceiro, sua omissão no dever de custódia de um preso em regime fechado causou o latrocínio.",
+        "perspective": "relator",
+        "evidence": [
+          "src_e78c7d363e2f4c61",
+          "src_7bc6e39b968c4b50",
+          "src_72ea31d850704795"
+        ],
+        "dossier_refs": [
+          "prec_422650345ecf4faa"
+        ]
+      },
+      {
+        "rule": "r2: CrimeLatroc => MorteVitima",
+        "kind": "causal",
+        "gloss_pt": "O latrocínio cometido pelo foragido resultou na morte da vítima.",
+        "perspective": "comum",
+        "evidence": [
+          "src_a5b5c7f3a9ca4d80",
+          "src_7adf43487cee456e"
+        ],
+        "dossier_refs": [
+          "prec_162ff6b502734337"
+        ]
+      }
+    ],
+    "modelling_notes_pt": "A tese do recorrente sobre o rompimento do nexo causal por 'fato de terceiro' (baseada no lapso temporal e no concurso de agentes) foi movida para o estágio 4, onde será tratada como uma questão de imputação jurídica. Isso corrige o erro que impedia a derivação do resultado 'MorteVitima' nesta camada. Consequentemente, os átomos 'Crime3Meses' e 'CrimeQuadr', que fundamentam essa tese, foram removidos das premissas. O átomo 'DeverSegPub', que representa o dever genérico de segurança, também foi omitido das premissas por pertencer à discussão sobre a natureza do dever, a ser tratada no estágio 4 (esquema 'unom'). O argumento do voto convergente sobre o ônus da prova foi mantido como uma regra causal paralela (r1)."
+  }
+}

@@ -18,15 +18,22 @@ def test_index_serves_html_shell():
     resp = client.get("/")
     assert resp.status_code == 200
     assert "text/html" in resp.headers["content-type"]
-    assert "case-select" in resp.text
-    assert "case-container" in resp.text
+    assert "case-nav" in resp.text       # the case picker
+    assert "case-container" in resp.text  # where a view is injected
 
 
 def test_list_cases_returns_all_catalog_entries():
+    """The dropdown leads with the paper cases, in catalog order, and may be
+    followed by whatever has been formalized into `data/translated/` -- see
+    `test_catalog_api.py` for the dossier side, which pins its own directory
+    instead of depending on what happens to be committed."""
     resp = client.get("/api/cases")
     assert resp.status_code == 200
     payload = resp.json()
-    assert [entry["id"] for entry in payload] == [case.id for case in LEGAL_CASES]
+    paper_ids = [entry["id"] for entry in payload if entry["origin"] == "paper"]
+    assert paper_ids == [case.id for case in LEGAL_CASES]
+    assert payload[:len(LEGAL_CASES)] == [entry for entry in payload
+                                          if entry["origin"] == "paper"]
     assert all("title" in entry for entry in payload)
 
 

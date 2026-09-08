@@ -1,0 +1,63 @@
+{
+  "stage": "queries",
+  "prompt": {
+    "path": "prompts/formalize/03_queries.v1.md",
+    "version": 1,
+    "template_sha256": "caa2960356884709f5a1b19de7d8c8b7a5cf2e649b5a43dcf4ea8a866282f736",
+    "rendered_sha256": "13810e986b8370493592e6b6faf07cef168223b5bf0f9a063b7ec2cc431e0df2",
+    "config": {
+      "model": "gemini-2.5-pro",
+      "temperature": 0
+    },
+    "includes": []
+  },
+  "attempts": 1,
+  "repairs": [],
+  "issues": [],
+  "output": {
+    "queries": [
+      {
+        "phi": "¬AtdTemp",
+        "psi": "SeqIrr",
+        "question_pt": "A demora no atendimento médico foi causa das sequelas irreversíveis do preso?",
+        "court_verdict": "rejeitada",
+        "court_rationale_pt": "A corte rejeitou esta relação causal por entender que a perícia não foi conclusiva sobre a demora e que, de todo modo, o atendimento seguiu os protocolos de saúde aplicáveis.",
+        "evidence": [
+          "src_01141170d2b74513",
+          "src_f930afb4cd4c4c45"
+        ]
+      },
+      {
+        "phi": "¬CelHum",
+        "psi": "SeqIrr",
+        "question_pt": "As condições desumanas da cela foram causa das sequelas irreversíveis do preso?",
+        "court_verdict": "rejeitada",
+        "court_rationale_pt": "A corte afastou esta causa por falta de provas, afirmando que a alegação sobre as condições da cela não foi acompanhada de evidência técnica ou documental que estabelecesse a relação causal.",
+        "evidence": [
+          "src_c40f876685624014",
+          "src_e87485590fb74cad"
+        ]
+      },
+      {
+        "phi": "FatRisc",
+        "psi": "SeqIrr",
+        "question_pt": "Os fatores de risco pessoais do preso foram causa de suas sequelas irreversíveis?",
+        "court_verdict": "acolhida",
+        "court_rationale_pt": "A corte considerou que os fatores de risco pessoais do preso, como tabagismo e uso de cocaína no passado, eram uma explicação plausível para o dano, o que serviu para interromper o nexo causal com a conduta do Estado.",
+        "evidence": [
+          "src_91167dafaffc41cc"
+        ]
+      },
+      {
+        "phi": "AgrQuad",
+        "psi": "SeqIrr",
+        "question_pt": "O agravamento do quadro de saúde do preso foi a causa de suas sequelas irreversíveis?",
+        "court_verdict": "acolhida",
+        "court_rationale_pt": "Foi um ponto incontroverso no processo que as sequelas e a incapacidade laboral resultaram diretamente do agravamento do quadro de pneumonia e insuficiência cardíaca do preso.",
+        "evidence": [
+          "src_985014a104cf4772"
+        ]
+      }
+    ]
+  }
+}

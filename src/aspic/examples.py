@@ -8,38 +8,61 @@ models -- both `tests/test_legal_cases.py` and `aspic.graph_export` /
 own copy of the same five `kb`/`model` dicts.
 
 The `expect_*` fields on `CausalQuery` are not illustrative guesses: they are
-the actual outputs of `is_ness_cause` / `ArgumentationFramework.is_cause` /
+the actual outputs of `ArgumentationFramework.ness_cause` /
 `ArgumentationFramework.but_for` for that (phi, psi) pair, and
-`test_legal_cases.py` / `test_ness.py` assert them independently. Where the
-three notions disagree, `note` spells out why -- these disagreements are the
-whole point of walking through the cases (e.g. but-for's classic failure
-under preemption, or plain NESS's blindness to the leukaemia omission).
+`test_legal_cases.py` asserts them independently. Where the two notions
+disagree, `note` spells out why -- these disagreements are the whole point of
+walking through the cases (but-for's classic failure under overdetermination
+and preemption).
 
 `narrative_pt`, `atom_glosses`, `rule_glosses` and `note_pt` are the content
 behind the didactic view (`aspic.didactic`) aimed at legal professionals:
 plain-Portuguese glosses for every literal/rule that actually appears in the
 case's *base* framework (not the counterfactual axiom-expansions used by
-`is_cause`/`but_for` -- those stay inside the technical/English toggle,
+`ness_cause`/`but_for` -- those stay inside the technical/English toggle,
 which reuses `aspic.report`'s existing English rendering unchanged).
 """
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 @dataclass(frozen=True)
 class CausalQuery:
     """One (phi, psi) causal question to run against a case's framework, and
-    the three notions' verdicts on it: plain NESS (Hart & Honoré/Wright),
-    `is_cause` (ICAIL 2025 Definition 4.3 / ICAIL 2026 Definition 3.4 "NESS
-    Cause" -- same notion, later paper's terminology), and `but_for` (ICAIL
-    2026 Definition 3.5)."""
+    the two notions' verdicts on it: the NESS cause (ICAIL 2025 Definition
+    4.3, renamed "NESS Cause" in ICAIL 2026 Definition 3.4) and `but_for`
+    (ICAIL 2026 Definition 3.5)."""
     phi: str
     psi: str
     expect_ness: bool
-    expect_cause: bool
     expect_but_for: bool
     note: str = ""
     note_pt: str = ""
+
+
+@dataclass(frozen=True)
+class LRCLayer:
+    """The legally-relevant-causation module of the ICAIL 2026 follow-up paper
+    ("From Cause-in-Fact to Legally Relevant Cause through Argumentation",
+    Pisano, Prakken & Sartor), as a second argumentation framework layered on
+    top of a case's cause-in-fact one.
+
+    `knowledge_base` mixes premises of two very different provenances: the
+    `CaFa_*`/`ButFor_*` literals, which are *computed* from the cause-in-fact
+    framework (see `aspic.lrc` and `formalize.bridge`), and the doctrinal ones
+    (`Om_*`, `Obl_*`, `Unexpected_*`, ...), which come from reading the
+    judgment. `targets` lists the `LeReCa_*` conclusions worth asking about.
+
+    The five ICAIL 2025 cases in `LEGAL_CASES` carry no LRC layer, so
+    `CaseSpec.lrc` is None for them and they render exactly as before; the
+    layer is populated for cases formalized from an annotated dossier.
+    """
+    knowledge_base: dict
+    causal_model: dict
+    targets: List[str] = field(default_factory=list)
+    atom_glosses: Dict[str, str] = field(default_factory=dict)
+    rule_glosses: Dict[str, str] = field(default_factory=dict)
+    duty_basis_pt: str = ""
 
 
 @dataclass(frozen=True)
@@ -56,6 +79,12 @@ class CaseSpec:
     narrative_pt: str = ""
     atom_glosses: Dict[str, str] = field(default_factory=dict)
     rule_glosses: Dict[str, str] = field(default_factory=dict)
+    lrc: Optional[LRCLayer] = None
+    #: The case's ordering between defeasible arguments
+    #: (`aspic.preferences.PreferenceModel`), or None for the basic ordering
+    #: of Definition 2.11 -- which is what all five paper cases use.
+    preferences: Optional[object] = None
+    origin: str = "paper"
 
 
 LEGAL_CASES: List[CaseSpec] = [
@@ -105,17 +134,17 @@ LEGAL_CASES: List[CaseSpec] = [
         },
         queries=[
             CausalQuery(
-                "Ex1", "Di", expect_ness=True, expect_cause=True, expect_but_for=False,
-                note="Overdetermination: removing Ex1 still leaves Ex2+Ex3 sufficient (r2), so but-for fails even though Ex1 is a NESS/is_cause cause.",
+                "Ex1", "Di", expect_ness=True, expect_but_for=False,
+                note="Overdetermination: removing Ex1 still leaves Ex2+Ex3 sufficient (r2), so but-for fails even though Ex1 is a NESS cause.",
                 note_pt="Sobredeterminação: mesmo removendo hipoteticamente a exposição no empregador 1, a exposição nos empregadores 2 e 3 continua sendo suficiente para causar a doença — por isso o teste do \"não fosse por\" falha, mesmo a exposição 1 sendo reconhecida como causa.",
             ),
             CausalQuery(
-                "Ex2", "Di", expect_ness=True, expect_cause=True, expect_but_for=False,
+                "Ex2", "Di", expect_ness=True, expect_but_for=False,
                 note="Same overdetermination pattern via the other two sufficient pairs (r1, r3).",
                 note_pt="Mesmo padrão de sobredeterminação, agora pelos pares empregador 1+2 e 1+3.",
             ),
             CausalQuery(
-                "Ex3", "Di", expect_ness=True, expect_cause=True, expect_but_for=False,
+                "Ex3", "Di", expect_ness=True, expect_but_for=False,
                 note="Same overdetermination pattern via the other two sufficient pairs (r1, r2).",
                 note_pt="Mesmo padrão de sobredeterminação, agora pelos pares empregador 1+2 e 2+3.",
             ),
@@ -166,12 +195,12 @@ LEGAL_CASES: List[CaseSpec] = [
         },
         queries=[
             CausalQuery(
-                "BuSh", "GeDi", expect_ness=True, expect_cause=True, expect_but_for=False,
+                "BuSh", "GeDi", expect_ness=True, expect_but_for=False,
                 note="Classic preemption failure of but-for: axiom-expanding with ¬BuSh removes Bush's shot, which also removes r4's undercut, reviving Dlugash's r3 chain -- GeDi stays justified even though Bush's shot is the actual (NESS) cause.",
                 note_pt="Caso clássico de falha do teste \"não fosse por\" (preempção): se, por hipótese, retirássemos o tiro de Bush, isso também removeria o ataque à regra r1, reabilitando a cadeia do tiro de Dlugash — a morte continuaria justificada mesmo assim. Ainda assim, o tiro de Bush é reconhecido como a causa real (pelo teste NESS e pela análise mais ampla).",
             ),
             CausalQuery(
-                "DlSh", "GeDi", expect_ness=False, expect_cause=False, expect_but_for=False,
+                "DlSh", "GeDi", expect_ness=False, expect_but_for=False,
                 note="Dlugash's chain is undercut by r4 and never justified in the first place, so it is not a cause under any of the three notions.",
                 note_pt="A cadeia do tiro de Dlugash é bloqueada pela regra r4 e nunca chega a ser aceita — por isso não é causa em nenhum dos três testes.",
             ),
@@ -224,13 +253,13 @@ LEGAL_CASES: List[CaseSpec] = [
         },
         queries=[
             CausalQuery(
-                "ChLe", "ChDi", expect_ness=True, expect_cause=True, expect_but_for=True,
+                "ChLe", "ChDi", expect_ness=True, expect_but_for=True,
                 note="Straightforward direct cause: ChLe is the only element of the only sufficient set, and removing it removes ChDi entirely.",
                 note_pt="Causa direta e evidente: é o único elemento do único conjunto suficiente para a morte, e removê-lo remove a morte por completo — os três testes concordam.",
             ),
             CausalQuery(
-                "¬PaCo", "ChDi", expect_ness=False, expect_cause=True, expect_but_for=True,
-                note="Plain NESS misses this: ¬PaCo is not a premise of any argument for ChDi. is_cause catches it via axiom-expansion (PaCo would enable Chem, which would undercut r0) -- the gap plain NESS was never designed to close.",
+                "¬PaCo", "ChDi", expect_ness=True, expect_but_for=True,
+                note="A negatively relevant cause: ¬PaCo is not a premise of any argument for ChDi, so a purely deductive reading of NESS misses it. The argumentation-theoretic NESS of Definition 4.3 catches it via axiom-expansion -- PaCo would enable Chem, which would undercut r0.",
                 note_pt="O teste NESS clássico não enxerga esta causa, pois a recusa de consentimento nunca aparece como premissa de nenhum argumento que leva à morte. A análise mais ampla identifica que, hipoteticamente, o consentimento habilitaria a quimioterapia, que derrubaria a regra que liga a leucemia à morte — por isso a omissão É reconhecida como causa nessa análise mais completa.",
             ),
         ],
@@ -280,12 +309,12 @@ LEGAL_CASES: List[CaseSpec] = [
         },
         queries=[
             CausalQuery(
-                "¬DrPu", "AcHa", expect_ness=True, expect_cause=True, expect_but_for=False,
+                "¬DrPu", "AcHa", expect_ness=True, expect_but_for=False,
                 note="Same preemption pattern as the double-shooting case: axiom-expanding with DrPu removes r3's undercut, reviving the BrMa-via-BrFa chain, so AcHa stays justified even though ¬DrPu is the actual (NESS) cause.",
                 note_pt="Mesmo padrão de preempção do caso Dlugash: se, por hipótese, o motorista tivesse pisado no freio, isso removeria o ataque à regra r2, reabilitando a cadeia do defeito nos freios — o acidente continuaria justificado mesmo assim. Ainda assim, a omissão do motorista é reconhecida como a causa real.",
             ),
             CausalQuery(
-                "BrMa", "AcHa", expect_ness=False, expect_cause=False, expect_but_for=False,
+                "BrMa", "AcHa", expect_ness=False, expect_but_for=False,
                 note="The malfunction's chain is undercut by r3 and never justified, so it is not a cause under any of the three notions.",
                 note_pt="A cadeia do defeito nos freios é bloqueada pela regra r3 e nunca chega a ser aceita — por isso não é causa em nenhum dos três testes.",
             ),
@@ -323,8 +352,8 @@ LEGAL_CASES: List[CaseSpec] = [
         },
         queries=[
             CausalQuery(
-                "SoSh", "PrDi", expect_ness=True, expect_cause=True, expect_but_for=False,
-                note="Preemption again: axiom-expanding with ¬SoSh triggers r2, so the sergeant's shot (SeSh, via r1) reinstates PrDi -- but-for fails, NESS/is_cause don't.",
+                "SoSh", "PrDi", expect_ness=True, expect_but_for=False,
+                note="Preemption again: axiom-expanding with ¬SoSh triggers r2, so the sergeant's shot (SeSh, via r1) reinstates PrDi -- but-for fails, NESS does not.",
                 note_pt="Mesmo padrão de preempção: se, por hipótese, o soldado se recusasse a atirar, isso acionaria a regra que faz o sargento atirar em seu lugar, e a morte continuaria justificada — mesmo assim, o tiro do soldado é reconhecido como a causa real quando ele de fato atira.",
             ),
         ],
@@ -364,7 +393,7 @@ LEGAL_CASES: List[CaseSpec] = [
         },
         queries=[
             CausalQuery(
-                "¬SoSh", "PrDi", expect_ness=True, expect_cause=True, expect_but_for=False,
+                "¬SoSh", "PrDi", expect_ness=True, expect_but_for=False,
                 note="Symmetric preemption: axiom-expanding with SoSh triggers r0 directly, reinstating PrDi via the soldier's own shot -- but-for fails here too.",
                 note_pt="Preempção simétrica: se, por hipótese, o soldado tivesse atirado, a regra r0 seria acionada diretamente e a morte continuaria justificada pelo tiro dele — mesmo assim, a recusa do soldado (que aciona o tiro do sargento) é reconhecida como a causa real neste cenário.",
             ),

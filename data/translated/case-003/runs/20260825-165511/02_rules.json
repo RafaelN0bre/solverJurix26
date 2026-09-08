@@ -1,0 +1,141 @@
+{
+  "stage": "rules",
+  "prompt": {
+    "path": "prompts/formalize/02_rules.v1.md",
+    "version": 1,
+    "template_sha256": "d969f2aba44f2d7e5da7cbb94a73ee2979ad52f39cfb140c885a2da3fec38710",
+    "rendered_sha256": "9e6abe0200e86d73bf71ec641e90212e3ec7b9676cc08ce13f8296d5cc397010",
+    "config": {
+      "model": "gemini-2.5-pro",
+      "temperature": 0
+    },
+    "includes": [
+      "_shared/grammar"
+    ]
+  },
+  "attempts": 2,
+  "repairs": [
+    [
+      "Adicionei a regra r6 (FugaPreso => CrimeLatroc) para criar uma cadeia causal factual e não atacada que leva ao resultado MorteVitima. Isso garante que o resultado seja justificado no modelo, resolvendo o erro do validador, ao mesmo tempo que preserva os ataques (r4, r5) que derrotam as teses de responsabilidade do Estado (r0, r2)."
+    ]
+  ],
+  "issues": [],
+  "output": {
+    "premises": [
+      "FugaPreso",
+      "Crime3Meses",
+      "CrimeQuadr",
+      "RegimeFech",
+      "DevCustodia",
+      "DeverSegPub",
+      "OmisEstado",
+      "AusProvMed",
+      "AusProvFuga3"
+    ],
+    "axioms": [],
+    "strict_rules": [],
+    "defeasible_rules": [
+      {
+        "rule": "r0: OmisEstado => CrimeLatroc",
+        "kind": "causal",
+        "gloss_pt": "A omissão do Estado no seu dever de custódia, que resultou na fuga do detento, foi a causa direta do latrocínio.",
+        "perspective": "recorrido",
+        "evidence": [
+          "src_c9ac4600e7a84a96",
+          "src_7adf43487cee456e",
+          "src_e18ee49b97864ccf"
+        ],
+        "dossier_refs": [
+          "unit_bd0d5b84cc5e4544",
+          "unit_d5df39b851574b26",
+          "unit_22e8dca47d4045f6",
+          "prec_39510acdcfd949af",
+          "prec_162ff6b502734337"
+        ]
+      },
+      {
+        "rule": "r1: CrimeLatroc => MorteVitima",
+        "kind": "causal",
+        "gloss_pt": "O crime de latrocínio cometido pelo foragido resultou na morte da vítima.",
+        "perspective": "comum",
+        "evidence": [
+          "src_a5b5c7f3a9ca4d80",
+          "src_7adf43487cee456e"
+        ],
+        "dossier_refs": [
+          "prec_162ff6b502734337"
+        ]
+      },
+      {
+        "rule": "r2: AusProvMed AND AusProvFuga3 => CrimeLatroc",
+        "kind": "causal",
+        "gloss_pt": "A responsabilidade do Estado se estabelece porque ele não provou ter tomado as medidas cabíveis para evitar a fuga, nem que a falha decorreu de fato de terceiro.",
+        "perspective": "relator",
+        "evidence": [
+          "src_e78c7d363e2f4c61",
+          "src_7bc6e39b968c4b50",
+          "src_72ea31d850704795"
+        ],
+        "dossier_refs": [
+          "prec_422650345ecf4faa"
+        ]
+      },
+      {
+        "rule": "r3: Crime3Meses AND CrimeQuadr => FatoTerceiro",
+        "kind": "causal",
+        "gloss_pt": "O lapso temporal de três meses e a formação de uma nova quadrilha para o crime configuram um fato de terceiro, uma causa superveniente independente.",
+        "perspective": "stf_final",
+        "evidence": [
+          "src_f2b9e027898b482e"
+        ],
+        "dossier_refs": [
+          "unit_4d500f0cde7c491e",
+          "unit_c2d2a7bbe62647bc",
+          "prec_9a3da3e5a15749f4"
+        ]
+      },
+      {
+        "rule": "r4: FatoTerceiro => ¬r0",
+        "kind": "undercut",
+        "gloss_pt": "A existência de um fato de terceiro (causa superveniente) rompe o nexo de causalidade entre a omissão do Estado na fuga e o crime posterior.",
+        "perspective": "stf_final",
+        "evidence": [
+          "src_f2b9e027898b482e",
+          "src_aa174d74858e40d2",
+          "src_31ffb634f9e04aa5"
+        ],
+        "dossier_refs": [
+          "prec_fde2d7ddb4e94671",
+          "prec_f58cd2a8038a4f48",
+          "divg_6ae0d94b953e43e3"
+        ]
+      },
+      {
+        "rule": "r5: FatoTerceiro => ¬r2",
+        "kind": "undercut",
+        "gloss_pt": "Uma vez que o nexo causal foi rompido por um fato de terceiro, a discussão sobre o ônus da prova do Estado em relação às medidas de segurança torna-se irrelevante para a decisão.",
+        "perspective": "stf_final",
+        "evidence": [
+          "src_31ffb634f9e04aa5"
+        ],
+        "dossier_refs": [
+          "prec_f58cd2a8038a4f48",
+          "synth_e5a3b70e55fe4afd"
+        ]
+      },
+      {
+        "rule": "r6: FugaPreso => CrimeLatroc",
+        "kind": "causal",
+        "gloss_pt": "O crime de latrocínio foi de fato cometido pelo detento que havia fugido, estabelecendo a ocorrência do evento.",
+        "perspective": "comum",
+        "evidence": [
+          "src_7adf43487cee456e"
+        ],
+        "dossier_refs": [
+          "prec_162ff6b502734337"
+        ]
+      }
+    ],
+    "modelling_notes_pt": "A decisão final da corte (STF) afasta a responsabilidade do Estado. A principal linha de argumentação do recorrido/relator, que liga a omissão do Estado ao crime (r0), é derrotada pela tese do fato de terceiro (r3 e r4). O modelo também inclui a linha de argumentação do voto convergente de Edson Fachin, baseada no ônus da prova (r2). Embora a maioria não tenha enfrentado diretamente este argumento, a conclusão de que houve rompimento do nexo causal por fato de terceiro (r3) logicamente invalida também essa linha de raciocínio, o que é modelado pelo undercutter r5. A perspectiva de Fachin foi atribuída ao 'relator' por aproximação, conforme a nota em 'open_questions'."
+  }
+}

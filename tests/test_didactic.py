@@ -57,6 +57,7 @@ def test_no_duplicate_attack_explanation_within_a_single_card(case):
 def test_causal_table_uses_plain_language_headers():
     case = LEGAL_CASES[0]
     html_out = render_case_didactic(case)
-    assert "Foi indispensável, junto com outros?" in html_out
-    assert "É reconhecido como causa?" in html_out
+    assert "É causa do resultado?" in html_out
     assert "não ocorreria de jeito nenhum sem ele" in html_out
+    # Two columns, not three: the papers define two notions.
+    assert "É reconhecido como causa?" not in html_out

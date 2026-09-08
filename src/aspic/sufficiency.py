@@ -1,26 +1,35 @@
-"""NESS (Necessary Element of a Sufficient Set) causality.
+"""Sufficient sets: *why* a NESS verdict came out the way it did.
 
-The NESS test, introduced by Hart & Honoré and developed by Wright, says:
+The NESS test -- Hart & Honoré's, developed by Wright -- says:
 
     A fact A is a cause of an effect E iff A is a necessary element of a
     set S of conditions which are jointly sufficient for E to be produced
     (S \\ {A} would not be sufficient to produce E).
 
-This is the classical, purely deductive test that motivated the
-argumentation-based `ArgumentationFramework.is_cause` in `solver.py`
-(Definition 4.3 of the ICAIL 2025 paper). It is deliberately implemented
-here as an *independent* algorithm -- forward-chaining sufficiency over the
-rule base, with no reference to attacks, defeats or axiom-expansion -- so
-that it can be cross-checked against the fuller argumentation-based notion.
+The **verdict** lives in `ArgumentationFramework.ness_cause`, which is the
+papers' own reading of that test over a defeasible theory (Definition 4.3 of
+ICAIL 2025 / Definition 3.4 of ICAIL 2026, and `ness/3` in the authors'
+implementation). This module does not re-decide it. What it supplies is the
+*decomposition* the verdict is silent about: which sets of conditions are in
+fact sufficient for the effect, and which members of each are individually
+necessary. That is what makes a NESS answer readable -- "é causa" is a
+verdict, "porque {Ex1, Ex2} basta e sem Ex1 não basta" is an explanation.
 
-The paper is explicit that its notion of a cause goes beyond plain NESS:
-besides literals that are *positively* part of a sufficient set (captured
-here), it also counts literals whose complement would enable a new
-undercutting/rebutting/undermining counterargument (Definition 4.3, case 3
--- e.g. the Childhood Leukaemia example's "¬PaCo"). Plain NESS as
-implemented in this module does not detect such cases; see
-`tests/test_ness.py::test_leukaemia_beyond_ness` for a worked example of the
-gap, and `ArgumentationFramework.is_cause` for the notion that closes it.
+Everything here is forward-chaining over the rule base: monotonic,
+defeat-agnostic, and deliberately independent of attacks and axiom-expansion.
+Sufficiency is a property of a causal theory applied to a set of conditions,
+not of what survives dialectical attack -- that is the solver's job.
+
+**Historical note.** This module used to export `is_ness_cause`, a third
+causal verdict standing beside `is_cause` and `but_for`. It was removed, for
+two reasons. It was not in the papers -- the authors' implementation
+(`tuProlog/arg2p-kt`) has `ness/3` and `but_for/2` and nothing else, and
+their `ness/3` is what this repository used to call `is_cause`. And it could
+not answer at all for a *derived* literal: it looked for phi inside an
+argument's premise set, so `Latrocinio` -- a conclusion, not a premise --
+came back "not a cause" when the honest answer was "this test does not
+apply". A verdict that says "no" when it means "I cannot tell" is worse than
+no verdict.
 """
 from dataclasses import dataclass
 from typing import FrozenSet, Iterable, List
@@ -130,25 +139,19 @@ def necessary_elements(S: SufficientSet, psi: str, rules: Iterable[Rule]) -> Fro
     )
 
 
-def is_ness_cause(af: ArgumentationFramework, phi: str, psi: str) -> bool:
-    """phi is a NESS cause of psi iff phi is a necessary element of some
-    (minimal, justified) sufficient set for psi."""
-    rules = list(af.rules.values())
-    for S in sufficient_sets(af, psi):
-        if phi in S and phi in necessary_elements(S, psi, rules):
-            return True
-    return False
+def sufficiency_report(af: ArgumentationFramework, psi: str) -> str:
+    """Human-readable breakdown for psi: every sufficient set found and
+    which of its elements are necessary within it.
 
-
-def ness_report(af: ArgumentationFramework, psi: str) -> str:
-    """Human-readable NESS breakdown for psi: every sufficient set found
-    and which of its elements are necessary within it."""
+    Explanatory only. Whether a literal *is* a cause is
+    `ArgumentationFramework.ness_cause`'s answer, not this one's.
+    """
     rules = list(af.rules.values())
     sets = sufficient_sets(af, psi)
     if not sets:
         return f"No justified argument concludes '{psi}'."
 
-    lines = [f"NESS analysis for '{psi}':"]
+    lines = [f"Sufficient sets for '{psi}':"]
     for i, S in enumerate(sets, start=1):
         necessary = necessary_elements(S, psi, rules)
         lines.append(

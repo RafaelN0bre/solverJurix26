@@ -30,6 +30,26 @@ def gloss(glosses: Dict[str, str], key: str) -> str:
     return glosses.get(key, f"`{key}`")
 
 
+def case_glossary(case) -> Dict[str, str]:
+    """Every symbol a reader can meet on screen, mapped to its reading.
+
+    The interface shows formal tokens in three places a lawyer cannot avoid --
+    the argument graph, the technical note under each card, and the fiche's
+    tables -- so the page needs one lookup covering *both* frameworks at once:
+    the cause-in-fact literals and rules, plus the legal-relevance layer's
+    `CaFa_*`/`LeReCa_*` literals and scheme rules when the case has one.
+
+    Kept here, next to the sentence templates, because it is the same
+    question they answer ("how do I say this symbol in Portuguese?") and it
+    stays a pure function of the `CaseSpec`.
+    """
+    glossary: Dict[str, str] = {**case.atom_glosses, **case.rule_glosses}
+    if getattr(case, "lrc", None) is not None:
+        glossary.update(case.lrc.atom_glosses)
+        glossary.update(case.lrc.rule_glosses)
+    return {code: text for code, text in glossary.items() if text}
+
+
 def capitalize_pt(sentence: str) -> str:
     return sentence[0].upper() + sentence[1:] if sentence else sentence
 

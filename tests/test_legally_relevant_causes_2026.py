@@ -13,7 +13,7 @@ docs/papers/ICAIL2026causation.pdf):
    Definition 4.3 "Cause" (same explanation-breaking-under-axiom-expansion
    idea, now phrased directly in terms of explanations and attacks rather
    than the old three-case enumeration) -- it has no behavioural difference
-   for this solver, and `ArgumentationFramework.is_cause` already implements
+   for this solver, and `ArgumentationFramework.ness_cause` already implements
    it. The Asbestos/Fairchild v Glenhaven example is reused verbatim in
    both papers (see test_legal_cases.py::test_asbestos_overdetermination).
 
@@ -67,7 +67,7 @@ def test_asbestos_ness_but_not_but_for():
     """ICAIL 2026, Section 3: the same Fairchild v Glenhaven asbestos case
     as test_legal_cases.py::test_asbestos_overdetermination, now used to
     illustrate the paper's new But-for Cause (Definition 3.5), which is
-    strictly stronger than NESS Cause (Definition 3.4, i.e. `is_cause`).
+    strictly stronger than the NESS cause (Definition 3.4).
 
     Since exposure at any *two* of the three employers suffices to cause
     the cancer, removing any single Ex_i still leaves a sufficient pair of
@@ -86,9 +86,9 @@ def test_asbestos_ness_but_not_but_for():
     }
     af = ArgumentationFramework(kb, model)
 
-    assert af.is_cause("Ex1", "Di") is True
-    assert af.is_cause("Ex2", "Di") is True
-    assert af.is_cause("Ex3", "Di") is True
+    assert af.ness_cause("Ex1", "Di") is True
+    assert af.ness_cause("Ex2", "Di") is True
+    assert af.ness_cause("Ex3", "Di") is True
 
     assert af.but_for("Ex1", "Di") is False
     assert af.but_for("Ex2", "Di") is False
@@ -116,8 +116,8 @@ def test_kingston_no_worse_off():
         ],
     }
     cif = ArgumentationFramework(cif_kb, cif_model)
-    assert cif.is_cause("DeFi", "De") is True
-    assert cif.is_cause("UnFi", "De") is True
+    assert cif.ness_cause("DeFi", "De") is True
+    assert cif.ness_cause("UnFi", "De") is True
 
     # Legally-relevant-causation layer: CaFa_x_y below are the (hand-fed)
     # outputs of the cause-in-fact evaluation above.
@@ -160,8 +160,8 @@ def test_watson_superseding_cause_match_drop():
         "defeasible_rules": ["r0: Ga AND Ma => Ig"],
     }
     cif = ArgumentationFramework(cif_kb, cif_model)
-    assert cif.is_cause("Ga", "Ig") is True
-    assert cif.is_cause("Ma", "Ig") is True
+    assert cif.ness_cause("Ga", "Ig") is True
+    assert cif.ness_cause("Ma", "Ig") is True
     # Unlike the overdetermination cases, this rule is conjunctive, so
     # both antecedents are individually necessary: But-for Cause holds too.
     assert cif.but_for("Ga", "Ig") is True
@@ -250,8 +250,8 @@ def test_berry_v_sugar_notch_risk_playout():
         ],
     }
     cif = ArgumentationFramework(cif_kb, cif_model)
-    assert cif.is_cause("PlSp", "In") is True
-    assert cif.is_cause("TrFa", "In") is True
+    assert cif.ness_cause("PlSp", "In") is True
+    assert cif.ness_cause("TrFa", "In") is True
 
     lrc_kb = {
         "premises": [

@@ -12,23 +12,34 @@ Compared to the original solver, two things changed:
 1. Defeat semantics. The original solver decided rebutting attacks using
    numeric rule preferences (weakest-link aggregation), which is specific to
    the BoardgameQA benchmark it was built for. This version instead
-   implements the paper's "basic argument ordering" (Definition 2.11): a
-   strict-and-firm argument is never weaker than anything, two
+   implements the paper's "basic argument ordering" (Definition 2.11) as its
+   default: a strict-and-firm argument is never weaker than anything, two
    defeasible/plausible arguments are incomparable (so any attack between
    them succeeds as a defeat), and undercutting always succeeds regardless
-   of strength.
+   of strength. A case that needs to weigh two defeasible reasons against
+   each other can pass an `aspic.preferences.PreferenceModel`, which refines
+   *only* the clause the basic ordering leaves open; with no model passed --
+   the default for every case in this repository except the ones that
+   declare weights -- the behaviour is exactly Definition 2.11's.
 2. Cause-in-fact machinery. Added explanations/support sets (Definition 3.3,
    computed via the grounded-extension fixed point rather than by literally
    enumerating the dialectical game trees) and axiom-expansion (Definition
-   4.2) to implement the paper's definition of a cause (Definition 4.3).
+   4.2) to implement the paper's NESS cause (Definition 4.3).
 
 Additionally ported `but_for` (Definition 3.5) from the ICAIL 2026
 follow-up paper, "From Cause-in-Fact to Legally Relevant Cause through
 Argumentation" (Pisano, Prakken & Sartor; docs/papers/ICAIL2026causation.pdf).
-That paper renames `is_cause`'s underlying notion "NESS Cause" (Definition
-3.4) -- a purely terminological refinement of this file's Definition 4.3,
-with no behavioural change here -- and adds the strictly stronger but-for
-test alongside it. See `tests/test_legally_relevant_causes_2026.py` for the
+That paper renames Definition 4.3 "NESS Cause" (Definition 3.4) -- a purely
+terminological refinement, with no behavioural change -- and adds the
+strictly stronger but-for test alongside it.
+
+**There are exactly two notions, and this file has exactly two methods.** The
+authors' own implementation confirms it: `tuProlog/arg2p-kt`'s causality
+module exposes `ness/3` and `but_for/2` and nothing else. An earlier version
+of this file called the first one `is_cause` and carried a third,
+home-grown deductive NESS test alongside it; both were removed, because the
+name hid that `is_cause` *was* the NESS cause and the third test could not
+answer for a derived literal at all. See `tests/test_legally_relevant_causes_2026.py` for the
 paper's new legal-cause examples that build a further "legally relevant
 causation" layer on top of cause-in-fact; that layer (Wright's no-worse-off,
 superseding-cause and risk-playout defences) is out of scope for this file
@@ -234,7 +245,8 @@ class ArgumentationFramework:
     """Constructs arguments, attacks and defeats, and computes the grounded
     extension and cause-in-fact relation for an ASPIC+ argumentation theory."""
 
-    def __init__(self, knowledge_base: Dict, causal_model: Dict):
+    def __init__(self, knowledge_base: Dict, causal_model: Dict,
+                 preferences=None):
         """
         Args:
             knowledge_base: {"premises": [...], "axioms": [...]} -- Kp and Kn.
@@ -242,8 +254,15 @@ class ArgumentationFramework:
                 Rule strings look like "r1: SuDe => SuTh" (defeasible) or
                 "r1: SuDe -> SuTh" (strict). Undercutters are ordinary rules
                 whose consequent is "¬<rule id>"; no separate list needed.
+            preferences: an optional `aspic.preferences.PreferenceModel`,
+                refining the basic ordering between two defeasible arguments.
+                Left None -- the default everywhere in this repository except
+                where a case explicitly declares weights -- the ordering is
+                exactly Definition 2.11's and two defeasible arguments stay
+                incomparable, so every existing framework behaves unchanged.
         """
         logger.info("Initializing ArgumentationFramework...")
+        self.preferences = preferences
 
         # Keep raw specs (deep-ish copy) so axiom_expand() can rebuild a
         # sibling framework with an extended axiom set.
@@ -412,11 +431,34 @@ class ArgumentationFramework:
     # Attacks (Definition 2.8) and defeats (Definition 2.10/2.11)
     # ------------------------------------------------------------------
     def _is_weaker(self, a: Argument, b: Argument) -> bool:
-        """Basic argument ordering (Definition 2.11): A ≺ B iff A is
-        defeasible-or-plausible and B is strict-and-firm."""
+        """Argument ordering: Definition 2.11's basic one, refined by the
+        case's declared preferences when it has any.
+
+        The basic clauses come first and are never overridden -- a
+        strict-and-firm argument is weaker than nothing, and everything
+        defeasible-or-plausible is weaker than a strict-and-firm one. Only
+        the case the basic ordering leaves open (two defeasible arguments,
+        incomparable by default) is handed to the preference model, and only
+        when one exists. This is the ASPIC+ shape: Definition 2.10 makes
+        rebutting and undermining defeat preference-dependent, so refining
+        the preorder here is where a weighing of reasons belongs.
+        """
         a_defeasible_or_plausible = not (a.is_strict and a.is_firm)
         b_strict_and_firm = b.is_strict and b.is_firm
-        return a_defeasible_or_plausible and b_strict_and_firm
+        if not a_defeasible_or_plausible:
+            return False
+        if b_strict_and_firm:
+            return True
+        if self.preferences is None:
+            return False
+        return self.preferences.is_weaker(a, b)
+
+    def strength(self, arg_id: str) -> Optional[float]:
+        """The argument's strength under the case's preference model, or None
+        when the case declares none (or the argument invokes no dimension)."""
+        if self.preferences is None:
+            return None
+        return self.preferences.argument_strength(self.arguments[arg_id])
 
     def _identify_attacks(self):
         logger.info("Identifying attacks among %d arguments...", len(self.arguments))
@@ -464,6 +506,10 @@ class ArgumentationFramework:
             len(self.attacks), by_type["undermine"], by_type["undercut"], by_type["rebut"],
         )
 
+    @property
+    def _ordering_name(self) -> str:
+        return "basic" if self.preferences is None else "preference-refined"
+
     def _compute_defeats(self):
         logger.info("Computing defeats from %d attacks...", len(self.attacks))
         self.defeats.clear()
@@ -478,9 +524,15 @@ class ArgumentationFramework:
             if not self._is_weaker(attacker, target_sub):
                 reason = (
                     "succeeds: attacker is not weaker than the attacked sub-argument "
-                    "under the basic ordering"
+                    f"under the {self._ordering_name} ordering"
                 )
+                if self.preferences is not None:
+                    reason += f" -- {self.preferences.explain(attacker, target_sub)}"
                 self.defeats.append(Defeat(attack, reason))
+            elif self.preferences is not None:
+                logger.debug(
+                    "attack %s failed on preference: %s",
+                    attack, self.preferences.explain(attacker, target_sub))
 
         logger.info("Defeats computed: %d out of %d attacks succeeded", len(self.defeats), len(self.attacks))
 
@@ -627,13 +679,22 @@ class ArgumentationFramework:
             "premises": list(self._kb_raw["premises"]),
             "axioms": list(dict.fromkeys([*self._kb_raw["axioms"], *new_axioms])),
         }
-        return ArgumentationFramework(expanded_kb, self._model_raw)
+        return ArgumentationFramework(expanded_kb, self._model_raw,
+                                     preferences=self.preferences)
 
-    def is_cause(self, phi: str, psi: str) -> bool:
-        """Definition 4.3: phi is a cause of psi relative to this framework
-        iff -phi ∈ L for a (here: singleton) axiom-expansion L such that
-        some explanation E of a justified argument for psi is no longer a
-        subset of the grounded extension of the expanded framework.
+    def ness_cause(self, phi: str, psi: str) -> bool:
+        """The **NESS cause**: phi is a cause in fact of psi.
+
+        Definition 4.3 of ICAIL 2025, renamed "NESS Cause" in Definition 3.4
+        of ICAIL 2026 -- the same notion under two names, and the one the
+        authors' own implementation exposes as the Prolog primitive `ness/3`
+        (`causality-solver/.../CausalitySolver.kt` in `tuProlog/arg2p-kt`;
+        see `~/.claude/knowledge/jurix26/maps/tuProlog--arg2p-kt.md`).
+
+        phi is a NESS cause of psi iff -phi ∈ L for a (here: singleton)
+        axiom-expansion L such that some explanation E of a justified
+        argument for psi is no longer a subset of the grounded extension of
+        the expanded framework.
 
         Implemented via the support set: Supp(psi, E) is the union of all
         explanations of psi, so checking whether the expansion drops *any*
@@ -641,11 +702,13 @@ class ArgumentationFramework:
         to checking whether it breaks *some* explanation -- exactly the
         existential in Definition 4.3.
 
-        This notion strictly generalizes the classical NESS test (see
-        `aspic.ness`): every NESS cause is a cause here too, but this also
-        catches "negatively relevant" causes -- literals whose complement
-        enables a new attacker on an otherwise justified argument -- which
-        plain NESS sufficiency/necessity cannot see.
+        "NESS" is Wright's *Necessary Element of a Sufficient Set*, and the
+        argumentation-theoretic reading above is what makes it computable
+        over a defeasible theory rather than over a bare set of conditions.
+        It is strictly weaker than `but_for`: it asks whether the
+        intervention breaks *some* route to psi, where but-for asks whether
+        it breaks *every* one. See `aspic.sufficiency` for the set-of-
+        conditions decomposition that explains a given verdict.
         """
         original_support = self.support_set(psi)
         if not original_support:
@@ -666,17 +729,21 @@ class ArgumentationFramework:
         any justified argument once the framework is axiom-expanded with
         the singleton intervention {-phi}.
 
-        This is strictly stronger than `is_cause` (the paper's NESS Cause,
-        Definition 3.4 -- a straight rename/rephrasing of the 2025 paper's
-        Definition 4.3 in terms of explanations, with no behavioural
-        difference for this solver): `is_cause` only requires that removing
-        phi breaks *one* explanation of psi, whereas `but_for` requires
-        that psi loses *all* justified arguments, i.e. that no alternative
-        explanation survives. Consequently every but-for cause is a NESS
-        cause, but not conversely -- overdetermination cases are the
-        textbook counterexample (see the Asbestos/Fairchild case: each
-        Ex_i is a NESS cause of Di, but none is a but-for cause, since the
-        other two exposures alone still suffice).
+        This is strictly stronger than `ness_cause`: NESS only requires that
+        the intervention break *one* explanation of psi, whereas `but_for`
+        requires that psi lose *all* justified arguments, i.e. that no
+        alternative explanation survives. Consequently every but-for cause
+        is a NESS cause, but not conversely, and the two are the only
+        notions the papers define (the authors' implementation exposes
+        exactly `ness/3` and `but_for/2`).
+
+        Overdetermination and preemption are the textbook counterexamples.
+        Asbestos/Fairchild: each Ex_i is a NESS cause of Di, but none is a
+        but-for cause, since the other two exposures alone still suffice.
+        Double Shooting: removing Bush's shot kills the only justified route
+        to the death -- yet the death survives, because the undercut that
+        Bush's kill placed on Dlugash's chain goes with it and a suppressed
+        route wakes up.
         """
         if psi not in self.justified_conclusions():
             return False
@@ -688,6 +755,8 @@ class ArgumentationFramework:
     # ------------------------------------------------------------------
     def to_json(self) -> str:
         return json.dumps({
+            "ordering": (None if self.preferences is None
+                         else self.preferences.as_dict()),
             "knowledge": {
                 "axioms": sorted(a.name for a in self.axioms),
                 "premises": sorted(p.name for p in self.premises),

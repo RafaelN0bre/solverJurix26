@@ -1,0 +1,47 @@
+[
+  {
+    "phi": "FugaPreso",
+    "psi": "MorteVitima",
+    "ness": true,
+    "is_cause": true,
+    "but_for": true,
+    "cafa_literal": "CaFa_FugaPreso_MorteVitima",
+    "but_for_literal": "ButFor_FugaPreso_MorteVitima"
+  },
+  {
+    "phi": "PresoRegFech",
+    "psi": "MorteVitima",
+    "ness": true,
+    "is_cause": true,
+    "but_for": true,
+    "cafa_literal": "CaFa_PresoRegFech_MorteVitima",
+    "but_for_literal": "ButFor_PresoRegFech_MorteVitima"
+  },
+  {
+    "phi": "CrimeApos3M",
+    "psi": "MorteVitima",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "FormacaoQuad",
+    "psi": "MorteVitima",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "Latrocinio",
+    "psi": "MorteVitima",
+    "ness": false,
+    "is_cause": true,
+    "but_for": true,
+    "cafa_literal": "CaFa_Latrocinio_MorteVitima",
+    "but_for_literal": "ButFor_Latrocinio_MorteVitima"
+  }
+]

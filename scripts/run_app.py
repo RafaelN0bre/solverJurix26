@@ -11,7 +11,11 @@ how `scripts/generate_graphs.py` already does it.
 Usage:
     uv run python scripts/run_app.py
 then open http://127.0.0.1:8000/
+
+Set `ASPIC_APP_PORT` to run somewhere else, which is what you want when
+another service already holds 8000.
 """
+import os
 import sys
 
 from pathlib import Path
@@ -22,5 +26,6 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 import uvicorn  # noqa: E402
 
 if __name__ == "__main__":
-    uvicorn.run("aspic.api:app", host="127.0.0.1", port=8000, reload=True,
+    port = int(os.environ.get("ASPIC_APP_PORT", "8000"))
+    uvicorn.run("aspic.api:app", host="127.0.0.1", port=port, reload=True,
                 reload_dirs=[str(REPO_ROOT / "src")])

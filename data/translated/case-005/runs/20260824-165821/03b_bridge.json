@@ -1,0 +1,110 @@
+[
+  {
+    "phi": "AtdTemp",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "CelHum",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "FatRisc",
+    "psi": "SeqIrr",
+    "ness": true,
+    "is_cause": true,
+    "but_for": true,
+    "cafa_literal": "CaFa_FatRisc_SeqIrr",
+    "but_for_literal": "ButFor_FatRisc_SeqIrr"
+  },
+  {
+    "phi": "DoePreEx",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "PerConcDem",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "ProtSeg",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "ProvCel",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "DevAtdSaude",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "DevCelHum",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "¬AtdTemp",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "¬CelHum",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": false,
+    "but_for": false,
+    "cafa_literal": null,
+    "but_for_literal": null
+  },
+  {
+    "phi": "AgrQuad",
+    "psi": "SeqIrr",
+    "ness": false,
+    "is_cause": true,
+    "but_for": true,
+    "cafa_literal": "CaFa_AgrQuad_SeqIrr",
+    "but_for_literal": "ButFor_AgrQuad_SeqIrr"
+  }
+]
