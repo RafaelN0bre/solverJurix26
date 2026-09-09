@@ -13,6 +13,14 @@ mesmos — é o único ponto do repositório em que a nossa leitura dos artigos 
 confrontada com a leitura de quem os escreveu. Um oráculo que passa a falhar
 aqui significa que divergimos da referência, não que "mudou o resultado".
 
+Onde divergimos, a auditoria de `docs/auditoria-icail2025.md` mediu de que
+lado está o artigo. Em dois pontos a *referência* é que se afasta do texto
+(exigir atacante `in`; coletar suporte a partir de argumentos não
+justificados) e nós seguimos o artigo; num terceiro a lacuna é nossa
+(intervenções conjuntas). Nenhum dos três move veredito publicado neste
+repositório -- 159 pares (φ,ψ) varridos, 3 divergências, todas em pares que
+nenhum caso consulta.
+
 Notação: as teorias de origem estão em sintaxe arg2p (`f1 :=> a.` é regra
 derrotável de corpo vazio concluindo `a`; `r0 : [] => c.` idem). Corpo vazio
 não existe na nossa gramática, então uma regra dessas vira premissa, e a
@@ -83,20 +91,27 @@ def test_theory2_a_is_a_ness_cause(theory2):
 
 
 @pytest.mark.xfail(
-    reason="Divergência conhecida com a referência: só implementamos a "
-           "intervenção unitária. Ver o docstring abaixo e o relatório do "
-           "agente de verificação.",
+    reason="Divergência conhecida: só implementamos a intervenção unitária, e "
+           "estes oráculos precisam de intervenção conjunta. Ver o docstring.",
     strict=True,
 )
-def test_theory2_b_is_a_ness_cause_under_a_joint_intervention(theory2):
-    """`isNessCause(b, c, true)` na referência; nós devolvemos False.
+@pytest.mark.parametrize("phi,psi,premises,rules", [
+    # theory2: `{¬a, ¬b}` acorda r2, que undercuta r0.
+    ("b", "c", ["a", "b", "T"],
+     ["r0: T => c", "r1: ¬a => ¬r0", "r2: ¬a AND ¬b => ¬r0"]),
+    # complex: `tx2 : d, e => undercut(r2)` -- a intervenção `{d, e}` acorda tx2.
+    ("¬d", "¬b", ["a"], ["r2: a => ¬b", "tx2: d AND e => ¬r2"]),
+    ("¬e", "¬b", ["a"], ["r2: a => ¬b", "tx2: d AND e => ¬r2"]),
+])
+def test_a_joint_intervention_is_needed_for_these(phi, psi, premises, rules):
+    """A referência devolve True nos três; nós devolvemos False.
 
-    **A divergência, e por que ela é substantiva.**
+    **A divergência, e o seu tamanho exato.**
 
     `ness/3` dos autores não testa só a intervenção unitária `{¬φ}`: ele
     *procura* uma intervenção. `generate_interventions/3`
-    (`CausalitySolver.kt`, cláusulas Prolog embutidas no fim do arquivo) gera
-    três famílias de candidatas para a causa S:
+    (`CausalitySolver.kt`, cláusulas Prolog no fim do arquivo) gera três
+    famílias de candidatas para a causa S:
 
         generate_interventions(_, S, [CS])            :- compl(S, CS).
         generate_interventions(_, S, [undercut(S)])   :- S \\= -_.
@@ -105,24 +120,58 @@ def test_theory2_b_is_a_ness_cause_under_a_joint_intervention(theory2):
                                                          subsets(UP, SUP),
                                                          member(CS, SUP).
 
-    1. o singleton `{¬S}` — a única que implementamos;
-    2. o *undercut* da regra `S`, o que faz de um **identificador de regra**
-       uma causa candidata (a bateria deles tem `isNessCause(r2, -b, true)`);
-    3. qualquer subconjunto das premissas ainda não usadas que **contenha**
-       `¬S` — ou seja, **intervenções conjuntas**.
+    Destas, **falta-nos só a terceira** — as intervenções conjuntas. A
+    primeira é a nossa. E a segunda, o *undercut* de uma regra, já vem de
+    graça na nossa notação: o literal de undercut de `r2` escreve-se `¬r2`,
+    que é exatamente `compl("r2")`, então `ness_cause("r2", ψ)` já faz o que
+    a família (b) faria. `test_a_rule_id_is_a_candidate_cause` fixa isso.
 
-    `checkCausalityICAIL25` então exige minimalidade: nenhum subconjunto
-    próprio da intervenção pode produzir os mesmos atacantes IN.
-
-    Aqui `b` só é causa pela família 3: `{¬a}` sozinho já derruba `c` via r1,
-    mas `{¬a, ¬b}` derruba via r2, e r2 não é atacante de nenhum subconjunto
-    próprio — logo `{¬a, ¬b}` é minimal e `b` é causa. Com intervenção
-    unitária `{¬b}`, r2 não dispara (falta `¬a`) e nós dizemos False.
-
-    Consequência prática: **nós sub-reportamos causas.** Todo veredito
-    positivo nosso é positivo na referência; o inverso não vale.
+    A família (c) só se ativa quando `¬φ` é antecedente de uma regra que
+    **não disparou**: é ela que a intervenção acorda. Nos casos deste
+    repositório isso nunca acontece — os literais consultados ou já são
+    premissas, ou o seu complemento não é antecedente de regra inerte — e por
+    isso a lacuna hoje não move nenhum veredito publicado. É propriedade da
+    modelagem dos casos, não garantia: uma formalização com regras adormecidas
+    de dois antecedentes reabre a questão.
     """
-    assert theory2.ness_cause("b", "c") is True
+    af = framework(premises, rules)
+    assert af.ness_cause(phi, psi) is True
+
+
+def test_a_rule_id_is_a_candidate_cause():
+    """A família (b) da referência, que na nossa notação não é família nenhuma.
+
+    `isNessCause(r2, -b, true)` em `causalityTestComplex`: intervir undercutando
+    `r2` mata `¬b`, logo `r2` é causa de `¬b`. Para nós a intervenção é o axioma
+    `¬r2`, que é o mesmo objeto -- daí acertarmos o oráculo sem código extra.
+    """
+    af = framework(["a"], ["r2: a => ¬b", "tx2: d AND e => ¬r2"])
+    assert "¬b" in af.justified_conclusions()
+    assert af.ness_cause("r2", "¬b") is True
+    assert af.ness_cause("a", "¬b") is True
+    assert af.ness_cause("d", "¬b") is False
+
+
+def test_we_follow_the_paper_where_the_reference_is_stricter():
+    """Def. 4.3 pede que a explicação saia da extensão. Só isso.
+
+    `checkCausalityICAIL25` (`CausalitySolver.kt:190`) pede mais: que o
+    argumento que derrubou o suporte esteja ele próprio rotulado `in`. Aqui a
+    intervenção `{x}` cria um `¬e` que se rebate mutuamente com as duas rotas
+    para `e`; o ciclo par deixa todos `und`, e nenhum atacante fica `in`. O
+    suporte saiu da extensão, então pelo texto do artigo `¬x` é causa de `e`;
+    a referência diz que não.
+
+    Divergimos da implementação dos autores **a favor do artigo**, e de
+    propósito. Em fuzzing sobre teorias aleatórias este é o padrão mais comum
+    de divergência entre nós e eles; nos casos deste repositório não ocorre
+    nenhuma vez.
+    """
+    af = framework(["p", "p2"], ["r1: p => e", "r6: p2 => e", "r2: x => ¬e"])
+    assert "e" in af.justified_conclusions()
+    # `x` não é premissa: quem o introduz é a intervenção, que é o que torna
+    # `¬x` a causa candidata. Depois dela os três argumentos ficam UNDEC.
+    assert af.ness_cause("¬x", "e") is True
 
 
 # ----------------------------------------------------------------------

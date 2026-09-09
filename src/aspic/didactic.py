@@ -5,6 +5,7 @@ sentence templates. Used by the live API (`aspic.api`); the static bundle
 unchanged, in English, for the paper's figures.
 """
 import html
+import re
 
 from .causal_report import causal_comparison_section, ness_html_table
 from .examples import CaseSpec
@@ -37,7 +38,8 @@ _STATUS_RANK = {"IN": 0, "UNDEC": 1, "OUT": 2}
 
 def _argument_card_html(af: ArgumentationFramework, args: list, description: str,
                          status_map: dict, defeat_attack_ids: set,
-                         atom_glosses: dict, rule_glosses: dict) -> str:
+                         atom_glosses: dict, rule_glosses: dict,
+                         layer_tag: str = "") -> str:
     """One card for one *conclusion-with-a-rationale*, not one card per
     argument object.
 
@@ -90,7 +92,7 @@ def _argument_card_html(af: ArgumentationFramework, args: list, description: str
         body += f'<p class="attacks-out">Este argumento também ataca conclusões que dependem de: <code>{html.escape(targets)}</code>.</p>'
 
     technical_note = '<p class="tech-note">' + "".join(
-        f'<code>{html.escape(arg.id)}: '
+        f'<code>{html.escape(layer_tag + "·" + arg.id if layer_tag else arg.id)}: '
         f'{html.escape(", ".join(sorted(arg.premises)) or "∅")} ⊢ {html.escape(arg.conclusion)}</code> '
         for arg in args
     ) + "</p>"
@@ -110,15 +112,21 @@ def _argument_card_html(af: ArgumentationFramework, args: list, description: str
 
 def _argument_cards_html(af: ArgumentationFramework, status_map: dict,
                           defeat_attack_ids: set, atom_glosses: dict,
-                          rule_glosses: dict) -> str:
-    """Every argument of a framework as cards, one per distinct reading."""
+                          rule_glosses: dict, layer_tag: str = "") -> str:
+    """Every argument of a framework as cards, one per distinct reading.
+
+    `layer_tag` distinguishes the two frameworks of a case in the technical
+    note under each card: both number their arguments from A0, so a page that
+    renders the cause-in-fact cards above the legal-relevance ones would print
+    the same `A8` for two different arguments.
+    """
     groups: dict = {}
     for arg in af.arguments.values():
         description = describe_argument(arg, atom_glosses, rule_glosses)
         groups.setdefault(description, []).append(arg)
     return "\n".join(
         _argument_card_html(af, args, description, status_map, defeat_attack_ids,
-                            atom_glosses, rule_glosses)
+                            atom_glosses, rule_glosses, layer_tag)
         for description, args in groups.items()
     )
 
@@ -282,6 +290,77 @@ def _causal_plain_table_html(case: CaseSpec, af: ArgumentationFramework) -> str:
 
 
 
+#: Como cada família de predicado se apresenta, e a ordem em que a tabela as
+#: mostra: primeiro de onde o literal vem, depois o que ele afirma.
+_PREDICATE_KINDS = (
+    ("factual", "Vem do solver",
+     "Escritos por <code>formalize.bridge</code> a partir da camada de causa "
+     "de fato. Ninguém os digita: é esta fronteira que impede a formalização "
+     "de alegar relevância jurídica para o que o teste contrafactual nunca "
+     "estabeleceu."),
+    ("doutrinario", "Vem do acórdão",
+     "A leitura humana do julgado. Dizem o que o direito qualifica: havia "
+     "dever de agir, o evento era inesperado, a conduta era ilícita."),
+    ("derivado", "A camada conclui",
+     "O único predicado que esta camada estabelece por argumento, em vez de "
+     "receber pronto — a regra 5 o conclui e a regra 4 o consome."),
+    ("conclusao", "O que se decide",
+     "A pergunta que a camada existe para responder."),
+)
+
+
+def _inline_markup(text: str) -> str:
+    """Escapa o texto e converte a marcação inline que a fonte usa.
+
+    As descrições vivem em `aspic.lrc.PREDICATES`, onde `**assim**` e crases
+    se leem bem em código. Na página elas têm de virar HTML, e escapar antes
+    de converter é o que impede que uma descrição futura injete marcação.
+    """
+    out = html.escape(text)
+    out = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", out)
+    out = re.sub(r"`(.+?)`", r"<code>\1</code>", out)
+    return re.sub(r"(?<![\w*])\*([^*]+?)\*(?![\w*])", r"<em>\1</em>", out)
+
+
+def _predicate_reference_html() -> str:
+    """A tabela de predicados, gerada de `aspic.lrc.PREDICATES`.
+
+    Gerada, e não escrita à mão, porque uma tabela de documentação digitada é
+    uma tabela que envelhece na primeira mudança de aridade.
+    """
+    from .lrc import predicate_reference
+
+    entradas = predicate_reference()
+    blocos = []
+    for chave, titulo, explicacao in _PREDICATE_KINDS:
+        deste = [e for e in entradas if e["kind"] == chave]
+        if not deste:
+            continue
+        linhas = "".join(
+            "<tr>"
+            f'<td class="mono">{html.escape(e["shape"])}</td>'
+            f'<td><strong>{html.escape(e["label_pt"])}</strong></td>'
+            f'<td>{_inline_markup(e["reading_pt"])}</td>'
+            f'<td class="mono">{html.escape(e["source"])}</td>'
+            "</tr>"
+            for e in deste
+        )
+        blocos.append(
+            f"<h5>{html.escape(titulo)}</h5><p class=\"lead\">{explicacao}</p>"
+            "<table><thead><tr><th>Forma</th><th>Lê-se</th>"
+            "<th>O que afirma</th><th>No artigo</th></tr></thead>"
+            f"<tbody>{linhas}</tbody></table>")
+    return (
+        '<details class="predicate-reference"><summary>O vocabulário desta '
+        "camada — os 12 predicados, um a um</summary>"
+        '<p class="lead">Todo literal desta camada é um destes predicados '
+        "aplicado a átomos do caso. A forma escrita junta o nome ao "
+        "argumento com sublinhado — <code>CaFa_FugaPreso_Danos</code> é "
+        "<code>CaFa(FugaPreso, Danos)</code> —, e uma negação vira o prefixo "
+        "<code>not</code> no argumento: <code>CaFa_notPaCo_ChDi</code>."
+        "</p>" + "".join(blocos) + "</details>")
+
+
 def _lrc_section_html(case: CaseSpec) -> str:
     """The legal-relevance layer (ICAIL 2026) as its own didactic block.
 
@@ -332,8 +411,10 @@ def _lrc_section_html(case: CaseSpec) -> str:
         )
 
     cards = _argument_cards_html(af, status, defeat_attack_ids,
-                                 layer.atom_glosses, layer.rule_glosses)
-    dot = to_dot(af, extension, title=f"{case.title} — relevância jurídica")
+                                 layer.atom_glosses, layer.rule_glosses,
+                                 layer_tag="R")
+    dot = to_dot(af, extension, title=f"{case.title} — relevância jurídica",
+                 layer_tag="R")
 
     return f"""
   <h3>Relevância jurídica <span class="tech-ref">(camada ICAIL 2026)</span></h3>
@@ -342,6 +423,7 @@ def _lrc_section_html(case: CaseSpec) -> str:
   que o solver reconheceu acima e verifica se alguma defesa doutrinária afasta
   a relevância jurídica de cada uma.</p>
   {duty}
+  {_predicate_reference_html()}
   {table}
 
   <details class="technical-toggle lrc-toggle">
@@ -365,17 +447,21 @@ def render_case_didactic(case: CaseSpec) -> str:
     defeat_attack_ids = {id(d.attack) for d in af.defeats}
 
     summary_html = _conclusion_summary_html(case, af)
+    # Só etiqueta quando há duas camadas na mesma página; um caso de camada
+    # única não tem ambiguidade a resolver e o prefixo seria ruído.
+    cif_tag = "F" if case.lrc is not None else ""
     cards_html = _argument_cards_html(af, status, defeat_attack_ids,
-                                      case.atom_glosses, case.rule_glosses)
+                                      case.atom_glosses, case.rule_glosses,
+                                      layer_tag=cif_tag)
     causal_html = _causal_plain_table_html(case, af)
     disputes_html = _disputes_html(af, case.atom_glosses, case.rule_glosses)
     glossary_html = _glossary_html(case)
     lrc_html = _lrc_section_html(case) if case.lrc is not None else ""
 
-    dot = to_dot(af, extension, title=case.title)
+    dot = to_dot(af, extension, title=case.title, layer_tag=cif_tag)
     graph_svg = render_to_string(dot, fmt="svg")
     ness_table = ness_html_table(af, case.effect)
-    causal_section_en = causal_comparison_section(af, case.queries)
+    causal_section_en = causal_comparison_section(af, case.queries, cif_tag)
     technical = technical_section_html(case, graph_svg, ness_table, causal_section_en)
 
     return f"""

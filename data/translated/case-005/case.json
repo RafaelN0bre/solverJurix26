@@ -518,11 +518,15 @@
       {
         "target": "LeReCa_FatRisc_SeqIrr",
         "justified": true,
+        "derivable": true,
+        "status": "reconhecida",
         "blocked_by": []
       },
       {
         "target": "LeReCa_AgrQuad_SeqIrr",
         "justified": false,
+        "derivable": true,
+        "status": "afastada",
         "blocked_by": [
           {
             "undercut_rule": "cf2lrc_AgrQuad",
@@ -530,6 +534,8 @@
             "attacker_rules": [
               "nwo_AgrQuad"
             ],
+            "attacked_argument": "A6",
+            "attack_type": "undercut",
             "scheme": "nwo",
             "scheme_pt": "Exceção do \"não estaria melhor\" / no-worse-off (regra 3): existe uma causa paralela não ilícita que teria produzido o mesmo dano."
           }

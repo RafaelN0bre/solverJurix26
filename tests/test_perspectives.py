@@ -288,6 +288,101 @@ def test_the_view_carries_a_rules_legend_and_an_argument_table(record):
     assert "Omis AND Dever =&gt; Elo" in body or "Omis AND Dever => Elo" in body
 
 
+def test_an_empty_box_says_which_kind_of_empty_it_is(record):
+    """"Sem movimento" e "não é o primeiro titular" são coisas diferentes.
+
+    O nó de uma regra mora na caixa do primeiro titular em ordem de leitura.
+    Uma perspectiva que sustenta regras mas nunca é a primeira fica sem nó
+    nenhum — e a caixa vazia dizia "sem movimento", que no modelo de Prakken
+    é uma afirmação substantiva (quem não ataca, endossa). Era mentira.
+    """
+    # O relator sustenta a única regra do caso, mas o recorrido vem antes na
+    # ordem de leitura, então o nó é desenhado lá e o relator fica sem nó.
+    only = FormalizedCase(
+        case=CaseMeta(id="x", title="x", annotator="t", source_file="",
+                      source_sha256=""),
+        effect="D",
+        atoms=[atom("A", perspectives=["recorrido"]),
+               atom("D", kind="resultado", established=False)],
+        knowledge_base={"premises": ["A"], "axioms": []},
+        causal_model={"strict_rules": [], "defeasible_rules": ["r0: A => D"]},
+        rules_meta=[RuleMeta(id="r0", rule="r0: A => D", kind="causal",
+                             gloss_pt="g", perspective="recorrido",
+                             perspectives=["recorrido", "relator"])])
+    assert "relator" in P.mapped_rules(only)[0].holders
+    dot = P.to_adjudication_dot(only)
+    assert "desenhadas na caixa de outro titular" in dot
+    assert P.SILENT_NOTE not in dot
+
+
+# ----------------------------------------------------------------------
+# Quem ataca quem
+# ----------------------------------------------------------------------
+def test_an_attack_is_attributed_to_the_holders_not_to_the_drawn_box(record):
+    """O mapa desenha um nó numa caixa só -- a do primeiro titular em ordem
+    de leitura, e as partes vêm antes dos adjudicadores. Um ataque a uma
+    regra que um julgador sustenta junto com uma parte chega, no desenho, à
+    caixa da parte. `mapped_attacks` diz quem está de fato em cada ponta."""
+    attack = next(a for a in P.mapped_attacks(record) if a.target == "cf2lrc_Omis")
+    assert "voto_divergente" in attack.source_holders
+    # A caixa desenhada e os titulares não coincidem quando a regra é dividida.
+    assert attack.target_box in attack.target_holders or not attack.target_holders
+
+
+def test_confrontations_are_classified_per_pair_not_per_attack(record):
+    """Uma regra que três vozes sustentam produz três confrontos, e eles não
+    são todos da mesma natureza: quem move é quem está na ponta de origem
+    daquele par, não quem move o ataque em abstrato."""
+    for row in P.confrontations(record):
+        esperado = "decisão" if row["source"] in P.ADJUDICATORS else "argumentação"
+        assert row["phase"] == esperado
+        assert row["between_adjudicators"] == (
+            row["source"] in P.ADJUDICATORS and row["target"] in P.ADJUDICATORS)
+
+
+def test_a_voice_never_attacks_itself(record):
+    """Uma regra sustentada por A e B, atacando outra sustentada por B, não
+    põe B contra si mesmo."""
+    for row in P.confrontations(record):
+        assert row["source"] != row["target"]
+
+
+def test_the_view_reports_the_confrontations_the_map_flattens(record):
+    from aspic.perspective_view import render_perspectives
+
+    body = render_perspectives(record, title="Mini")
+    assert "Quem ataca quem" in body
+    # E o desenho passou a mostrar o confronto, em vez de só admitir que não
+    # mostrava: arestas para a caixa dos demais titulares, e um grafo por
+    # perspectiva onde o embate entre adjudicadores aparece como tal.
+    assert "Quem enfrenta quem" in body
+    # O grafo por perspectiva desenha o confronto sem as regras no meio.
+    confrontos = P.to_confrontation_dot(record)
+    for row in P.confrontations(record):
+        assert f'"{row["source"]}" -> "{row["target"]}"' in confrontos
+
+
+def test_the_map_reaches_the_boxes_of_the_other_holders(record):
+    """A aresta principal chega ao nó, que mora numa caixa só. Estas chegam à
+    *caixa* de cada titular que a principal não tocou -- sem elas, um ataque
+    de um ministro à tese de outro aparece como ataque a uma parte."""
+    # A presunção passa a ser sustentada pelo recorrido *e* pelo relator; o
+    # voto divergente a ataca. O nó dela é desenhado na caixa do recorrido, e
+    # sem a aresta extra o ataque ao relator não apareceria em lugar nenhum.
+    presuncao = record.lrc.scheme_rules[0]
+    presuncao.perspective = "recorrido"
+    presuncao.perspectives = ["recorrido", "relator"]
+
+    ataque = next(a for a in P.mapped_attacks(record)
+                  if a.target == "cf2lrc_Omis")
+    assert set(ataque.target_holders) == {"recorrido", "relator"}
+    assert ataque.between_adjudicators is True
+
+    dot = P.to_adjudication_dot(record)
+    assert 'lhead="cluster_p_relator"' in dot
+    assert "co-holder" in dot and "between-adjudicators" in dot
+
+
 # ----------------------------------------------------------------------
 # Two vocabularies, one roll call
 # ----------------------------------------------------------------------

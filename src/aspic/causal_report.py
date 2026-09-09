@@ -54,7 +54,8 @@ def _verdict_cell(value: bool) -> str:
     return f'<td class="verdict {cls}">{glyph}</td>'
 
 
-def causal_comparison_section(af: ArgumentationFramework, queries: List[CausalQuery]) -> str:
+def causal_comparison_section(af: ArgumentationFramework, queries: List[CausalQuery],
+                              layer_tag: str = "") -> str:
     """Table comparing the two notions the papers define -- the NESS cause
     (Definition 4.3 / 3.4) and `but_for` (Definition 3.5) -- for each
     (phi, psi) query, followed by one collapsed counterfactual graph per
@@ -77,7 +78,7 @@ def causal_comparison_section(af: ArgumentationFramework, queries: List[CausalQu
             f'<td class="note">{_html.escape(q.note)}</td>'
             "</tr>"
         )
-        details.append(_counterfactual_detail(af, q))
+        details.append(_counterfactual_detail(af, q, layer_tag))
 
     table = (
         '<table class="causal-table">'
@@ -89,11 +90,13 @@ def causal_comparison_section(af: ArgumentationFramework, queries: List[CausalQu
     return table + "\n" + "\n".join(details)
 
 
-def _counterfactual_detail(af: ArgumentationFramework, q: CausalQuery) -> str:
+def _counterfactual_detail(af: ArgumentationFramework, q: CausalQuery,
+                           layer_tag: str = "") -> str:
     not_phi = negate_literal(q.phi)
     expanded = af.axiom_expand([not_phi])
     ext, _ = expanded.compute_grounded_extension()
-    dot = to_dot(expanded, ext, title=f"Counterfactual: axiom-expanded with {not_phi}")
+    dot = to_dot(expanded, ext, layer_tag=layer_tag,
+                 title=f"Counterfactual: axiom-expanded with {not_phi}")
     svg = render_to_string(dot, "svg")
     still_justified = q.psi in expanded.justified_conclusions()
     verdict = (

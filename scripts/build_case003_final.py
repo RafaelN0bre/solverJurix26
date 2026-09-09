@@ -287,6 +287,22 @@ DIMENSIONS = [
 #: desenho: fossem elas pontuadas, o peso do fundamento seria contado duas
 #: vezes e o elo mais fraco passaria a medir o encadeamento, não a razão.
 PROFILES = {
+    # --- premissas ordinárias ------------------------------------------
+    # A Definição 21 de Modgil & Prakken compara `Prem_p` **e** `DefRules`.
+    # Classificar só as regras deixa a ordenação muda: dois conjuntos de
+    # premissas não vazios e não classificados nunca se precedem, e a
+    # conjunção falha qualquer que seja a comparação entre as regras. Estes
+    # três fatos são exatamente os `abstract_factor` que os átomos já
+    # declaram — a balança de fatores e a ordenação passam a falar da mesma
+    # coisa em vez de duas parecidas.
+    "RegFechado": ({"dever_especifico": 1.0},
+                   "É o fato que torna o dever específico: regime fechado, "
+                   "custódia estrita."),
+    "LapsoTemp": ({"intervencao_causal": 1.0},
+                  "É o evento interposto: três meses entre a fuga e o crime."),
+    "FormacaoQuad": ({"autonomia": 1.0},
+                     "É a deliberação própria de terceiros: concurso de agentes."),
+    # --- regras ---------------------------------------------------------
     "r1": ({"dever_especifico": 1.0},
            "Lê o regime fechado, que é o que torna o dever específico."),
     "r5": ({"intervencao_causal": 1.0},
@@ -301,6 +317,11 @@ PROFILES = {
     "dvgen_q1": ({"intervencao_causal": 1.0, "autonomia": 1.0},
                  "É o outro lado de ⟨q0, q2⟩, e se apoia nas duas outras "
                  "dimensões ao mesmo tempo."),
+    "dvgen_q2": ({"intervencao_causal": 1.0, "autonomia": 1.0},
+                 "Tira a consequência de q1, e carrega o fundamento dela. "
+                 "Sob a Def. 21 não existe regra 'neutra' que se pule: a "
+                 "comparação é sobre o conjunto inteiro de DefRules, e um "
+                 "membro sem classificação torna o conjunto incomparável."),
     "suca_q3": ({"intervencao_causal": 1.0},
                 "Caracteriza o ato de terceiro só pelo lapso."),
     "suca_q4": ({"intervencao_causal": 1.0, "autonomia": 1.0},
@@ -315,13 +336,25 @@ PREFERENCE_NOTES = (
     "derrotáveis incomparáveis, e o documento marca ⟨q0, q2⟩ como o único "
     "ataque ativo por rebutting da formalização: `dvesp_q0` conclui "
     "DeverEspec, `dvgen_q2` conclui ¬DeverEspec, e nenhum dos dois undercuta "
-    "o outro. Sem preferência, os dois ficam UNDEC, `unom_q7` e `dvpre_q8` "
-    "deixam ambos de disparar, e a camada de relevância não responde nada. "
-    "Com a tupla ⟨4, 5, 5⟩ e agregação pelo elo mais fraco, o argumento por "
-    "¬DeverEspec vale 10 (5 + 5, por `dvgen_q1`) contra 4 do argumento por "
-    "DeverEspec (`dvesp_q0`), e a camada decide. O ponto de virada está em "
-    "10: com peso maior que esse para a especificidade do dever, é o dever "
-    "específico que prevalece e a pretensão se sustenta."
+    "o outro. Sem preferência, os dois ficam UNDEC e a camada de relevância "
+    "não responde nada.\n\n"
+    "A comparação segue a Definição 21 de Modgil & Prakken (2013), com o "
+    "comparador elitista: `B ≺ A` exige `Prem_p(B) ◁ Prem_p(A)` **e** "
+    "`DefRules(B) ◁ DefRules(A)`. Por isso as premissas também são "
+    "classificadas — `RegFechado` no eixo do dever, `LapsoTemp` na "
+    "intervenção causal, `FormacaoQuad` na autonomia. Classificar só as "
+    "regras, como esta formalização fazia antes, é a anomalia que os próprios "
+    "autores da definição declararam ter ido corrigir: deixa a ordenação "
+    "declarar preferência onde o ASPIC+ canônico não declara nenhuma.\n\n"
+    "Do lado do dever específico, `⟨RegFechado⟩` = 4 e `⟨dvesp_q0⟩` = 4; do "
+    "outro, `⟨LapsoTemp, FormacaoQuad⟩` = ⟨5, 5⟩ e `⟨dvgen_q1, dvgen_q2⟩` = "
+    "⟨10, 10⟩. As duas comparações correm no mesmo sentido, então a conjunção "
+    "vale e o dever genérico prevalece.\n\n"
+    "A ordenação é movimento do **voto divergente**, não fato do mundo: é ele "
+    "que sustenta q2, e é dele o argumento de prioridade. Antes de o voto "
+    "entrar, o traço roda sob a ordenação básica — de outro modo uma "
+    "preferência decidiria um rebate entre as partes sem adjudicador nenhum, "
+    "o que a fase de decisão de Prakken (§4.3) não admite."
 )
 
 
@@ -429,6 +462,8 @@ def build_record(directory: Path) -> FormalizedCase:
 
     preferences = PreferenceBlock(
         principle="weakest",
+        comparator="elitist",
+        perspective=AM,
         dimensions=list(DIMENSIONS),
         profiles=[RuleProfileOut(rule=rule_id, coefficients=dict(coefficients),
                                  rationale_pt=why)

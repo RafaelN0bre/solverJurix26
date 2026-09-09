@@ -76,9 +76,15 @@ def _map_html(record, title: str) -> str:
   <code>R·</code> na de relevância jurídica, porque as duas numeram por conta
   própria e um <code>A17</code> solto nomearia dois argumentos diferentes.
   <em>(sem argumento)</em> quer dizer que os antecedentes nunca foram
-  satisfeitos, o que é diferente de a regra ter sido afastada. Passe o mouse
-  para ver a regra completa, a sua leitura e a situação de cada argumento; as
-  duas tabelas abaixo trazem tudo por extenso.</p>
+  satisfeitos, o que é diferente de a regra ter sido afastada.</p>
+  <p class="legend-note">Seta vermelha <strong>tracejada</strong> apontando
+  para a borda de uma caixa: a regra atacada é sustentada também por aquela
+  perspectiva, e o ataque a atinge do mesmo jeito. Ela existe porque um nó
+  mora numa caixa só — a do primeiro titular, e as partes vêm antes dos
+  adjudicadores nessa ordem —, de modo que sem ela um ataque de um ministro à
+  tese de outro apareceria como ataque a uma parte. Ponta vazada: as duas
+  pontas são adjudicadores. Para ver esse embate sem as regras no meio, veja
+  o grafo <em>Quem enfrenta quem</em>, mais abaixo.</p>
 """
 
 
@@ -97,6 +103,73 @@ def _holders_text(keys, origin: str = "") -> str:
     if keys == [P.SHARED]:
         return "incontroverso (todas)"
     return ", ".join(P._label(key) for key in keys)
+
+
+def _confrontation_graph_html(record) -> str:
+    """O confronto entre perspectivas como grafo, sem as regras no meio."""
+    try:
+        svg = render_to_string(
+            P.to_confrontation_dot(record, title="Quem enfrenta quem"), fmt="svg")
+    except RuntimeError as exc:
+        return f'<p class="notice">{_esc(exc)}</p>'
+    return f"""
+  <div class="graph-wrap">{svg}</div>
+  <p class="legend-note">Um nó por perspectiva, uma aresta por confronto, lida
+  pelos <strong>titulares</strong> das regras e não pelas caixas do mapa acima.
+  Aresta vermelha cheia: confronto <strong>entre adjudicadores</strong> — é
+  nele que a fase de decisão acontece, e é o que o mapa de regras não consegue
+  desenhar, porque lá a regra atacada mora numa caixa só. Aresta cinza
+  tracejada: confronto em que ao menos uma ponta é parte.</p>
+"""
+
+
+def _confrontations_html(record) -> str:
+    """Quem ataca quem, lido pelos titulares das regras.
+
+    A pergunta que o mapa não responde. Um nó mora numa caixa só — a do
+    primeiro titular em ordem de leitura — e as partes vêm antes dos
+    adjudicadores nessa ordem. Então uma regra que o relator sustenta junto
+    com o recorrido é desenhada na caixa do recorrido, e o ataque do voto
+    divergente contra ela *parece* um ataque à parte. Em `case-003-final`,
+    seis dos sete ataques são entre adjudicadores e nenhum aparece assim no
+    desenho.
+    """
+    rows_data = P.confrontations(record)
+    if not rows_data:
+        return ('<p class="notice">Nenhum ataque entre perspectivas: as regras '
+                "deste caso não se atacam, ou nenhuma tem autor identificado.</p>")
+    entre = [r for r in rows_data if r["between_adjudicators"]]
+    rows = "".join(
+        f'<tr class="{"turning-row" if row["between_adjudicators"] else ""}">'
+        f'<td><strong>{_esc(P._label(row["source"]))}</strong></td>'
+        f'<td>{_esc(P._label(row["target"]))}</td>'
+        f'<td>{_esc(row["phase"])}</td>'
+        f'<td class="mono">{_esc(", ".join(row["rules"]))}</td>'
+        + ('<td><span class="turning">adjudicador × adjudicador</span></td>'
+           if row["between_adjudicators"] else "<td></td>")
+        + "</tr>"
+        for row in rows_data
+    )
+    nota = (f'<p class="lead"><strong>{len(entre)}</strong> destes confrontos são '
+            "entre adjudicadores — é neles que a fase de decisão acontece. No "
+            "mapa acima eles estão desenhados com traço mais grosso, mas com uma "
+            "parte numa das pontas: a regra atacada é sustentada também por ela, "
+            "e o nó teve de ser posto em alguma caixa. É esta tabela, e não o "
+            "desenho, que diz quem estava de cada lado.</p>"
+            if entre else
+            '<p class="lead">Nenhum confronto entre adjudicadores: a fase de '
+            "decisão deste caso não tem juiz contra juiz.</p>")
+    return (
+        '<p class="lead">Cada par de perspectivas que se enfrenta, lido pelas '
+        "regras que cada uma sustenta — não pelas caixas do mapa. Uma regra que "
+        "três vozes sustentam produz três confrontos, e eles não são todos da "
+        "mesma natureza: <code>dvesp_q0 ⤅ dvgen_q2</code> é o recorrido "
+        "respondendo ao dissenso na fase de argumentação <em>e</em> o relator "
+        "respondendo na fase de decisão, conforme o titular de que se lê.</p>"
+        + nota +
+        "<table><thead><tr><th>Ataca</th><th>Quem</th><th>Fase</th>"
+        f"<th>Por quais regras</th><th></th></tr></thead><tbody>{rows}</tbody></table>"
+    )
 
 
 def _rules_legend_html(record) -> str:
@@ -478,6 +551,10 @@ def render_perspectives(record, title: str = "") -> str:
   Prakken, <em>A Formal Model of Adjudication Dialogues</em> (2008).</p>
 
   {_map_html(record, title)}
+
+  <h4>Quem ataca quem</h4>
+  {_confrontation_graph_html(record)}
+  {_confrontations_html(record)}
 
   <h4>Legenda das regras</h4>
   {_rules_legend_html(record)}

@@ -181,53 +181,90 @@ def _tuple_block(model: PR.PreferenceModel, block) -> str:
     signature = ", ".join(f"{d.label_pt} = {d.weight:g}" for d in block.dimensions)
     return (
         f'<p class="lead">A ordenação deste caso é a tupla ⟨{_esc(signature)}⟩, '
-        f"agregada por <strong>{_esc(PR.PRINCIPLE_LABELS.get(model.principle, model.principle))}</strong>. "
-        "A força de uma regra é a soma dos pesos dos eixos que ela invoca; a "
-        "de um argumento, a agregação das forças das regras que ele usa. "
-        "Ataques por <em>undercut</em> não entram nessa conta em momento "
-        "algum — no ASPIC+ eles independem de preferência.</p>"
+        f"comparada por <strong>{_esc(PR.PRINCIPLE_LABELS.get(model.principle, model.principle))}</strong>, "
+        f"com comparador <strong>{_esc(PR.COMPARATOR_LABELS.get(model.comparator, model.comparator))}</strong>. "
+        "A força de um elemento é a soma dos pesos dos eixos que ele invoca. "
+        "A ordenação, porém, não compara dois números: compara <em>conjuntos</em> "
+        "(Definição 19 de Modgil &amp; Prakken), e o weakest-link exige que as "
+        "premissas ordinárias <em>e</em> as regras derrotáveis corram no mesmo "
+        "sentido (Definição 21). Por isso as premissas também aparecem "
+        "classificadas abaixo: comparar só as regras declara preferência onde "
+        "o ASPIC+ canônico não declara nenhuma. Um elemento sem classificação "
+        "não tem posição na preordem, e um só deles basta para tornar o "
+        "conjunto incomparável. Ataques por <em>undercut</em> não entram nessa "
+        "conta em momento algum — no ASPIC+ eles independem de preferência.</p>"
         "<table><thead><tr><th>Eixo</th><th>Do que se trata</th><th>Peso</th>"
         f"<th>Por quê</th></tr></thead><tbody>{rows}</tbody></table>"
     )
 
 
 def _profiles_block(model: PR.PreferenceModel, record) -> str:
-    from formalize import build
+    """Every element the ordering can see, ranked or not.
 
+    Rules *and* ordinary premises, because Definition 21 compares both. An
+    element with no rank has no position in the preorder, and one of them is
+    enough to make its whole set incomparable -- so the unranked rows are not
+    filler, they are where the ordering goes silent.
+    """
     heads = "".join(f"<th>{_esc(d.label_pt)}</th>" for d in model.dimensions)
-    known = {meta.id for meta in record.rules_meta}
-    if record.lrc is not None:
-        known |= {rule.rule.split(":", 1)[0].strip()
-                  for rule in record.lrc.scheme_rules}
+    rules = {meta.id for meta in record.rules_meta}
     glosses = {meta.id: meta.gloss_pt for meta in record.rules_meta}
     if record.lrc is not None:
-        glosses.update({rule.rule.split(":", 1)[0].strip(): rule.gloss_pt
-                        for rule in record.lrc.scheme_rules})
+        for rule in record.lrc.scheme_rules:
+            rule_id = rule.rule.split(":", 1)[0].strip()
+            rules.add(rule_id)
+            glosses[rule_id] = rule.gloss_pt
+    premises = set(record.knowledge_base.get("premises", []))
+    if record.lrc is not None:
+        premises |= set(record.lrc.knowledge_base.get("premises", []))
+    atoms = {atom.code: atom.label_pt for atom in record.atoms}
 
-    rows = []
-    for rule_id in sorted(known, key=lambda r: (r not in model.profiles, r)):
-        strength = model.rule_strength(rule_id)
+    def row(key: str, kind: str) -> str:
+        strength = model.rule_strength(key)
         coefficients = "".join(
             f'<td class="num">{_num(c) if c else "·"}</td>'
-            for c in model.tuple_for(rule_id))
-        profile = model.profiles.get(rule_id)
-        rows.append(
-            f'<tr class="{"" if strength is not None else "muted"}">'
-            f'<td class="mono">{_esc(rule_id)}</td>'
-            f"{coefficients}"
-            f'<td class="num"><strong>{_num(strength)}</strong></td>'
-            f'<td class="muted">{_esc(profile.rationale_pt if profile else "")}</td>'
-            "</tr>"
-        )
-    neutral = sum(1 for r in known if model.rule_strength(r) is None)
+            for c in model.tuple_for(key))
+        profile = model.profiles.get(key)
+        why = profile.rationale_pt if profile else ""
+        if not why:
+            why = glosses.get(key, "") or atoms.get(key.lstrip("¬"), "")
+        return (f'<tr class="{"" if strength is not None else "muted"}">'
+                f'<td class="mono">{_esc(key)}</td>'
+                f"<td>{_esc(kind)}</td>"
+                f"{coefficients}"
+                f'<td class="num"><strong>{_num(strength)}</strong></td>'
+                f'<td class="muted">{_esc(why)}</td></tr>')
+
+    def block(label: str, keys, kind: str) -> List[str]:
+        ordered = sorted(keys, key=lambda k: (model.rule_strength(k) is None, k))
+        if not ordered:
+            return []
+        return ([f'<tr class="case-row"><td colspan="{4 + len(model.dimensions)}">'
+                 f"<strong>{_esc(label)}</strong></td></tr>"]
+                + [row(key, kind) for key in ordered])
+
+    rows = block("Premissas ordinárias", premises, "premissa")
+    rows += block("Regras derrotáveis", rules, "regra")
+
+    sem_rank = [k for k in (premises | rules) if model.rule_strength(k) is None]
+    nota = ""
+    if sem_rank:
+        nota = (f'<p class="lead">{len(sem_rank)} elemento(s) sem classificação. '
+                "Não são neutros no sentido de pesarem zero: eles simplesmente "
+                "<strong>não têm posição na preordem</strong>, e um só deles "
+                "torna incomparável o conjunto inteiro em que aparece. Se um "
+                "conflito que deveria ser decidido sai indeciso, é aqui que se "
+                "olha primeiro.</p>")
     return (
-        '<p class="lead">Cada regra declara que eixos invoca. As '
-        f"<strong>{neutral}</strong> regras sem força são neutras — passos que "
-        "apenas encadeiam o que já está posto, e que por isso não entram na "
-        "agregação: se entrassem, o fundamento seria contado duas vezes e o "
-        "elo mais fraco passaria a medir o encadeamento em lugar da razão.</p>"
-        f"<table><thead><tr><th>Regra</th>{heads}<th>Força</th><th>Por quê</th>"
-        f"</tr></thead><tbody>{''.join(rows)}</tbody></table>"
+        '<p class="lead">Cada elemento que a ordenação enxerga — regra ou '
+        "premissa — com os eixos que invoca e a força resultante. As premissas "
+        "estão aqui porque a Definição 21 as compara junto com as regras; "
+        "ordenar só as regras foi a anomalia que os autores da definição "
+        "declararam ter ido corrigir.</p>"
+        + nota +
+        f"<table><thead><tr><th>Elemento</th><th>Tipo</th>{heads}"
+        "<th>Força</th><th>Por quê</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table>"
     )
 
 

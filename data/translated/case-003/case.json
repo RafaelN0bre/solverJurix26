@@ -504,6 +504,8 @@
       {
         "target": "LeReCa_FugaPreso_MorteVitima",
         "justified": false,
+        "derivable": true,
+        "status": "afastada",
         "blocked_by": [
           {
             "undercut_rule": "cf2lrc_FugaPreso",
@@ -511,6 +513,8 @@
             "attacker_rules": [
               "unom_FugaPreso"
             ],
+            "attacked_argument": "A10",
+            "attack_type": "undercut",
             "scheme": "unom",
             "scheme_pt": "Omissão sem dever de agir (regra 8): a conduta omitida não era juridicamente obrigatória."
           },
@@ -521,6 +525,8 @@
               "sc_FugaPreso",
               "suca_Latrocinio"
             ],
+            "attacked_argument": "A10",
+            "attack_type": "undercut",
             "scheme": "sc",
             "scheme_pt": "Causa superveniente (regra 4): um evento posterior interrompe o nexo de relevância jurídica."
           }
@@ -529,11 +535,15 @@
       {
         "target": "LeReCa_PresoRegFech_MorteVitima",
         "justified": true,
+        "derivable": true,
+        "status": "reconhecida",
         "blocked_by": []
       },
       {
         "target": "LeReCa_Latrocinio_MorteVitima",
         "justified": true,
+        "derivable": true,
+        "status": "reconhecida",
         "blocked_by": []
       }
     ]

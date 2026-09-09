@@ -9,6 +9,7 @@ Rendering shells out to the system `dot` binary (Graphviz) rather than
 adding a Python Graphviz binding as a project dependency -- the DOT
 language is simple enough to build as a string, and `subprocess` is stdlib.
 """
+import re
 import shutil
 import subprocess
 
@@ -16,6 +17,18 @@ from pathlib import Path
 from typing import Dict, Set
 
 from .solver import Argument, ArgumentationFramework
+
+#: Um id de argumento como o solver os emite (`A0`, `A17`). Serve para
+#: etiquetar textos livres -- os tooltips de ataque são frases prontas -- com
+#: a camada a que pertencem.
+_RE_ARG = re.compile(r"\bA\d+\b")
+
+
+def _tag_ids(text: str, layer_tag: str) -> str:
+    """Prefixa cada id de argumento do texto com a etiqueta da camada."""
+    if not layer_tag:
+        return text
+    return _RE_ARG.sub(lambda m: f"{layer_tag}·{m.group(0)}", text)
 
 ATTACK_STYLE = {
     "undercut": {"color": "#d17a00", "style": "dashed", "abbrev": "UC"},
@@ -64,17 +77,19 @@ def _dot_escape(text: str) -> str:
     return text.replace('"', '\\"')
 
 
-def _argument_label(arg: Argument) -> str:
+def _argument_label(arg: Argument, layer_tag: str = "") -> str:
     premises = ", ".join(sorted(arg.premises)) or "∅"
     rule_ids = arg.strict_rules + arg.defeasible_rules
+    name = f"{layer_tag}·{arg.id}" if layer_tag else arg.id
     if rule_ids:
         rules = ",".join(rule_ids)
-        return f"{arg.id}\\n[{premises}]\\n{rules} ⊢ {arg.conclusion}"
-    return f"{arg.id}\\n{arg.conclusion} (premise)"
+        return f"{name}\\n[{premises}]\\n{rules} ⊢ {arg.conclusion}"
+    return f"{name}\\n{arg.conclusion} (premise)"
 
 
 def to_dot(af: ArgumentationFramework, extension: Set[str], *,
-           include_atomic: bool = True, title: str = "") -> str:
+           include_atomic: bool = True, title: str = "",
+           layer_tag: str = "") -> str:
     """Build the Graphviz DOT source for `af`'s argument graph.
 
     One node per `Argument` (colored by IN/OUT/UNDEC status, Definition
@@ -82,6 +97,14 @@ def to_dot(af: ArgumentationFramework, extension: Set[str], *,
     undercut/rebut/undermine -- and bolded if the attack succeeded as a
     `Defeat`, Definitions 2.8/2.10/2.11), plus a legend cluster listing the
     case's rules so the figure is self-explanatory without the source code.
+
+    `layer_tag` prefixes every argument name shown to the reader (`F·A8`
+    rather than `A8`). The two frameworks of a case -- cause in fact and legal
+    relevance -- both number from A0, so a page carrying both graphs prints
+    `A8` twice for two different arguments. It really happened here:
+    `A8: OmiEstatal ⊢ Latrocinio` in one figure and `A8: RegFechado ⊢
+    RegFechado` in the other. The DOT *node names* stay bare -- they only have
+    to be unique inside one graph, and the click-to-highlight JS keys on them.
     """
     status = argument_status(af, extension)
     successful_attacks = {id(d.attack) for d in af.defeats}
@@ -97,7 +120,7 @@ def to_dot(af: ArgumentationFramework, extension: Set[str], *,
             continue
         style = STATUS_STYLE[status[arg.id]]
         shape = "ellipse" if arg.is_atomic else "box"
-        label = _argument_label(arg)
+        label = _argument_label(arg, layer_tag)
         css_class = f'argnode status-{status[arg.id]} arg-{arg.id}'
         lines.append(
             f'  "{arg.id}" [shape={shape}, style="filled,rounded", '
@@ -127,7 +150,7 @@ def to_dot(af: ArgumentationFramework, extension: Set[str], *,
         lines.append(
             f'  "{attack.attacker_id}" -> "{attack.target_id}" '
             f'[label="{label}", color="{color}", style="{edge_style}", '
-            f'penwidth={penwidth}, tooltip="{_dot_escape(str(attack) + note)}", '
+            f'penwidth={penwidth}, tooltip="{_dot_escape(_tag_ids(str(attack) + note, layer_tag))}", '
             f'class="{css_class}"];'
         )
 

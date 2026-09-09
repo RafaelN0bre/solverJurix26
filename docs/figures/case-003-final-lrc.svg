@@ -18,9 +18,9 @@
 <!-- A0 -->
 <g id="node1" class="node argnode status&#45;IN arg&#45;A0">
 <title>A0</title>
-<g id="a_node1"><a xlink:title="A0&#10;ButFor_Latrocinio_Danos (premise)">
+<g id="a_node1"><a xlink:title="R·A0&#10;ButFor_Latrocinio_Danos (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="132.76" cy="-335.12" rx="132.76" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="132.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A0</text>
+<text xml:space="preserve" text-anchor="middle" x="132.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A0</text>
 <text xml:space="preserve" text-anchor="middle" x="132.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">ButFor_Latrocinio_Danos (premise)</text>
 </a>
 </g>
@@ -28,9 +28,9 @@
 <!-- A1 -->
 <g id="node2" class="node argnode status&#45;IN arg&#45;A1">
 <title>A1</title>
-<g id="a_node2"><a xlink:title="A1&#10;CaFa_FormacaoQuad_Danos (premise)">
+<g id="a_node2"><a xlink:title="R·A1&#10;CaFa_FormacaoQuad_Danos (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="431.76" cy="-335.12" rx="148.67" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="431.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A1</text>
+<text xml:space="preserve" text-anchor="middle" x="431.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A1</text>
 <text xml:space="preserve" text-anchor="middle" x="431.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">CaFa_FormacaoQuad_Danos (premise)</text>
 </a>
 </g>
@@ -38,9 +38,9 @@
 <!-- A2 -->
 <g id="node3" class="node argnode status&#45;IN arg&#45;A2">
 <title>A2</title>
-<g id="a_node3"><a xlink:title="A2&#10;CaFa_LapsoTemp_Danos (premise)">
+<g id="a_node3"><a xlink:title="R·A2&#10;CaFa_LapsoTemp_Danos (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="733.76" cy="-335.12" rx="134.88" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="733.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A2</text>
+<text xml:space="preserve" text-anchor="middle" x="733.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A2</text>
 <text xml:space="preserve" text-anchor="middle" x="733.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">CaFa_LapsoTemp_Danos (premise)</text>
 </a>
 </g>
@@ -48,9 +48,9 @@
 <!-- A3 -->
 <g id="node4" class="node argnode status&#45;IN arg&#45;A3">
 <title>A3</title>
-<g id="a_node4"><a xlink:title="A3&#10;CaFa_Latrocinio_Danos (premise)">
+<g id="a_node4"><a xlink:title="R·A3&#10;CaFa_Latrocinio_Danos (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1014.76" cy="-335.12" rx="128.52" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1014.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A3</text>
+<text xml:space="preserve" text-anchor="middle" x="1014.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A3</text>
 <text xml:space="preserve" text-anchor="middle" x="1014.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">CaFa_Latrocinio_Danos (premise)</text>
 </a>
 </g>
@@ -58,9 +58,9 @@
 <!-- A4 -->
 <g id="node5" class="node argnode status&#45;IN arg&#45;A4">
 <title>A4</title>
-<g id="a_node5"><a xlink:title="A4&#10;FormacaoQuad (premise)">
+<g id="a_node5"><a xlink:title="R·A4&#10;FormacaoQuad (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1259.76" cy="-335.12" rx="98.82" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1259.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A4</text>
+<text xml:space="preserve" text-anchor="middle" x="1259.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A4</text>
 <text xml:space="preserve" text-anchor="middle" x="1259.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">FormacaoQuad (premise)</text>
 </a>
 </g>
@@ -68,9 +68,9 @@
 <!-- A5 -->
 <g id="node6" class="node argnode status&#45;IN arg&#45;A5">
 <title>A5</title>
-<g id="a_node6"><a xlink:title="A5&#10;LapsoTemp (premise)">
+<g id="a_node6"><a xlink:title="R·A5&#10;LapsoTemp (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1461.76" cy="-335.12" rx="85.03" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1461.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A5</text>
+<text xml:space="preserve" text-anchor="middle" x="1461.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A5</text>
 <text xml:space="preserve" text-anchor="middle" x="1461.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">LapsoTemp (premise)</text>
 </a>
 </g>
@@ -78,9 +78,9 @@
 <!-- A6 -->
 <g id="node7" class="node argnode status&#45;IN arg&#45;A6">
 <title>A6</title>
-<g id="a_node7"><a xlink:title="A6&#10;Latrocinio (premise)">
+<g id="a_node7"><a xlink:title="R·A6&#10;Latrocinio (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1643.76" cy="-335.12" rx="78.67" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1643.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A6</text>
+<text xml:space="preserve" text-anchor="middle" x="1643.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A6</text>
 <text xml:space="preserve" text-anchor="middle" x="1643.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">Latrocinio (premise)</text>
 </a>
 </g>
@@ -88,9 +88,9 @@
 <!-- A7 -->
 <g id="node8" class="node argnode status&#45;IN arg&#45;A7">
 <title>A7</title>
-<g id="a_node8"><a xlink:title="A7&#10;OmiEstatal (premise)">
+<g id="a_node8"><a xlink:title="R·A7&#10;OmiEstatal (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1823.76" cy="-335.12" rx="82.91" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1823.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A7</text>
+<text xml:space="preserve" text-anchor="middle" x="1823.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A7</text>
 <text xml:space="preserve" text-anchor="middle" x="1823.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">OmiEstatal (premise)</text>
 </a>
 </g>
@@ -98,9 +98,9 @@
 <!-- A8 -->
 <g id="node9" class="node argnode status&#45;IN arg&#45;A8">
 <title>A8</title>
-<g id="a_node9"><a xlink:title="A8&#10;RegFechado (premise)">
+<g id="a_node9"><a xlink:title="R·A8&#10;RegFechado (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="2014.76" cy="-335.12" rx="89.8" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="2014.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">A8</text>
+<text xml:space="preserve" text-anchor="middle" x="2014.76" y="-336.68" font-family="Helvetica,sans-Serif" font-size="11.00">R·A8</text>
 <text xml:space="preserve" text-anchor="middle" x="2014.76" y="-324.68" font-family="Helvetica,sans-Serif" font-size="11.00">RegFechado (premise)</text>
 </a>
 </g>
@@ -108,9 +108,9 @@
 <!-- A9 -->
 <g id="node10" class="node argnode status&#45;OUT arg&#45;A9">
 <title>A9</title>
-<g id="a_node10"><a xlink:title="A9&#10;[RegFechado]&#10;dvesp_q0 ⊢ DeverEspec">
+<g id="a_node10"><a xlink:title="R·A9&#10;[RegFechado]&#10;dvesp_q0 ⊢ DeverEspec">
 <path fill="#f6d6d6" stroke="#b71c1c" d="M2248.51,-358.25C2248.51,-358.25 2135.01,-358.25 2135.01,-358.25 2129.01,-358.25 2123.01,-352.25 2123.01,-346.25 2123.01,-346.25 2123.01,-324 2123.01,-324 2123.01,-318 2129.01,-312 2135.01,-312 2135.01,-312 2248.51,-312 2248.51,-312 2254.51,-312 2260.51,-318 2260.51,-324 2260.51,-324 2260.51,-346.25 2260.51,-346.25 2260.51,-352.25 2254.51,-358.25 2248.51,-358.25"/>
-<text xml:space="preserve" text-anchor="middle" x="2191.76" y="-343.8" font-family="Helvetica,sans-Serif" font-size="11.00">A9</text>
+<text xml:space="preserve" text-anchor="middle" x="2191.76" y="-343.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A9</text>
 <text xml:space="preserve" text-anchor="middle" x="2191.76" y="-331.8" font-family="Helvetica,sans-Serif" font-size="11.00">[RegFechado]</text>
 <text xml:space="preserve" text-anchor="middle" x="2191.76" y="-319.8" font-family="Helvetica,sans-Serif" font-size="11.00">dvesp_q0 ⊢ DeverEspec</text>
 </a>
@@ -119,9 +119,9 @@
 <!-- A11 -->
 <g id="node12" class="node argnode status&#45;IN arg&#45;A11">
 <title>A11</title>
-<g id="a_node12"><a xlink:title="A11&#10;[FormacaoQuad, LapsoTemp]&#10;dvgen_q1,dvgen_q2 ⊢ ¬DeverEspec">
+<g id="a_node12"><a xlink:title="R·A11&#10;[FormacaoQuad, LapsoTemp]&#10;dvgen_q1,dvgen_q2 ⊢ ¬DeverEspec">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M2240.38,-233.25C2240.38,-233.25 2069.13,-233.25 2069.13,-233.25 2063.13,-233.25 2057.13,-227.25 2057.13,-221.25 2057.13,-221.25 2057.13,-199 2057.13,-199 2057.13,-193 2063.13,-187 2069.13,-187 2069.13,-187 2240.38,-187 2240.38,-187 2246.38,-187 2252.38,-193 2252.38,-199 2252.38,-199 2252.38,-221.25 2252.38,-221.25 2252.38,-227.25 2246.38,-233.25 2240.38,-233.25"/>
-<text xml:space="preserve" text-anchor="middle" x="2154.76" y="-218.8" font-family="Helvetica,sans-Serif" font-size="11.00">A11</text>
+<text xml:space="preserve" text-anchor="middle" x="2154.76" y="-218.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A11</text>
 <text xml:space="preserve" text-anchor="middle" x="2154.76" y="-206.8" font-family="Helvetica,sans-Serif" font-size="11.00">[FormacaoQuad, LapsoTemp]</text>
 <text xml:space="preserve" text-anchor="middle" x="2154.76" y="-194.8" font-family="Helvetica,sans-Serif" font-size="11.00">dvgen_q1,dvgen_q2 ⊢ ¬DeverEspec</text>
 </a>
@@ -130,7 +130,7 @@
 <!-- A9&#45;&gt;A11 -->
 <g id="edge1" class="edge argedge type&#45;rebut failed&#45;attack from&#45;A9 to&#45;A11">
 <title>A9&#45;&gt;A11</title>
-<g id="a_edge1"><a xlink:title="A9 rebuts A11 on ¬DeverEspec &#45;&#45; attack failed, not a defeat">
+<g id="a_edge1"><a xlink:title="R·A9 rebuts R·A11 on ¬DeverEspec &#45;&#45; attack failed, not a defeat">
 <path fill="none" stroke="#bbbbbb" stroke-dasharray="1,5" d="M2177.02,-311.62C2168.98,-298.01 2159.81,-279.96 2155.51,-262.5 2154.12,-256.85 2153.39,-250.75 2153.07,-244.79"/>
 <polygon fill="#bbbbbb" stroke="#bbbbbb" points="2156.57,-245.12 2152.93,-235.17 2149.58,-245.22 2156.57,-245.12"/>
 </a>
@@ -140,9 +140,9 @@
 <!-- A16 -->
 <g id="node17" class="node argnode status&#45;IN arg&#45;A16">
 <title>A16</title>
-<g id="a_node17"><a xlink:title="A16&#10;[FormacaoQuad, LapsoTemp, OmiEstatal]&#10;dvgen_q1,dvgen_q2,unom_q7 ⊢ ¬cf2lrc_q5">
+<g id="a_node17"><a xlink:title="R·A16&#10;[FormacaoQuad, LapsoTemp, OmiEstatal]&#10;dvgen_q1,dvgen_q2,unom_q7 ⊢ ¬cf2lrc_q5">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M2485.51,-233.25C2485.51,-233.25 2282.01,-233.25 2282.01,-233.25 2276.01,-233.25 2270.01,-227.25 2270.01,-221.25 2270.01,-221.25 2270.01,-199 2270.01,-199 2270.01,-193 2276.01,-187 2282.01,-187 2282.01,-187 2485.51,-187 2485.51,-187 2491.51,-187 2497.51,-193 2497.51,-199 2497.51,-199 2497.51,-221.25 2497.51,-221.25 2497.51,-227.25 2491.51,-233.25 2485.51,-233.25"/>
-<text xml:space="preserve" text-anchor="middle" x="2383.76" y="-218.8" font-family="Helvetica,sans-Serif" font-size="11.00">A16</text>
+<text xml:space="preserve" text-anchor="middle" x="2383.76" y="-218.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A16</text>
 <text xml:space="preserve" text-anchor="middle" x="2383.76" y="-206.8" font-family="Helvetica,sans-Serif" font-size="11.00">[FormacaoQuad, LapsoTemp, OmiEstatal]</text>
 <text xml:space="preserve" text-anchor="middle" x="2383.76" y="-194.8" font-family="Helvetica,sans-Serif" font-size="11.00">dvgen_q1,dvgen_q2,unom_q7 ⊢ ¬cf2lrc_q5</text>
 </a>
@@ -151,7 +151,7 @@
 <!-- A9&#45;&gt;A16 -->
 <g id="edge2" class="edge argedge type&#45;rebut failed&#45;attack from&#45;A9 to&#45;A16">
 <title>A9&#45;&gt;A16</title>
-<g id="a_edge2"><a xlink:title="A9 rebuts A16 on ¬DeverEspec &#45;&#45; attack failed, not a defeat">
+<g id="a_edge2"><a xlink:title="R·A9 rebuts R·A16 on ¬DeverEspec &#45;&#45; attack failed, not a defeat">
 <path fill="none" stroke="#bbbbbb" stroke-dasharray="1,5" d="M2217.97,-311.53C2232.71,-299.32 2251.73,-284.35 2269.76,-272.5 2287.91,-260.58 2308.59,-248.91 2327.32,-239.01"/>
 <polygon fill="#bbbbbb" stroke="#bbbbbb" points="2328.9,-242.13 2336.15,-234.4 2325.66,-235.92 2328.9,-242.13"/>
 </a>
@@ -161,9 +161,9 @@
 <!-- A10 -->
 <g id="node11" class="node argnode status&#45;IN arg&#45;A10">
 <title>A10</title>
-<g id="a_node11"><a xlink:title="A10&#10;[FormacaoQuad, LapsoTemp]&#10;dvgen_q1 ⊢ DeverGener">
+<g id="a_node11"><a xlink:title="R·A10&#10;[FormacaoQuad, LapsoTemp]&#10;dvgen_q1 ⊢ DeverGener">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M2425.01,-358.25C2425.01,-358.25 2290.51,-358.25 2290.51,-358.25 2284.51,-358.25 2278.51,-352.25 2278.51,-346.25 2278.51,-346.25 2278.51,-324 2278.51,-324 2278.51,-318 2284.51,-312 2290.51,-312 2290.51,-312 2425.01,-312 2425.01,-312 2431.01,-312 2437.01,-318 2437.01,-324 2437.01,-324 2437.01,-346.25 2437.01,-346.25 2437.01,-352.25 2431.01,-358.25 2425.01,-358.25"/>
-<text xml:space="preserve" text-anchor="middle" x="2357.76" y="-343.8" font-family="Helvetica,sans-Serif" font-size="11.00">A10</text>
+<text xml:space="preserve" text-anchor="middle" x="2357.76" y="-343.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A10</text>
 <text xml:space="preserve" text-anchor="middle" x="2357.76" y="-331.8" font-family="Helvetica,sans-Serif" font-size="11.00">[FormacaoQuad, LapsoTemp]</text>
 <text xml:space="preserve" text-anchor="middle" x="2357.76" y="-319.8" font-family="Helvetica,sans-Serif" font-size="11.00">dvgen_q1 ⊢ DeverGener</text>
 </a>
@@ -172,7 +172,7 @@
 <!-- A11&#45;&gt;A9 -->
 <g id="edge3" class="edge argedge type&#45;rebut defeat from&#45;A11 to&#45;A9">
 <title>A11&#45;&gt;A9</title>
-<g id="a_edge3"><a xlink:title="A11 rebuts A9 on DeverEspec">
+<g id="a_edge3"><a xlink:title="R·A11 rebuts R·A9 on DeverEspec">
 <path fill="none" stroke="#c0392b" stroke-width="2.2" d="M2163.56,-233.48C2165.7,-239.23 2167.91,-245.44 2169.76,-251.25 2174.71,-266.78 2179.45,-284.18 2183.25,-299.02"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="2.2" points="2179.82,-299.72 2185.65,-308.56 2186.61,-298.01 2179.82,-299.72"/>
 </a>
@@ -182,9 +182,9 @@
 <!-- A17 -->
 <g id="node18" class="node argnode status&#45;OUT arg&#45;A17">
 <title>A17</title>
-<g id="a_node18"><a xlink:title="A17&#10;[RegFechado]&#10;dvesp_q0,dvpre_q8 ⊢ ¬sc_q6">
+<g id="a_node18"><a xlink:title="R·A17&#10;[RegFechado]&#10;dvesp_q0,dvpre_q8 ⊢ ¬sc_q6">
 <path fill="#f6d6d6" stroke="#b71c1c" d="M2223.51,-139.75C2223.51,-139.75 2086.01,-139.75 2086.01,-139.75 2080.01,-139.75 2074.01,-133.75 2074.01,-127.75 2074.01,-127.75 2074.01,-105.5 2074.01,-105.5 2074.01,-99.5 2080.01,-93.5 2086.01,-93.5 2086.01,-93.5 2223.51,-93.5 2223.51,-93.5 2229.51,-93.5 2235.51,-99.5 2235.51,-105.5 2235.51,-105.5 2235.51,-127.75 2235.51,-127.75 2235.51,-133.75 2229.51,-139.75 2223.51,-139.75"/>
-<text xml:space="preserve" text-anchor="middle" x="2154.76" y="-125.3" font-family="Helvetica,sans-Serif" font-size="11.00">A17</text>
+<text xml:space="preserve" text-anchor="middle" x="2154.76" y="-125.3" font-family="Helvetica,sans-Serif" font-size="11.00">R·A17</text>
 <text xml:space="preserve" text-anchor="middle" x="2154.76" y="-113.3" font-family="Helvetica,sans-Serif" font-size="11.00">[RegFechado]</text>
 <text xml:space="preserve" text-anchor="middle" x="2154.76" y="-101.3" font-family="Helvetica,sans-Serif" font-size="11.00">dvesp_q0,dvpre_q8 ⊢ ¬sc_q6</text>
 </a>
@@ -193,7 +193,7 @@
 <!-- A11&#45;&gt;A17 -->
 <g id="edge4" class="edge argedge type&#45;rebut defeat from&#45;A11 to&#45;A17">
 <title>A11&#45;&gt;A17</title>
-<g id="a_edge4"><a xlink:title="A11 rebuts A17 on DeverEspec">
+<g id="a_edge4"><a xlink:title="R·A11 rebuts R·A17 on DeverEspec">
 <path fill="none" stroke="#c0392b" stroke-width="2.2" d="M2154.76,-186.51C2154.76,-176.42 2154.76,-164.31 2154.76,-153.06"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="2.2" points="2158.26,-153.31 2154.76,-143.31 2151.26,-153.31 2158.26,-153.31"/>
 </a>
@@ -203,9 +203,9 @@
 <!-- A12 -->
 <g id="node13" class="node argnode status&#45;IN arg&#45;A12">
 <title>A12</title>
-<g id="a_node13"><a xlink:title="A12&#10;[LapsoTemp, Latrocinio]&#10;suca_q3 ⊢ AtoTerceiro">
+<g id="a_node13"><a xlink:title="R·A12&#10;[LapsoTemp, Latrocinio]&#10;suca_q3 ⊢ AtoTerceiro">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M2572.76,-358.25C2572.76,-358.25 2466.76,-358.25 2466.76,-358.25 2460.76,-358.25 2454.76,-352.25 2454.76,-346.25 2454.76,-346.25 2454.76,-324 2454.76,-324 2454.76,-318 2460.76,-312 2466.76,-312 2466.76,-312 2572.76,-312 2572.76,-312 2578.76,-312 2584.76,-318 2584.76,-324 2584.76,-324 2584.76,-346.25 2584.76,-346.25 2584.76,-352.25 2578.76,-358.25 2572.76,-358.25"/>
-<text xml:space="preserve" text-anchor="middle" x="2519.76" y="-343.8" font-family="Helvetica,sans-Serif" font-size="11.00">A12</text>
+<text xml:space="preserve" text-anchor="middle" x="2519.76" y="-343.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A12</text>
 <text xml:space="preserve" text-anchor="middle" x="2519.76" y="-331.8" font-family="Helvetica,sans-Serif" font-size="11.00">[LapsoTemp, Latrocinio]</text>
 <text xml:space="preserve" text-anchor="middle" x="2519.76" y="-319.8" font-family="Helvetica,sans-Serif" font-size="11.00">suca_q3 ⊢ AtoTerceiro</text>
 </a>
@@ -214,9 +214,9 @@
 <!-- A13 -->
 <g id="node14" class="node argnode status&#45;IN arg&#45;A13">
 <title>A13</title>
-<g id="a_node14"><a xlink:title="A13&#10;[FormacaoQuad, LapsoTemp, Latrocinio]&#10;suca_q4 ⊢ AtoTerceiro">
+<g id="a_node14"><a xlink:title="R·A13&#10;[FormacaoQuad, LapsoTemp, Latrocinio]&#10;suca_q4 ⊢ AtoTerceiro">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M2802.26,-358.25C2802.26,-358.25 2615.26,-358.25 2615.26,-358.25 2609.26,-358.25 2603.26,-352.25 2603.26,-346.25 2603.26,-346.25 2603.26,-324 2603.26,-324 2603.26,-318 2609.26,-312 2615.26,-312 2615.26,-312 2802.26,-312 2802.26,-312 2808.26,-312 2814.26,-318 2814.26,-324 2814.26,-324 2814.26,-346.25 2814.26,-346.25 2814.26,-352.25 2808.26,-358.25 2802.26,-358.25"/>
-<text xml:space="preserve" text-anchor="middle" x="2708.76" y="-343.8" font-family="Helvetica,sans-Serif" font-size="11.00">A13</text>
+<text xml:space="preserve" text-anchor="middle" x="2708.76" y="-343.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A13</text>
 <text xml:space="preserve" text-anchor="middle" x="2708.76" y="-331.8" font-family="Helvetica,sans-Serif" font-size="11.00">[FormacaoQuad, LapsoTemp, Latrocinio]</text>
 <text xml:space="preserve" text-anchor="middle" x="2708.76" y="-319.8" font-family="Helvetica,sans-Serif" font-size="11.00">suca_q4 ⊢ AtoTerceiro</text>
 </a>
@@ -225,9 +225,9 @@
 <!-- A14 -->
 <g id="node15" class="node argnode status&#45;IN arg&#45;A14">
 <title>A14</title>
-<g id="a_node15"><a xlink:title="A14&#10;[LapsoTemp, Latrocinio]&#10;suca_q3,sc_q6 ⊢ ¬cf2lrc_q5">
+<g id="a_node15"><a xlink:title="R·A14&#10;[LapsoTemp, Latrocinio]&#10;suca_q3,sc_q6 ⊢ ¬cf2lrc_q5">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M2119.76,-46.25C2119.76,-46.25 1989.76,-46.25 1989.76,-46.25 1983.76,-46.25 1977.76,-40.25 1977.76,-34.25 1977.76,-34.25 1977.76,-12 1977.76,-12 1977.76,-6 1983.76,0 1989.76,0 1989.76,0 2119.76,0 2119.76,0 2125.76,0 2131.76,-6 2131.76,-12 2131.76,-12 2131.76,-34.25 2131.76,-34.25 2131.76,-40.25 2125.76,-46.25 2119.76,-46.25"/>
-<text xml:space="preserve" text-anchor="middle" x="2054.76" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">A14</text>
+<text xml:space="preserve" text-anchor="middle" x="2054.76" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A14</text>
 <text xml:space="preserve" text-anchor="middle" x="2054.76" y="-19.8" font-family="Helvetica,sans-Serif" font-size="11.00">[LapsoTemp, Latrocinio]</text>
 <text xml:space="preserve" text-anchor="middle" x="2054.76" y="-7.8" font-family="Helvetica,sans-Serif" font-size="11.00">suca_q3,sc_q6 ⊢ ¬cf2lrc_q5</text>
 </a>
@@ -236,9 +236,9 @@
 <!-- A15 -->
 <g id="node16" class="node argnode status&#45;IN arg&#45;A15">
 <title>A15</title>
-<g id="a_node16"><a xlink:title="A15&#10;[FormacaoQuad, LapsoTemp, Latrocinio]&#10;suca_q4,sc_q6 ⊢ ¬cf2lrc_q5">
+<g id="a_node16"><a xlink:title="R·A15&#10;[FormacaoQuad, LapsoTemp, Latrocinio]&#10;suca_q4,sc_q6 ⊢ ¬cf2lrc_q5">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M2349.26,-46.25C2349.26,-46.25 2162.26,-46.25 2162.26,-46.25 2156.26,-46.25 2150.26,-40.25 2150.26,-34.25 2150.26,-34.25 2150.26,-12 2150.26,-12 2150.26,-6 2156.26,0 2162.26,0 2162.26,0 2349.26,0 2349.26,0 2355.26,0 2361.26,-6 2361.26,-12 2361.26,-12 2361.26,-34.25 2361.26,-34.25 2361.26,-40.25 2355.26,-46.25 2349.26,-46.25"/>
-<text xml:space="preserve" text-anchor="middle" x="2255.76" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">A15</text>
+<text xml:space="preserve" text-anchor="middle" x="2255.76" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A15</text>
 <text xml:space="preserve" text-anchor="middle" x="2255.76" y="-19.8" font-family="Helvetica,sans-Serif" font-size="11.00">[FormacaoQuad, LapsoTemp, Latrocinio]</text>
 <text xml:space="preserve" text-anchor="middle" x="2255.76" y="-7.8" font-family="Helvetica,sans-Serif" font-size="11.00">suca_q4,sc_q6 ⊢ ¬cf2lrc_q5</text>
 </a>
@@ -247,7 +247,7 @@
 <!-- A17&#45;&gt;A14 -->
 <g id="edge5" class="edge argedge type&#45;undercut defeat from&#45;A17 to&#45;A14">
 <title>A17&#45;&gt;A14</title>
-<g id="a_edge5"><a xlink:title="A17 undercuts A14 on rule sc_q6">
+<g id="a_edge5"><a xlink:title="R·A17 undercuts R·A14 on rule sc_q6">
 <path fill="none" stroke="#d17a00" stroke-width="2.2" stroke-dasharray="5,2" d="M2130.04,-93.01C2117.57,-81.59 2102.25,-67.58 2088.69,-55.17"/>
 <polygon fill="#d17a00" stroke="#d17a00" stroke-width="2.2" points="2091.39,-52.9 2081.65,-48.73 2086.67,-58.06 2091.39,-52.9"/>
 </a>
@@ -257,7 +257,7 @@
 <!-- A17&#45;&gt;A15 -->
 <g id="edge6" class="edge argedge type&#45;undercut defeat from&#45;A17 to&#45;A15">
 <title>A17&#45;&gt;A15</title>
-<g id="a_edge6"><a xlink:title="A17 undercuts A15 on rule sc_q6">
+<g id="a_edge6"><a xlink:title="R·A17 undercuts R·A15 on rule sc_q6">
 <path fill="none" stroke="#d17a00" stroke-width="2.2" stroke-dasharray="5,2" d="M2179.73,-93.01C2192.32,-81.59 2207.8,-67.58 2221.49,-55.17"/>
 <polygon fill="#d17a00" stroke="#d17a00" stroke-width="2.2" points="2223.55,-58.03 2228.61,-48.72 2218.85,-52.84 2223.55,-58.03"/>
 </a>

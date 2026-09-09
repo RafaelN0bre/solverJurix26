@@ -21,33 +21,54 @@ preferred, and ASPIC+ has the room for it: Definition 2.10 makes rebutting
 and undermining defeat *preference-dependent*, and only undercutting
 preference-independent.
 
-This module supplies the missing preorder, and computes it from an explicit,
+This module supplies the missing preorder, following Modgil & Prakken, "A
+general account of argumentation with preferences" (AIJ 195, 2013) --
+Definition 19 for comparing two sets, Definition 20 for last-link and
+Definition 21 for weakest-link. It computes the ranking from an explicit,
 auditable tuple rather than from a bare number:
 
 * a **dimension** is one doctrinal axis the judgment weighs (for Caso 003:
   the specificity of the duty to act, the causal intervention of a later
   event, the autonomy of the third party who acted), each with the weight the
   reader assigns to it;
-* a **rule profile** says which dimensions a defeasible rule invokes, and how
-  strongly (a coefficient, normally 0 or 1);
-* a rule's **strength** is the weighted sum ``Σ_d weight_d · coefficient_d``.
-  A rule that invokes no dimension is *neutral*: it carries no weight of its
-  own and is skipped, which is what a purely inferential step should be;
-* an **argument's** strength aggregates the strengths of the defeasible rules
-  it uses, by one of the two principles ASPIC+ names -- weakest-link (the
-  default) or last-link -- plus `sum`, for a reading in which reasons
-  accumulate rather than bottleneck.
+* a **profile** says which dimensions one element invokes -- a defeasible
+  rule *or an ordinary premise*, both, because Definition 21 compares
+  `Prem_p` and `DefRules` together;
+* an element's **strength** is the weighted sum ``Σ_d weight_d · coefficient_d``.
+  An element the case did not rank has no position in the preorder at all,
+  and one such element is enough to make its whole set incomparable;
+* the **ordering** is the set comparison, `elitist` by default (one element
+  of the weaker set below every element of the stronger), which is ASPIC+'s
+  default and the reference implementation's (`orderingComparator(elitist)`).
 
-`A ≺ B` iff both arguments are scored and `strength(A) < strength(B)`. When
-either is unscored the two stay incomparable and the basic ordering decides,
-so a framework whose rules carry no profile behaves exactly as before -- the
-preference model is strictly additive.
+**What this module used to do, and why it was wrong.** It scored an argument
+by aggregating its *defeasible rules only*, and compared the two scalars.
+Definition 21 clause 3 requires `Prem_p(B) ◁ Prem_p(A)` **and**
+`DefRules(B) ◁ DefRules(A)`; dropping a conjunct can only make a preference
+hold in *more* cases, so the old reading declared orderings where canonical
+ASPIC+ declares none. Modgil & Prakken call the premise-ignoring version "an
+anomaly" they set out to correct. It also treated an unprofiled rule as
+skippable, which is not conservative either -- skipping versus counting it
+inverted the verdict of a three-rule theory.
+
+A framework whose elements carry no profile behaves exactly as it did before
+the module existed: nothing precedes anything, the basic ordering decides.
+The preference model is strictly additive in that sense -- but *not* in the
+sense of being free: a case that wants the weights to decide has to rank
+everything the conflicting arguments are built from, premises included.
 
 Nothing here inspects the *content* of a rule: the profile is data supplied
 with the case (`FormalizedCase.preferences`), so the weighing is part of the
 formalization the reader can audit and change, not a heuristic buried in the
 solver. `sensitivity` exists for exactly that: it reports the weight at which
 a given conflict would flip.
+
+Who *moves* the ordering is `PreferenceBlock.perspective`, and
+`aspic.perspectives` honours it: a projection that has not admitted that
+voice runs under the basic ordering. In Prakken's adjudication model a
+priority argument is a move of the decision phase, so an ordering that
+applied from step 0 would let a preference settle a dispute between the
+parties on nobody's authority.
 """
 from dataclasses import dataclass, replace
 from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
@@ -58,16 +79,25 @@ from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 #: against one is doing something a min() cannot express.
 WEAKEST_LINK = "weakest"
 LAST_LINK = "last"
-SUM = "sum"
-PRINCIPLES = (WEAKEST_LINK, LAST_LINK, SUM)
+PRINCIPLES = (WEAKEST_LINK, LAST_LINK)
 
 PRINCIPLE_LABELS = {
-    WEAKEST_LINK: "elo mais fraco (weakest-link): a força de um argumento é a "
-                  "da regra mais fraca que ele usa",
-    LAST_LINK: "último elo (last-link): vale a força da última regra aplicada, "
-               "que é a que responde diretamente pela conclusão",
-    SUM: "soma: as razões se acumulam, e um argumento apoiado em dois eixos "
-         "pesa mais do que um apoiado em um só",
+    WEAKEST_LINK: "elo mais fraco (weakest-link, Def. 21): compara as premissas "
+                  "ordinárias E as regras derrotáveis dos dois argumentos",
+    LAST_LINK: "último elo (last-link, Def. 20): compara as últimas regras "
+               "derrotáveis aplicadas, e só cai nas premissas quando não há "
+               "regra derrotável de nenhum dos lados",
+}
+
+#: Comparadores de conjunto da Definição 19. `elitist` é o padrão do ASPIC+ e
+#: o padrão da implementação de referência (`orderingComparator(elitist)`).
+ELITIST = "elitist"
+DEMOCRAT = "democrat"
+COMPARATORS = (ELITIST, DEMOCRAT)
+
+COMPARATOR_LABELS = {
+    ELITIST: "elitista: basta um elemento de B ser mais fraco que todos os de A",
+    DEMOCRAT: "democrata: todo elemento de B tem de ser mais fraco que algum de A",
 }
 
 
@@ -121,13 +151,19 @@ class PreferenceModel:
 
     def __init__(self, dimensions: Sequence[Dimension],
                  profiles: Iterable[RuleProfile] = (),
-                 principle: str = WEAKEST_LINK):
+                 principle: str = WEAKEST_LINK,
+                 comparator: str = ELITIST):
         if principle not in PRINCIPLES:
             raise ValueError(
                 f"princípio de agregação desconhecido: {principle!r} "
                 f"(use um de {', '.join(PRINCIPLES)})")
+        if comparator not in COMPARATORS:
+            raise ValueError(
+                f"comparador de conjuntos desconhecido: {comparator!r} "
+                f"(use um de {', '.join(COMPARATORS)})")
         self.dimensions: Tuple[Dimension, ...] = tuple(dimensions)
         self.principle = principle
+        self.comparator = comparator
         self.profiles: Dict[str, RuleProfile] = {p.rule_id: p for p in profiles}
         unknown = {
             key
@@ -169,76 +205,148 @@ class PreferenceModel:
                          if coefficient))
 
     def contributing_rules(self, rule_ids: Sequence[str]) -> List[str]:
-        """The rules of an argument that actually carry weight, in the order
-        they were applied."""
+        """The elements of an argument that carry weight, in order."""
         return [rule_id for rule_id in rule_ids
                 if self.rule_strength(rule_id) is not None]
 
-    def strength_of_rules(self, rule_ids: Sequence[str]) -> Optional[float]:
-        """Aggregate strength of a set of defeasible rules under this
-        model's principle, or None when none of them carries weight.
+    @staticmethod
+    def last_defeasible_rules(argument) -> List[str]:
+        """`LastDefRules(A)` (Modgil & Prakken, Def. 20).
 
-        Under `last`, the *last* weight-carrying rule decides. The last rule
-        applied may itself be neutral -- `q2: DeverGener ⇒ ¬DeverEspec` is a
-        pure inference step -- and refusing to score the argument at all in
-        that case would make last-link strictly less informative than
-        weakest-link for no reason, so the scan walks backwards to the
-        nearest rule that does carry weight.
+        Empty for an atomic argument; `{top rule}` when the top rule is
+        defeasible; the **union** of the sub-arguments' last defeasible rules
+        when it is strict. A *set* -- never "the last item of a list", which
+        is what this used to read and which made the answer depend on the
+        order the antecedents happen to be written in.
         """
-        scored = [self.rule_strength(rule_id)
-                  for rule_id in self.contributing_rules(rule_ids)]
-        if not scored:
-            return None
-        if self.principle == WEAKEST_LINK:
-            return min(scored)
-        if self.principle == LAST_LINK:
-            return scored[-1]
-        return float(sum(scored))
+        if argument.top_rule is None:
+            return []
+        if not argument.top_rule.is_strict:
+            return [argument.top_rule.id]
+        out: List[str] = []
+        for sub in argument.sub_arguments:
+            for rule_id in PreferenceModel.last_defeasible_rules(sub):
+                if rule_id not in out:
+                    out.append(rule_id)
+        return out
 
     def argument_strength(self, argument) -> Optional[float]:
-        """Strength of an `aspic.solver.Argument`.
+        """An indicative scalar for the interface, **not** the ordering.
 
-        Strict rules never enter: they are not defeasible, so no preference
-        attaches to them, and an argument that uses only strict rules over
-        premises is already handled by the basic ordering.
+        The ordering is a comparison between *sets* (Def. 19), and a set does
+        not collapse to a number without losing exactly the information the
+        definition uses. This is the weakest carrying element, which is what a
+        reader wants next to an argument in a table; `compare` is what decides.
         """
-        return self.strength_of_rules(argument.defeasible_rules)
+        keys = (self.last_defeasible_rules(argument)
+                if self.principle == LAST_LINK
+                else list(argument.defeasible_rules) + sorted(argument.ordinary_premises))
+        scored = [self.rule_strength(key) for key in self.contributing_rules(keys)]
+        return min(scored) if scored else None
+
+    # ------------------------------------------------------------------
+    # Definition 19: comparing two sets of elements
+    # ------------------------------------------------------------------
+    def precedes(self, left: Sequence[str], right: Sequence[str]) -> bool:
+        """`Γ ◁ₛ Γ′` (Def. 19), over sets of rule ids and/or premise literals.
+
+        Clauses 1 and 2 are the paper's: the empty set never precedes, and a
+        non-empty set precedes the empty one. Then `elitist` asks for one
+        element of `Γ` below *every* element of `Γ′`, `democrat` for every
+        element of `Γ` below *some* element of `Γ′`.
+
+        An element the case did not rank has no position in the preorder, so
+        `X < Y` is false for every pair it appears in. One unranked element on
+        the right is therefore enough to defeat the elitist clause -- which is
+        the honest reading of "incomparable", and the reason a case that wants
+        the weights to decide has to rank *everything* the conflicting
+        arguments are built from, not only the rules that carry the doctrine.
+        """
+        if not left:
+            return False
+        if not right:
+            return True
+        lhs = [self.rule_strength(key) for key in left]
+        rhs = [self.rule_strength(key) for key in right]
+
+        def below(x: Optional[float], y: Optional[float]) -> bool:
+            return x is not None and y is not None and x < y
+
+        if self.comparator == ELITIST:
+            return any(all(below(x, y) for y in rhs) for x in lhs)
+        return all(any(below(x, y) for y in rhs) for x in lhs)
 
     # ------------------------------------------------------------------
     # The ordering
     # ------------------------------------------------------------------
+    def _precedes_argument(self, weaker, stronger) -> bool:
+        """`B ≺ A` under the declared principle (Def. 20 or Def. 21)."""
+        prem_b = sorted(weaker.ordinary_premises)
+        prem_a = sorted(stronger.ordinary_premises)
+
+        if self.principle == LAST_LINK:
+            last_b = self.last_defeasible_rules(weaker)
+            last_a = self.last_defeasible_rules(stronger)
+            if self.precedes(last_b, last_a):
+                return True
+            return not last_b and not last_a and self.precedes(prem_b, prem_a)
+
+        # Definition 21, all three clauses.
+        rules_b = list(weaker.defeasible_rules)
+        rules_a = list(stronger.defeasible_rules)
+        if not rules_b and not rules_a:              # both strict
+            return self.precedes(prem_b, prem_a)
+        if not prem_b and not prem_a:                # both firm
+            return self.precedes(rules_b, rules_a)
+        return self.precedes(prem_b, prem_a) and self.precedes(rules_b, rules_a)
+
     def compare(self, left, right) -> Comparison:
-        """Compare two arguments. `verdict` is which side is *stronger*."""
-        left_score = self.argument_strength(left)
-        right_score = self.argument_strength(right)
-        left_rules = tuple(self.contributing_rules(left.defeasible_rules))
-        right_rules = tuple(self.contributing_rules(right.defeasible_rules))
-        if left_score is None or right_score is None or left_score == right_score:
-            verdict = "incomparable"
+        """Compare two arguments. `verdict` is which side is *stronger*.
+
+        The verdict comes from the set comparison, not from the scalars: the
+        scalars are shown alongside because a table needs a number, but two
+        arguments with different scalars can still be incomparable, and two
+        with the same scalar can still be ordered.
+        """
+        left_weaker = self._precedes_argument(left, right)
+        right_weaker = self._precedes_argument(right, left)
+        if left_weaker and not right_weaker:
+            verdict = "right"
+        elif right_weaker and not left_weaker:
+            verdict = "left"
         else:
-            verdict = "left" if left_score > right_score else "right"
-        return Comparison(left=left_score, right=right_score, verdict=verdict,
-                          left_rules=left_rules, right_rules=right_rules)
+            verdict = "incomparable"
+        return Comparison(
+            left=self.argument_strength(left), right=self.argument_strength(right),
+            verdict=verdict,
+            left_rules=tuple(self.contributing_rules(
+                list(left.defeasible_rules) + sorted(left.ordinary_premises))),
+            right_rules=tuple(self.contributing_rules(
+                list(right.defeasible_rules) + sorted(right.ordinary_premises))))
 
     def is_weaker(self, a, b) -> bool:
-        """`A ≺ B`: both scored, and A scores strictly lower."""
-        return self.compare(a, b).verdict == "right"
+        """`A ≺ B`, by Definition 20 or 21."""
+        return self._precedes_argument(a, b) and not self._precedes_argument(b, a)
 
     def explain(self, a, b) -> str:
         """One line saying how the two compare, for a tooltip or a table."""
         comparison = self.compare(a, b)
-        if comparison.left is None or comparison.right is None:
-            return ("sem preferência aplicável: ao menos um dos argumentos não "
-                    "invoca nenhuma dimensão, então os dois seguem incomparáveis")
         if comparison.verdict == "incomparable":
-            return (f"empate de força ({comparison.left:g} × {comparison.right:g}): "
-                    "os dois seguem incomparáveis")
+            if not comparison.left_rules or not comparison.right_rules:
+                return ("sem preferência aplicável: ao menos um dos argumentos "
+                        "não tem elemento classificado, então os dois seguem "
+                        "incomparáveis")
+            return ("incomparáveis: nenhum dos dois precede o outro sob a "
+                    f"{PRINCIPLE_LABELS.get(self.principle, self.principle)}")
         stronger, weaker = ((a, b) if comparison.verdict == "left" else (b, a))
         high, low = ((comparison.left, comparison.right)
                      if comparison.verdict == "left"
                      else (comparison.right, comparison.left))
-        return (f"{stronger.id} ({high:g}) prevalece sobre {weaker.id} ({low:g}) "
-                f"por {self.principle}")
+        detalhe = ""
+        if high is not None and low is not None:
+            detalhe = f" ({low:g} < {high:g} no elo mais fraco)"
+        return (f"{stronger.id} prevalece sobre {weaker.id} por "
+                f"{self.principle}/{self.comparator}{detalhe}")
 
     # ------------------------------------------------------------------
     # Sensitivity
@@ -247,15 +355,23 @@ class PreferenceModel:
         """A copy with some dimension weights replaced."""
         dimensions = [replace(d, weight=float(overrides.get(d.key, d.weight)))
                       for d in self.dimensions]
-        return PreferenceModel(dimensions, self.profiles.values(), self.principle)
+        return PreferenceModel(dimensions, self.profiles.values(),
+                               self.principle, self.comparator)
 
     def with_principle(self, principle: str) -> "PreferenceModel":
-        return PreferenceModel(self.dimensions, self.profiles.values(), principle)
+        return PreferenceModel(self.dimensions, self.profiles.values(), principle,
+                               self.comparator)
+
+    def with_comparator(self, comparator: str) -> "PreferenceModel":
+        return PreferenceModel(self.dimensions, self.profiles.values(),
+                               self.principle, comparator)
 
     def as_dict(self) -> Dict[str, object]:
         return {
             "principle": self.principle,
             "principle_pt": PRINCIPLE_LABELS.get(self.principle, self.principle),
+            "comparator": self.comparator,
+            "comparator_pt": COMPARATOR_LABELS.get(self.comparator, self.comparator),
             "dimensions": [
                 {"key": d.key, "label_pt": d.label_pt, "weight": d.weight,
                  "rationale_pt": d.rationale_pt}

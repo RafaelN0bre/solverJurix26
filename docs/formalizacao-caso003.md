@@ -146,15 +146,15 @@ nenhum — todos os ataques do CIF são undercutting
 ### Inventário de regras
 
 ```
-q0 : RegFechado                                 ⇒ DeverEspec                 [RDO_, MA_, EF_]
-q1 : LapsoTemporal ∧ FormacaoQuad               ⇒ DeverGener                 [AM_]
-q2 : DeverGener                                 ⇒ ¬DeverEspec                [AM_]
-q3 : Latrocinio ∧ LapsoTemporal                 ⇒ AtoTerceiro                [RTE_]
+q0 : RegFechado                                 ⇒ DeverEspec                 [EF_]
+q1 : LapsoTemporal ∧ FormacaoQuad               ⇒ DeverGener                 [EF_]
+q2 : DeverGener                                 ⇒ ¬DeverEspec                [EF_]
+q3 : Latrocinio ∧ LapsoTemporal                 ⇒ DeverGener                 [EF_]
 q4 : Latrocinio ∧ LapsoTemporal ∧ FormacaoQuad  ⇒ AtoTerceiro                [AM_]
 q5 : caFa(OmiEstatal, Danos)                    ⇒ leReCa(OmiEstatal, Danos)  [RDO_, MA_, EF_]
 q6 : AtoTerceiro                                ⇒ ¬q5                        [RTE_, AM_]
-q7 : OmiEstatal ∧ ¬DeverEspec                   ⇒ ¬q5                        [AM_]
-q8 : DeverEspec                                 ⇒ ¬q6                        [MA_]
+q7 : OmiEstatal ∧ ¬DeverEspec                   ⇒ ¬q5                        [EF_]
+q8 : DeverEspec                                 ⇒ ¬q6                        [EF_]
 ```
 
 ### Por perspectiva
@@ -163,35 +163,35 @@ q8 : DeverEspec                                 ⇒ ¬q6                        
 
 ```
 Premissas   —
-Regras      q0, q5
+Regras      q5
 ```
 
 **RTE_ (Recorrente)**
 
 ```
 Premissas   —
-Regras      q3, q6
+Regras      q6
 ```
 
 **MA_ (Marco Aurélio — relator)**
 
 ```
 Premissas   AtoTerceiro
-Regras      q0, q5, q8
+Regras      q5
 ```
 
 **EF_ (Edson Fachin)**
 
 ```
 Premissas   —
-Regras      q0, q5
+Regras      q0, q1, q2, q3, q5, q7, q8
 ```
 
 **AM_ (Alexandre de Moraes)**
 
 ```
 Premissas   —
-Regras      q1, q2, q4, q6, q7
+Regras      q4, q6
 ```
 
 ### Grafo de ataques
@@ -203,11 +203,11 @@ FASE DE ARGUMENTAÇÃO — partes
 
 FASE DE DECISÃO — adjudicadores
 
-  MA_     q8  ⇏  q6        undercutting
-  EF_     —
-  AM_     q2  ⤅  q0        rebutting
-          q6  ⇏  q5        undercutting
+  MA_     —
+  EF_     q2  ⤅  q0        rebutting
           q7  ⇏  q5        undercutting
+          q8  ⇏  q6        undercutting
+  AM_     q6  ⇏  q5        undercutting
 ```
 
 ### Estratificação

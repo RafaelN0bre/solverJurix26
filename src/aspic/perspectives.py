@@ -116,11 +116,33 @@ def _admits(selected: Set[str], held: Set[str]) -> bool:
     return not held or SHARED in held or bool(selected & held)
 
 
-def _preferences(record):
-    """The record's ordering, or None. Imported lazily: `formalize` imports
-    `aspic`, so a module-level import here would close the cycle."""
+def _preferences(record, keys: Optional[Sequence[str]] = None):
+    """The record's ordering, or None when the perspectives in `keys` do not
+    yet include whoever moves it.
+
+    In Prakken's model a priority argument is a **move** of the decision
+    phase (§4.3), not a standing fact. An ordering injected into every
+    projection applies at step 0 too, where no adjudicator has spoken -- and
+    then a preference can settle a rebut *between the parties* on nobody's
+    authority. So the block names its holder, and a projection that has not
+    admitted them runs under the basic ordering.
+
+    `keys=None` means "the whole case", which is what the single-framework
+    view is: there every voice is present, so every move has been made.
+
+    Imported lazily: `formalize` imports `aspic`, so a module-level import
+    here would close the cycle.
+    """
     from formalize.build import preference_model
-    return preference_model(record)
+
+    model = preference_model(record)
+    if model is None or keys is None:
+        return model
+    block = getattr(record, "preferences", None)
+    holder = _canon(getattr(block, "perspective", "") or "")
+    if not holder or holder == SHARED:
+        return model
+    return model if holder in {_canon(key) for key in keys} else None
 
 
 def perspectives_in(record) -> List[str]:
@@ -175,7 +197,7 @@ def project(record, keys: Sequence[str]) -> Theory:
     return Theory(key="+".join(keys), label=label, premises=premises,
                   rules=[meta.rule for meta in rules],
                   rule_ids=[meta.id for meta in rules],
-                  preferences=_preferences(record))
+                  preferences=_preferences(record, keys))
 
 
 def verdicts(theory: Theory, queries: Sequence) -> Dict[str, dict]:
@@ -317,7 +339,7 @@ def project_lrc(record, keys: Sequence[str],
                   premises=list(dict.fromkeys(premises)),
                   rules=[rule.rule for rule in rules],
                   rule_ids=[_rule_id(rule.rule) for rule in rules],
-                  preferences=_preferences(record))
+                  preferences=_preferences(record, keys))
 
 
 def _rule_id(rule: str) -> str:
@@ -469,6 +491,7 @@ _SHORT = {
     "CaFa": "causa({0})", "ButFor": "só-por({0})", "LeReCa": "relevante({0})",
     "Om": "omissão({0})", "Obl": "dever({0})", "Tortious": "ilícito({0})",
     "Unexpected": "inesperado({0})", "SupersedingCause": "superveniente({0})",
+    "SupersedingCause/3": "superveniente({0}) entre {1} e {2}",
     "After": "{0} após {1}", "Foreseeable": "previsível({0})",
     "ForeseeableRisk": "risco({0})", "Playout": "concretiza({0})",
 }
@@ -721,7 +744,8 @@ def short_literal(literal: str) -> str:
     if split is None:
         return literal
     predicate, arguments = split
-    template = _SHORT.get(predicate)
+    template = (_SHORT.get(f"{predicate}/{len(arguments)}")
+                or _SHORT.get(predicate))
     if not template:
         return literal
     try:
@@ -773,6 +797,110 @@ SILENT_NOTE = "sem movimento"
 
 #: Argument ids drawn on a rule node before the list is cut short.
 _MAX_ARGUMENT_IDS = 3
+
+
+@dataclass(frozen=True)
+class MappedAttack:
+    """One attack, attributed to the perspectives on each end.
+
+    The map draws a rule inside a single box -- the first holder's, in
+    reading order -- because a node cannot sit in two boxes. Parties come
+    before adjudicators in that order, so a rule the reporting judge shares
+    with the respondent is drawn in the respondent's box, and every attack on
+    it *looks* like an attack on a party.
+
+    In `case-003-final` that hid the entire decision phase: six of the seven
+    attacks are substantively between adjudicators, and the diagram showed a
+    party on one end of all six. This is what says who is really on each end.
+    """
+    source: str
+    target: str
+    kind: str                       # "undercut" | "rebut"
+    source_holders: List[str]
+    target_holders: List[str]
+    #: Box the edge is drawn between, which is not the same thing.
+    source_box: str
+    target_box: str
+
+    @property
+    def source_adjudicators(self) -> List[str]:
+        return [k for k in self.source_holders if k in ADJUDICATORS]
+
+    @property
+    def target_adjudicators(self) -> List[str]:
+        return [k for k in self.target_holders if k in ADJUDICATORS]
+
+    @property
+    def between_adjudicators(self) -> bool:
+        """Both ends held by an adjudicator: a decision-phase confrontation,
+        which is the move Prakken's model is about and the one the lanes
+        flatten."""
+        return bool(self.source_adjudicators and self.target_adjudicators)
+
+    @property
+    def phase(self) -> str:
+        """Whose move it is. An attack is made by whoever holds the attacking
+        rule; when a party and an adjudicator both hold it, the party raised
+        it and the adjudicator adopted it, so the argumentation phase is
+        where it enters."""
+        parties = [k for k in self.source_holders if k in ADVERSARIES]
+        return "argumentação" if parties else "decisão"
+
+
+def mapped_attacks(record) -> List[MappedAttack]:
+    """Every attack of the map, with the perspectives actually on each end."""
+    rules = {rule.id: rule for rule in mapped_rules(record)}
+    out: List[MappedAttack] = []
+    for rule in rules.values():
+        if rule.attacks and rule.attacks in rules:
+            target = rules[rule.attacks]
+            out.append(MappedAttack(
+                rule.id, target.id, "undercut", list(rule.holders),
+                list(target.holders), rule.perspective, target.perspective))
+    for source, target in _rebutting_pairs(list(rules.values())):
+        out.append(MappedAttack(
+            source.id, target.id, "rebut", list(source.holders),
+            list(target.holders), source.perspective, target.perspective))
+    return out
+
+
+def confrontations(record) -> List[dict]:
+    """`quem ataca quem`, perspective by perspective.
+
+    Read off the holders, not off the boxes. One row per ordered pair of
+    perspectives that actually confront each other, with the rules involved.
+    """
+    tally: Dict[tuple, dict] = {}
+    for attack in mapped_attacks(record):
+        for source in attack.source_holders or [SHARED]:
+            for target in attack.target_holders or [SHARED]:
+                if source == target:
+                    continue        # a voice does not attack itself
+                # Classified per *pair*, not per attack. One rule several
+                # voices hold produces several confrontations, and they are
+                # not all of the same kind: `dvesp_q0 ⤅ dvgen_q2` is the
+                # respondent answering the dissent in the argumentation
+                # phase *and* the reporting judge answering it in the
+                # decision phase, depending on which holder you read it from.
+                entry = tally.setdefault((source, target), {
+                    "source": source, "target": target, "rules": [],
+                    "between_adjudicators": (source in ADJUDICATORS
+                                             and target in ADJUDICATORS),
+                    "phase": "decisão" if source in ADJUDICATORS else "argumentação",
+                })
+                notation = (f"{attack.source} ⇏ {attack.target}"
+                            if attack.kind == "undercut"
+                            else f"{attack.source} ⤅ {attack.target}")
+                if notation not in entry["rules"]:
+                    entry["rules"].append(notation)
+    order = [*ADVERSARIES, *ADJUDICATORS]
+
+    def sort_key(entry):
+        def rank(key):
+            return order.index(key) if key in order else len(order)
+        return (rank(entry["source"]), rank(entry["target"]))
+
+    return sorted(tally.values(), key=sort_key)
 
 
 def _argument_note(arguments: Sequence[MappedArgument]) -> str:
@@ -882,16 +1010,27 @@ def to_adjudication_dot(record, title: str = "", known: Sequence[str] = ()) -> s
             for rule in members_rules:
                 lines.append("  " + node(rule))
             if not members_rules:
+                # An empty box means one of two very different things, and
+                # saying "sem movimento" for both is a lie about the second:
+                # a perspective may hold rules and still own no node, because
+                # every rule it holds is drawn in an earlier holder's box.
+                elsewhere = [rule.id for rule in rules if key in rule.holders]
+                note = (SILENT_NOTE if not elsewhere else
+                        f"sustenta {len(elsewhere)} regra(s),\\ndesenhadas na caixa "
+                        "de outro titular")
                 lines.append(
                     f'      "silent_{key}" [shape=plaintext, fontsize=9, '
-                    f'fontcolor="#8a8a8a", label="{SILENT_NOTE}"];')
+                    f'fontcolor="#8a8a8a", label="{_dot_escape(note)}"];')
             lines.append("    }")
         lines.append("  }")
 
-    anchors = [(by_perspective[key][0].id if by_perspective.get(key)
-                else f"silent_{key}")
-               for _, keys in LANES
-               for key in keys
+    #: `{perspectiva: um nó dentro da caixa dela}`. Graphviz recorta uma
+    #: aresta na borda do cluster com `lhead`, mas ela ainda precisa de um nó
+    #: real como destino lógico -- é para isso que serve esta âncora.
+    anchor_of = {key: (by_perspective[key][0].id if by_perspective.get(key)
+                       else f"silent_{key}")
+                 for _, keys in LANES for key in keys if key in present}
+    anchors = [anchor_of[key] for _, keys in LANES for key in keys
                if key in present]
     for upper, lower in zip(anchors, anchors[1:]):
         lines.append(f'  "{upper}" -> "{lower}" [style=invis, weight=10];')
@@ -911,24 +1050,132 @@ def to_adjudication_dot(record, title: str = "", known: Sequence[str] = ()) -> s
                 f'tooltip="{_dot_escape(source.id + " sustenta " + target.id)}", '
                 f'class="argedge support from-{source.id} to-{target.id}"];')
 
+    # The edges, annotated with who is *really* on each end. A node sits in
+    # one box, so an attack on a rule three voices share is drawn touching one
+    # of them; without this the decision phase of `case-003-final` -- six of
+    # its seven attacks -- reads as parties being attacked.
+    attacks = {(a.source, a.target): a for a in mapped_attacks(record)}
+
+    def edge_tooltip(attack: MappedAttack, verb: str) -> str:
+        quem = lambda keys: ", ".join(_label(k) for k in keys) or "ninguém"
+        tip = (f"{attack.source} {verb} {attack.target}\n\n"
+               f"{quem(attack.source_holders)} → {quem(attack.target_holders)}")
+        if attack.between_adjudicators:
+            tip += "\n\nConfronto entre adjudicadores: fase de decisão."
+        return tip
+
     for rule in rules:
         if rule.attacks:
+            attack = attacks.get((rule.id, rule.attacks))
+            entre = bool(attack and attack.between_adjudicators)
             lines.append(
                 f'  "{rule.id}" -> "{rule.attacks}" [color="#c0392b", '
-                f'style="solid", penwidth=1.8, arrowsize=0.8, '
-                f'tooltip="{_dot_escape(rule.id + " afasta " + rule.attacks)}", '
-                f'class="argedge defeat from-{rule.id} to-{rule.attacks}"];')
+                f'style="solid", penwidth={2.6 if entre else 1.8}, arrowsize=0.8, '
+                f'tooltip="{_dot_escape(edge_tooltip(attack, "afasta") if attack else rule.id)}", '
+                f'class="argedge defeat from-{rule.id} to-{rule.attacks}'
+                f'{" between-adjudicators" if entre else ""}"];')
 
     # Head-on contradiction: two rules concluding complementary literals.
     # Drawn without an arrowhead because it runs both ways -- which is
     # precisely why it needs a preference to settle, and why the case that
     # has one is the case that needed `aspic.preferences`.
     for source, target in _rebutting_pairs(rules):
+        attack = attacks.get((source.id, target.id))
+        entre = bool(attack and attack.between_adjudicators)
         lines.append(
             f'  "{source.id}" -> "{target.id}" [color="#c0392b", '
-            'style="solid", penwidth=1.6, dir="none", constraint=false, '
-            f'tooltip="{_dot_escape(source.id + " contradiz " + target.id + " -- rebut mutuo")}", '
-            f'class="argedge rebut from-{source.id} to-{target.id}"];')
+            f'style="solid", penwidth={2.4 if entre else 1.6}, dir="none", '
+            'constraint=false, '
+            f'tooltip="{_dot_escape(edge_tooltip(attack, "contradiz") if attack else source.id)}", '
+            f'class="argedge rebut from-{source.id} to-{target.id}'
+            f'{" between-adjudicators" if entre else ""}"];')
+
+    # A regra atacada mora numa caixa só, e quando várias vozes a sustentam
+    # essa caixa é a do primeiro titular -- que, na ordem de leitura, tende a
+    # ser uma parte. O ataque de um ministro à tese de outro ficava, por isso,
+    # desenhado como ataque a uma parte. Estas arestas fecham o buraco: uma
+    # para a *caixa* de cada titular que a aresta principal não tocou,
+    # recortada na borda do cluster com `lhead`.
+    for attack in mapped_attacks(record):
+        target_rule = next((r for r in rules if r.id == attack.target), None)
+        if target_rule is None:
+            continue
+        for holder in attack.target_holders:
+            if holder == target_rule.perspective or holder not in anchor_of:
+                continue
+            if holder in attack.source_holders:
+                continue        # ninguém ataca a si mesmo
+            entre = (holder in ADJUDICATORS
+                     and any(k in ADJUDICATORS for k in attack.source_holders))
+            tip = (f"{attack.source} atinge {attack.target}, que "
+                   f"{_label(holder)} também sustenta")
+            lines.append(
+                f'  "{attack.source}" -> "{anchor_of[holder]}" '
+                f'[lhead="cluster_p_{holder}", color="#c0392b", style="dashed", '
+                # `constraint=false`: estas arestas não devem empurrar nada na
+                # hierarquia. Sem isso o Graphviz reordena as raias para
+                # acomodá-las e o mapa inteiro se desorganiza para exibir
+                # informação que é secundária ao desenho.
+                f'constraint=false, penwidth={1.6 if entre else 1.0}, '
+                f'arrowsize=0.7, {"arrowhead=empty, " if entre else ""}'
+                f'tooltip="{_dot_escape(tip)}", '
+                f'class="argedge co-holder from-{attack.source} to-{holder}'
+                f'{" between-adjudicators" if entre else ""}"];')
+
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def to_confrontation_dot(record, title: str = "") -> str:
+    """O confronto entre perspectivas, sem as regras no meio.
+
+    O mapa de adjudicação é sobre regras: cada elipse é uma, dentro da caixa
+    de quem a move. Isso responde "o que cada voz sustenta" e responde mal
+    "quem enfrenta quem", porque uma regra sustentada por três vozes é
+    desenhada numa caixa só. Este grafo é o outro corte do mesmo dado --
+    um nó por perspectiva, uma aresta por confronto, lida pelos titulares --
+    e é onde o embate entre ministros aparece como embate entre ministros.
+    """
+    from .graph_export import _dot_escape
+
+    rows = confrontations(record)
+    present = perspectives_in(record)
+    lines = ["digraph Confrontos {", '  rankdir="LR";', '  bgcolor="transparent";',
+             '  fontname="Helvetica";', '  fontcolor="#8a8a8a";',
+             '  node [fontname="Helvetica", fontsize=11, shape=box, '
+             'style="rounded,filled", color="#666666", fontcolor="#222222"];',
+             '  edge [fontname="Helvetica", fontsize=8, fontcolor="#8a8a8a"];',
+             "  nodesep=0.5;", "  ranksep=1.4;"]
+    if title:
+        lines.append(f'  labelloc="t"; label="{_dot_escape(title)}"; fontsize=15;')
+
+    for lane_label, keys, fill in (("ADJUDICADORES", ADJUDICATORS, "#eef2fb"),
+                                   ("PARTES", ADVERSARIES, "#ffffff")):
+        members = [key for key in keys if key in present]
+        if not members:
+            continue
+        lines.append(f'  subgraph "cluster_c_{lane_label}" {{')
+        lines.append(f'    label="{lane_label}"; fontsize=12; color="#bbbbbb"; '
+                     'fontcolor="#8a8a8a"; style="dashed"; labeljust="l";')
+        for key in members:
+            lines.append(f'    "{key}" [label="{_dot_escape(_label(key))}", '
+                         f'fillcolor="{fill}"];')
+        lines.append("  }")
+
+    for row in rows:
+        entre = row["between_adjudicators"]
+        rotulo = ", ".join(row["rules"])
+        tip = (f"{_label(row['source'])} → {_label(row['target'])} "
+               f"(fase de {row['phase']}): {rotulo}")
+        lines.append(
+            f'  "{row["source"]}" -> "{row["target"]}" '
+            f'[color="{"#c0392b" if entre else "#b0b0b0"}", '
+            f'penwidth={2.2 if entre else 1.0}, arrowsize=0.8, '
+            f'style="{"solid" if entre else "dashed"}", '
+            f'label="{_dot_escape(rotulo if entre else "")}", '
+            f'tooltip="{_dot_escape(tip)}", '
+            f'class="argedge confronto from-{row["source"]} to-{row["target"]}'
+            f'{" between-adjudicators" if entre else ""}"];')
 
     lines.append("}")
     return "\n".join(lines)

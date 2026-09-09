@@ -247,7 +247,17 @@ class PreferenceDimensionOut(BaseModel):
 
 
 class RuleProfileOut(BaseModel):
-    """Which dimensions a rule invokes. `coefficients` is normally 0/1."""
+    """Which dimensions an element invokes. `coefficients` is normally 0/1.
+
+    `rule` names a defeasible rule **or an ordinary premise literal**. Both
+    are ranked, because Definition 21 of Modgil & Prakken compares
+    `Prem_p(B) ◁ Prem_p(A)` *and* `DefRules(B) ◁ DefRules(A)`: an argument
+    whose premises are unranked is incomparable no matter how its rules
+    compare. Ranking only the rules -- which is what this repository used to
+    do -- declares preferences where canonical ASPIC+ declares none, and the
+    authors call the version that ignores premises "an anomaly" they went out
+    of their way to correct.
+    """
     rule: str
     coefficients: Dict[str, float] = Field(default_factory=dict)
     rationale_pt: str = ""
@@ -256,14 +266,27 @@ class RuleProfileOut(BaseModel):
 class PreferenceBlock(BaseModel):
     """The case's ordering between defeasible arguments, as data.
 
-    Never authored by an LLM stage: the weights are the reader's, and the
-    point of writing them into the record is that somebody can disagree with
-    them and re-run. Applies to both layers -- rule ids are disjoint across
-    them -- and is inert for any rule it does not profile.
+    Never authored by an LLM stage: the weights are somebody's reading of the
+    judgment, and the point of writing them into the record is that another
+    reader can disagree and re-run. Applies to both layers -- rule ids are
+    disjoint across them -- and is silent about any element it does not rank.
+
+    `perspective` is who moves the ordering. In Prakken's adjudication model
+    a priority argument is a *move*, made by a player in the decision phase
+    (§4.3), not a fact of the world: an ordering that applies before anybody
+    argued for it would let a preference settle a dispute between the parties
+    with no adjudicator present. Left empty, the ordering is treated as
+    undisputed and applies from the first step -- which is the old behaviour,
+    and honest only for a case where nobody contests the weighing.
     """
-    principle: Literal["weakest", "last", "sum"] = "weakest"
+    principle: Literal["weakest", "last"] = "weakest"
+    comparator: Literal["elitist", "democrat"] = "elitist"
     dimensions: List[PreferenceDimensionOut] = Field(default_factory=list)
     profiles: List[RuleProfileOut] = Field(default_factory=list)
+    perspective: str = Field(
+        default="",
+        description="Quem move a ordenacao (relator, voto_divergente, ...). "
+                    "Vazio: incontroversa, vale desde o primeiro passo.")
     notes_pt: str = ""
 
     def model(self):
@@ -279,6 +302,7 @@ class PreferenceBlock(BaseModel):
             [RuleProfile(rule_id=p.rule, coefficients=dict(p.coefficients),
                          rationale_pt=p.rationale_pt) for p in self.profiles],
             principle=self.principle,
+            comparator=self.comparator,
         )
 
 

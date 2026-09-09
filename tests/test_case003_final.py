@@ -70,6 +70,52 @@ def test_the_weighing_decides_the_duty_and_only_the_duty(record):
     assert PR.resolved_conflicts(build.cif_framework(record)) == []
 
 
+def test_the_ordering_is_a_move_of_the_dissenting_vote(record):
+    """Prakken §4.3: um argumento de prioridade é **movimento**, não fato.
+
+    A ordenação injetada em toda projeção valia já no passo 0, onde nenhum
+    adjudicador falou -- e ali uma preferência decidiria um rebate entre as
+    partes por autoridade de ninguém. Agora o bloco nomeia quem a move, e uma
+    projeção que ainda não o admitiu roda sob a ordenação básica.
+    """
+    assert record.preferences.perspective == "voto_divergente"
+    ativa = {}
+    admitidas = []
+    for key in ("recorrente", "recorrido", "relator",
+                "voto_convergente", "voto_divergente"):
+        admitidas.append(key)
+        ativa[key] = P.project_lrc(record, list(admitidas)).preferences is not None
+    assert ativa == {"recorrente": False, "recorrido": False, "relator": False,
+                     "voto_convergente": False, "voto_divergente": True}
+    # E o caso inteiro, onde todas as vozes falaram, roda com ela.
+    assert build.preference_model(record) is not None
+
+
+def test_the_ordering_follows_definition_21(record):
+    """Premissas **e** regras, conjuntamente -- e por isso as premissas do
+    caso são classificadas nos mesmos três eixos dos átomos."""
+    model = build.preference_model(record)
+    assert model.principle == PR.WEAKEST_LINK
+    assert model.comparator == PR.ELITIST
+    ranked = {p.rule for p in record.preferences.profiles}
+    assert {"RegFechado", "LapsoTemp", "FormacaoQuad"} <= ranked
+
+    af = build.lrc_framework(record)
+    esp = next(a for a in af.arguments.values() if a.conclusion == "DeverEspec")
+    gen = next(a for a in af.arguments.values() if a.conclusion == "¬DeverEspec")
+    assert model.precedes(sorted(esp.ordinary_premises),
+                          sorted(gen.ordinary_premises)) is True
+    assert model.precedes(list(esp.defeasible_rules),
+                          list(gen.defeasible_rules)) is True
+
+    # Só com as regras -- a versão anterior -- a Def. 21 fica muda.
+    so_regras = PR.PreferenceModel(
+        model.dimensions,
+        [pr for pr in model.profiles.values()
+         if pr.rule_id not in ("RegFechado", "LapsoTemp", "FormacaoQuad")])
+    assert so_regras.is_weaker(esp, gen) is False
+
+
 def test_without_the_weights_the_layer_answers_nothing(record):
     """The control. Under the basic ordering the mutual rebut leaves both
     qualifications UNDEC, and with them the exception (`dvpre_q8`) and the
@@ -114,11 +160,52 @@ def test_the_cause_in_fact_layer_already_denies_the_omission(record):
     assert lrc_vocab.cafa("OmiEstatal", "Danos") not in record.lrc.bridged_premises
 
 
-def test_the_relevance_layer_still_blocks_the_claim_on_its_own_grounds(record):
+def test_the_claim_was_never_formulated_not_defeated(record):
+    """A distinção que o registro publicava errada.
+
+    `LeReCa_OmiEstatal_Danos` não é conclusão de argumento nenhum: sem
+    `CaFa_OmiEstatal_Danos`, `cf2lrc_q5` não tem antecedente e a presunção
+    nunca dispara. As defesas `sc` e `unom` estão no framework e teriam
+    bloqueado a pretensão -- só que não chegaram a fazê-lo. Dizer que a
+    bloquearam credita ao direito um resultado que os fatos já produziram.
+    """
     entry = next(e for e in record.lrc.relevance if e["target"] == TARGET)
     assert entry["justified"] is False
-    schemes = {blocker["scheme"] for blocker in entry["blocked_by"]}
-    assert schemes == {"sc", "unom"}
+    assert entry["derivable"] is False
+    assert entry["status"] == "nao_formulada"
+    assert entry["blocked_by"] == []
+
+
+def test_a_defence_that_wins_by_rebutting_is_reported_too(record):
+    """`relevance_report` lia só undercuts, e undercut é justamente o que
+    uma preferência não decide -- então a camada ficava cega onde os pesos
+    trabalham. Agora os bloqueios saem dos defeats do framework."""
+    from aspic.solver import ArgumentationFramework
+
+    kb = {"premises": ["CaFa_A_B", "Forte"], "axioms": []}
+    rules = {"strict_rules": [], "defeasible_rules": [
+        "cf2lrc_A: CaFa_A_B => LeReCa_A_B",
+        "nwo_A: Forte => ¬LeReCa_A_B"]}
+
+    # Sem preferência o rebut é mútuo, os dois ficam UNDEC e nada *aceito*
+    # bloqueia: a pretensão não é reconhecida nem afastada.
+    plain = lrc_vocab.relevance_report(ArgumentationFramework(kb, rules),
+                                       ["LeReCa_A_B"])[0]
+    assert plain["derivable"] is True
+    assert plain["blocked_by"] == []
+
+    # Com a defesa preferida, ela vence por rebut -- e é este o caso que a
+    # versão anterior de `relevance_report`, que só lia undercuts, não via.
+    # Premissas e regras, porque a Def. 21 compara as duas.
+    model = PR.PreferenceModel(
+        [PR.Dimension("d", "eixo", 5.0)],
+        [PR.RuleProfile("CaFa_A_B", {"d": 0.2}), PR.RuleProfile("Forte", {"d": 1.0}),
+         PR.RuleProfile("cf2lrc_A", {"d": 0.2}), PR.RuleProfile("nwo_A", {"d": 1.0})])
+    entry = lrc_vocab.relevance_report(
+        ArgumentationFramework(kb, rules, preferences=model), ["LeReCa_A_B"])[0]
+    assert entry["status"] == "afastada"
+    assert {b["attack_type"] for b in entry["blocked_by"]} == {"rebut"}
+    assert {b["scheme"] for b in entry["blocked_by"]} == {"nwo"}
 
 
 def test_the_solver_lands_where_the_court_landed(record):

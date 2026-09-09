@@ -146,3 +146,50 @@ def test_omission_scheme_does_not_fire_when_there_is_a_duty_to_act():
     blocked = lrc.relevance_report(without_duty, ["LeReCa_notPaCo_ChDi"])[0]
     assert blocked["justified"] is False
     assert blocked["blocked_by"][0]["scheme"] == "unom"
+
+
+# ----------------------------------------------------------------------
+# O vocabulário, e a tabela que o explica
+# ----------------------------------------------------------------------
+def test_the_predicate_families_are_derived_from_one_registry():
+    """`BINARY_PREDICATES` e companhia saem de `PREDICATES`, não de listas
+    paralelas. Duas listas que dizem a mesma coisa são duas listas que
+    divergem."""
+    assert set(lrc.ALL_PREDICATES) == {p.name for p in lrc.PREDICATES}
+    assert set(lrc.BINARY_PREDICATES) == {p.name for p in lrc.PREDICATES if p.arity == 2}
+    assert set(lrc.UNARY_PREDICATES) == {p.name for p in lrc.PREDICATES if p.arity == 1}
+    assert lrc.TERNARY_PREDICATES == ("SupersedingCause",)
+
+
+def test_superseding_cause_parses_in_both_arities():
+    """O artigo escreve `SupersedingCause(χ, φ, ψ)` (eqs. 4 e 5); este
+    repositório sempre escreveu a forma abreviada, deixando φ e ψ implícitos
+    na regra que consome o literal. As duas têm de ser lidas -- e a ternária
+    era mal-parseada como um argumento só chamado `Ma_Ga_Ig`."""
+    assert lrc.split_lrc_literal("SupersedingCause_Ma_Ga_Ig") == (
+        "SupersedingCause", ["Ma", "Ga", "Ig"])
+    assert lrc.split_lrc_literal("SupersedingCause_Ma") == ("SupersedingCause", ["Ma"])
+
+
+def test_every_predicate_documents_its_roles_and_source():
+    """A referência é gerada do registro, então cada predicado tem de trazer
+    o que a tabela mostra: forma, leitura, o que afirma e onde está no
+    artigo."""
+    for entrada in lrc.predicate_reference():
+        assert entrada["shape"].startswith(entrada["name"] + "_")
+        assert len(entrada["roles"]) == entrada["arity"]
+        assert entrada["label_pt"] and entrada["reading_pt"]
+        assert entrada["source"]
+        assert entrada["kind"] in ("factual", "doutrinario", "derivado", "conclusao")
+
+
+def test_the_reference_reaches_the_page():
+    from aspic import catalog
+    from aspic.didactic import _predicate_reference_html
+
+    body = _predicate_reference_html()
+    for predicate in lrc.PREDICATES:
+        assert f"{predicate.name}_" in body
+    # a marcação da fonte vira HTML, e não texto literal
+    assert "**" not in body
+    assert "<strong>" in body and "<code>" in body

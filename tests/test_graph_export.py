@@ -96,3 +96,32 @@ def test_render_to_string_produces_svg():
     svg = render_to_string(dot, fmt="svg")
     assert "<svg" in svg
     assert "argnode" in svg
+
+
+def test_argument_names_carry_their_layer_when_a_case_has_two():
+    """Os dois frameworks de um caso numeram a partir de A0, então uma página
+    que mostra os dois grafos imprime `A8` duas vezes para argumentos
+    diferentes. Aconteceu: `A8: OmiEstatal ⊢ Latrocinio` numa figura e
+    `A8: RegFechado ⊢ RegFechado` na outra.
+
+    O nome do *nó* no DOT continua nu -- ele só precisa ser único dentro de um
+    grafo, e o realce por clique se apoia nele.
+    """
+    from aspic.graph_export import to_dot
+    from aspic.solver import ArgumentationFramework
+
+    af = ArgumentationFramework(
+        {"premises": ["p"], "axioms": []},
+        {"strict_rules": [], "defeasible_rules": ["r0: p => q", "r1: q => ¬r0"]})
+    extension, _ = af.compute_grounded_extension()
+
+    nu = to_dot(af, extension)
+    etiquetado = to_dot(af, extension, layer_tag="F")
+
+    assert "label=\"A1\\n" in nu
+    assert "label=\"F·A1\\n" in etiquetado
+    assert "label=\"A1\\n" not in etiquetado
+    # o nome do nó não muda -- o JS de realce depende dele
+    assert '"A1" [shape' in etiquetado
+    # e os tooltips de ataque, que são frases prontas, também são etiquetados
+    assert "F·A" in [l for l in etiquetado.splitlines() if "tooltip" in l and "->" in l][0]

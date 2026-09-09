@@ -53,7 +53,10 @@ def render_case(case: CaseSpec, *, figures_dir=None) -> str:
                                 preferences=case.preferences)
     extension, _ = af.compute_grounded_extension()
 
-    dot = to_dot(af, extension, title=case.title)
+    # Só etiqueta quando a página também mostra a camada de relevância; um
+    # caso de camada única não tem ambiguidade e o prefixo seria ruído.
+    layer_tag = "F" if case.lrc is not None else ""
+    dot = to_dot(af, extension, title=case.title, layer_tag=layer_tag)
     if figures_dir is not None:
         render_to_file(dot, figures_dir / f"{case.id}.svg", fmt="svg")
         render_to_file(dot, figures_dir / f"{case.id}.pdf", fmt="pdf")
@@ -61,7 +64,7 @@ def render_case(case: CaseSpec, *, figures_dir=None) -> str:
 
     justified = sorted(af.justified_conclusions())
     ness_table = ness_html_table(af, case.effect)
-    causal_section = causal_comparison_section(af, case.queries)
+    causal_section = causal_comparison_section(af, case.queries, layer_tag)
     technical = technical_section_html(case, graph_svg, ness_table, causal_section)
 
     return f"""

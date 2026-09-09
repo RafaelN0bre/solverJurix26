@@ -709,6 +709,28 @@ class ArgumentationFramework:
         intervention breaks *some* route to psi, where but-for asks whether
         it breaks *every* one. See `aspic.sufficiency` for the set-of-
         conditions decomposition that explains a given verdict.
+
+        **Two deliberate departures from the authors' implementation**, both
+        audited in `docs/auditoria-icail2025.md` and both in favour of the
+        paper's text:
+
+        * `checkCausalityICAIL25` additionally requires that the argument
+          which knocked the support out be itself labelled `in`. Definition
+          4.3 requires only that the explanation leave the grounded
+          extension, and the paper's own §2.1 vocabulary calls an `und`
+          defeater non-overruled. Where an intervention creates an even
+          rebut cycle, everything goes `und`, no attacker is `in`, and the
+          reference answers "not a cause" where the definition answers
+          "cause". We follow the definition.
+        * `getSupports` there collects support starting from arguments that
+          are not justified for the effect; Definition 3.3 speaks of
+          explanations of a *justified* argument.
+
+        One departure is a genuine gap of ours: the paper's `L` need not be a
+        singleton, and this only ever intervenes with `{-phi}`. It costs a
+        cause exactly when `-phi` is an antecedent of a rule that never
+        fired -- see `tests/test_reference_fidelity.py`. No case in this
+        repository is affected.
         """
         original_support = self.support_set(psi)
         if not original_support:

@@ -89,7 +89,7 @@
 <!-- unom_FugaPreso&#45;&gt;cf2lrc_FugaPreso -->
 <g id="edge10" class="edge argedge defeat from&#45;unom_FugaPreso to&#45;cf2lrc_FugaPreso">
 <title>unom_FugaPreso&#45;&gt;cf2lrc_FugaPreso</title>
-<g id="a_edge10"><a xlink:title="unom_FugaPreso afasta cf2lrc_FugaPreso">
+<g id="a_edge10"><a xlink:title="unom_FugaPreso afasta cf2lrc_FugaPreso&#10;&#10;Voto divergente → comum">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M343.23,-595.58C390.71,-568.17 450.48,-532.05 457,-520.25 535.87,-377.5 421.76,-182.71 362.25,-97.19"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="364.61,-95.68 357.72,-90.75 360.04,-98.91 364.61,-95.68"/>
 </a>
@@ -134,7 +134,7 @@
 <!-- sc_FugaPreso&#45;&gt;cf2lrc_FugaPreso -->
 <g id="edge11" class="edge argedge defeat from&#45;sc_FugaPreso to&#45;cf2lrc_FugaPreso">
 <title>sc_FugaPreso&#45;&gt;cf2lrc_FugaPreso</title>
-<g id="a_edge11"><a xlink:title="sc_FugaPreso afasta cf2lrc_FugaPreso">
+<g id="a_edge11"><a xlink:title="sc_FugaPreso afasta cf2lrc_FugaPreso&#10;&#10;Voto divergente → comum">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M359.6,-437.19C360.6,-429.33 361.48,-421.05 362,-413.3 365.7,-357.6 365.79,-343.39 362,-287.7 357.57,-222.68 346.29,-148.19 338.38,-101.11"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="341.15,-100.73 337.05,-93.31 335.63,-101.67 341.15,-100.73"/>
 </a>
@@ -169,7 +169,7 @@
 <!-- r2&#45;&gt;r0 -->
 <g id="edge8" class="edge argedge defeat from&#45;r2 to&#45;r0">
 <title>r2&#45;&gt;r0</title>
-<g id="a_edge8"><a xlink:title="r2 afasta r0">
+<g id="a_edge8"><a xlink:title="r2 afasta r0&#10;&#10;Recorrente → Recorrido">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M145.48,-296.65C151.19,-282.53 156.98,-264.91 161.52,-248.26"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="164.18,-249.15 163.48,-240.7 158.76,-247.74 164.18,-249.15"/>
 </a>
@@ -189,7 +189,7 @@
 <!-- r3&#45;&gt;r0 -->
 <g id="edge9" class="edge argedge defeat from&#45;r3 to&#45;r0">
 <title>r3&#45;&gt;r0</title>
-<g id="a_edge9"><a xlink:title="r3 afasta r0">
+<g id="a_edge9"><a xlink:title="r3 afasta r0&#10;&#10;Recorrente → Recorrido">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M259.76,-297.61C245.64,-281.82 227.42,-261.42 210.87,-242.89"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="213.13,-241.22 205.71,-237.12 208.95,-244.95 213.13,-241.22"/>
 </a>

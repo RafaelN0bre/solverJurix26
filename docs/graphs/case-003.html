@@ -331,13 +331,13 @@ versão viva, com abas e glossário ao passar o mouse, rode
 
   <h4>Argumentos construídos</h4>
   <div class="argument-cards">
-    <div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O crime foi praticado três meses após a fuga.<p class="tech-note"><code>A0: CrimeApos3M ⊢ CrimeApos3M</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O Estado tinha um dever específico de custódia sobre o preso.<p class="tech-note"><code>A1: DeverEspec ⊢ DeverEspec</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O crime foi praticado em concurso de agentes (formação de quadrilha).<p class="tech-note"><code>A2: FormacaoQuad ⊢ FormacaoQuad</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O detento fugiu do sistema prisional.<p class="tech-note"><code>A3: FugaPreso ⊢ FugaPreso</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O detento cumpria pena em regime fechado.<p class="tech-note"><code>A4: PresoRegFech ⊢ PresoRegFech</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que o detento fugiu do sistema prisional e o Estado tinha um dever específico de custódia sobre o preso e o detento cumpria pena em regime fechado, conclui-se que o foragido cometeu latrocínio contra a vítima. (A fuga do detento, que estava sob o dever específico de custódia do Estado por cumprir pena em regime fechado, foi a causa do latrocínio.)<p class="tech-note"><code>A5: DeverEspec, FugaPreso, PresoRegFech ⊢ Latrocinio</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que o foragido cometeu latrocínio contra a vítima, conclui-se que a vítima foi morta em decorrência de um latrocínio. (O latrocínio cometido pelo foragido resultou na morte da vítima.)<p class="tech-note"><code>A6: DeverEspec, FugaPreso, PresoRegFech ⊢ MorteVitima</code> </p></div>
+    <div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O crime foi praticado três meses após a fuga.<p class="tech-note"><code>F·A0: CrimeApos3M ⊢ CrimeApos3M</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O Estado tinha um dever específico de custódia sobre o preso.<p class="tech-note"><code>F·A1: DeverEspec ⊢ DeverEspec</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O crime foi praticado em concurso de agentes (formação de quadrilha).<p class="tech-note"><code>F·A2: FormacaoQuad ⊢ FormacaoQuad</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O detento fugiu do sistema prisional.<p class="tech-note"><code>F·A3: FugaPreso ⊢ FugaPreso</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O detento cumpria pena em regime fechado.<p class="tech-note"><code>F·A4: PresoRegFech ⊢ PresoRegFech</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que o detento fugiu do sistema prisional e o Estado tinha um dever específico de custódia sobre o preso e o detento cumpria pena em regime fechado, conclui-se que o foragido cometeu latrocínio contra a vítima. (A fuga do detento, que estava sob o dever específico de custódia do Estado por cumprir pena em regime fechado, foi a causa do latrocínio.)<p class="tech-note"><code>F·A5: DeverEspec, FugaPreso, PresoRegFech ⊢ Latrocinio</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que o foragido cometeu latrocínio contra a vítima, conclui-se que a vítima foi morta em decorrência de um latrocínio. (O latrocínio cometido pelo foragido resultou na morte da vítima.)<p class="tech-note"><code>F·A6: DeverEspec, FugaPreso, PresoRegFech ⊢ MorteVitima</code> </p></div>
   </div>
 
   <h4>Disputas entre os argumentos</h4>
@@ -358,27 +358,28 @@ versão viva, com abas e glossário ao passar o mouse, rode
   que o solver reconheceu acima e verifica se alguma defesa doutrinária afasta
   a relevância jurídica de cada uma.</p>
   <p class="duty-basis"><strong>Dever jurídico de agir:</strong> Art. 37, § 6º, da Constituição Federal. A controvérsia central foi sobre a natureza do dever do Estado: o relator e o recorrido sustentaram um dever específico de custódia do preso em regime fechado, enquanto a tese vencedora (voto divergente e posição final) entendeu que, pelo lapso temporal e modo de execução do novo crime, o dever se tornou genérico de segurança pública, o que rompeu o nexo causal.</p>
+  <details class="predicate-reference"><summary>O vocabulário desta camada — os 12 predicados, um a um</summary><p class="lead">Todo literal desta camada é um destes predicados aplicado a átomos do caso. A forma escrita junta o nome ao argumento com sublinhado — <code>CaFa_FugaPreso_Danos</code> é <code>CaFa(FugaPreso, Danos)</code> —, e uma negação vira o prefixo <code>not</code> no argumento: <code>CaFa_notPaCo_ChDi</code>.</p><h5>Vem do solver</h5><p class="lead">Escritos por <code>formalize.bridge</code> a partir da camada de causa de fato. Ninguém os digita: é esta fronteira que impede a formalização de alegar relevância jurídica para o que o teste contrafactual nunca estabeleceu.</p><table><thead><tr><th>Forma</th><th>Lê-se</th><th>O que afirma</th><th>No artigo</th></tr></thead><tbody><tr><td class="mono">CaFa_φ_ψ</td><td><strong>causa de fato</strong></td><td>φ é causa de fato de ψ. Vem do solver (<code>ness_cause</code>), não do acórdão: é a premissa que liga as duas camadas, e sem ela a presunção de relevância não tem sobre o que operar.</td><td class="mono">eq. (1), ponte</td></tr><tr><td class="mono">ButFor_φ_ψ</td><td><strong>causa &quot;não fosse por&quot;</strong></td><td>sem φ, ψ não teria ocorrido de jeito nenhum. Mais forte que <code>CaFa</code>: toda causa but-for é causa de fato, não o contrário. Também vem do solver, e é antecedente da caracterização da causa superveniente.</td><td class="mono">Def. 3.5</td></tr></tbody></table><h5>Vem do acórdão</h5><p class="lead">A leitura humana do julgado. Dizem o que o direito qualifica: havia dever de agir, o evento era inesperado, a conduta era ilícita.</p><table><thead><tr><th>Forma</th><th>Lê-se</th><th>O que afirma</th><th>No artigo</th></tr></thead><tbody><tr><td class="mono">After_χ_φ</td><td><strong>posterioridade</strong></td><td>o evento χ ocorreu depois de φ. Antecedente da caracterização da causa superveniente: um evento que não é posterior não interrompe nada.</td><td class="mono">eq. (5)</td></tr><tr><td class="mono">Foreseeable_φ_ψ</td><td><strong>previsibilidade</strong></td><td>ψ era previsível a partir de φ. Aparece <strong>negado</strong> na regra 6: o que afasta a relevância é a imprevisibilidade, não a previsibilidade.</td><td class="mono">eq. (6)</td></tr><tr><td class="mono">ForeseeableRisk_φ_χ</td><td><strong>risco previsível</strong></td><td>χ é um risco previsível de φ. Primeiro antecedente da concretização do risco — o que se alega previsível é o risco, não o dano exato.</td><td class="mono">eq. (7)</td></tr><tr><td class="mono">Playout_χ_ψ</td><td><strong>concretização do risco</strong></td><td>ψ é a realização do risco χ. Com <code>ForeseeableRisk</code>, desfaz a alegação de imprevisibilidade: o dano é justamente aquilo de que o risco era o risco.</td><td class="mono">eq. (7)</td></tr><tr><td class="mono">Om_φ</td><td><strong>omissão</strong></td><td>a conduta φ é uma omissão. Sem isto a regra 8 não se aplica: ela é sobre não fazer, não sobre fazer mal.</td><td class="mono">eq. (8)</td></tr><tr><td class="mono">Obl_¬φ</td><td><strong>dever de agir</strong></td><td>a conduta era juridicamente obrigatória. Note o argumento: a regra 8 escreve <code>¬Obl(¬φ)</code>, porque φ é a <em>omissão</em> e o dever recai sobre a conduta omitida, que é o complemento dela.</td><td class="mono">eq. (8)</td></tr><tr><td class="mono">Tortious_χ</td><td><strong>ilicitude</strong></td><td>χ é conduta ilícita. Aparece negado na regra 3: a defesa do &quot;não estaria melhor&quot; exige que a causa paralela seja <strong>lícita</strong> — se fosse ilícita, apontá-la não desculparia ninguém.</td><td class="mono">eq. (3)</td></tr><tr><td class="mono">Unexpected_χ</td><td><strong>evento inesperado</strong></td><td>χ era um evento altamente inesperado. É o que distingue uma causa superveniente de um desdobramento normal do que já estava em curso.</td><td class="mono">eq. (5)</td></tr></tbody></table><h5>A camada conclui</h5><p class="lead">O único predicado que esta camada estabelece por argumento, em vez de receber pronto — a regra 5 o conclui e a regra 4 o consome.</p><table><thead><tr><th>Forma</th><th>Lê-se</th><th>O que afirma</th><th>No artigo</th></tr></thead><tbody><tr><td class="mono">SupersedingCause_χ_φ_ψ</td><td><strong>causa superveniente</strong></td><td>χ é causa superveniente que rompe o nexo entre φ e ψ. Concluída pela regra 5 e consumida pela regra 4 — é o único predicado que a camada <strong>deriva</strong> em vez de receber pronto.</td><td class="mono">eqs. (4) e (5)</td></tr></tbody></table><h5>O que se decide</h5><p class="lead">A pergunta que a camada existe para responder.</p><table><thead><tr><th>Forma</th><th>Lê-se</th><th>O que afirma</th><th>No artigo</th></tr></thead><tbody><tr><td class="mono">LeReCa_φ_ψ</td><td><strong>causa juridicamente relevante</strong></td><td>φ é causa de ψ que o direito imputa. É a <strong>conclusão</strong> da camada — o que os esquemas 2 a 8 estabelecem ou afastam.</td><td class="mono">eq. (2)</td></tr></tbody></table></details>
   <table class="causal-table"><thead><tr><th>Afirmação de relevância jurídica</th><th>Aceita? <span class="tech-ref">(LeReCa)</span></th><th>Por quê</th></tr></thead><tbody><tr><td>“o detento fugiu do sistema prisional” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”</td><td class="verdict no">✗</td><td class="note">Omissão sem dever de agir (regra 8): a conduta omitida não era juridicamente obrigatória. Causa superveniente (regra 4): um evento posterior interrompe o nexo de relevância jurídica.</td></tr><tr><td>“o detento cumpria pena em regime fechado” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”</td><td class="verdict yes">✓</td><td class="note">Nenhuma defesa afastou a relevância jurídica.</td></tr><tr><td>“o foragido cometeu latrocínio contra a vítima” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”</td><td class="verdict yes">✓</td><td class="note">Nenhuma defesa afastou a relevância jurídica.</td></tr></tbody></table>
 
   <details class="technical-toggle lrc-toggle">
     <summary>Ver os argumentos e o grafo da camada de relevância jurídica</summary>
     <div class="argument-cards">
-      <div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O latrocínio ocorreu três meses após a fuga do preso..<p class="tech-note"><code>A0: After_Latrocinio_FugaPreso ⊢ After_Latrocinio_FugaPreso</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: Sem “o detento fugiu do sistema prisional”, “a vítima foi morta em decorrência de um latrocínio” não teria ocorrido de jeito nenhum.<p class="tech-note"><code>A1: ButFor_FugaPreso_MorteVitima ⊢ ButFor_FugaPreso_MorteVitima</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: Sem “o foragido cometeu latrocínio contra a vítima”, “a vítima foi morta em decorrência de um latrocínio” não teria ocorrido de jeito nenhum.<p class="tech-note"><code>A2: ButFor_Latrocinio_MorteVitima ⊢ ButFor_Latrocinio_MorteVitima</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: Sem “o detento cumpria pena em regime fechado”, “a vítima foi morta em decorrência de um latrocínio” não teria ocorrido de jeito nenhum.<p class="tech-note"><code>A3: ButFor_PresoRegFech_MorteVitima ⊢ ButFor_PresoRegFech_MorteVitima</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: “o detento fugiu do sistema prisional” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”.<p class="tech-note"><code>A4: CaFa_FugaPreso_MorteVitima ⊢ CaFa_FugaPreso_MorteVitima</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: “o foragido cometeu latrocínio contra a vítima” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”.<p class="tech-note"><code>A5: CaFa_Latrocinio_MorteVitima ⊢ CaFa_Latrocinio_MorteVitima</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: “o detento cumpria pena em regime fechado” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”.<p class="tech-note"><code>A6: CaFa_PresoRegFech_MorteVitima ⊢ CaFa_PresoRegFech_MorteVitima</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: A fuga do preso é uma omissão do Estado no dever de custódia..<p class="tech-note"><code>A7: Om_FugaPreso ⊢ Om_FugaPreso</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O latrocínio foi um evento inesperado, dada a formação de quadrilha e o lapso temporal..<p class="tech-note"><code>A8: Unexpected_Latrocinio ⊢ Unexpected_Latrocinio</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O dever de manter a custódia do preso tornou-se um dever genérico de segurança pública..<p class="tech-note"><code>A9: ¬Obl_ManterCustodia ⊢ ¬Obl_ManterCustodia</code> </p></div>
-<details class="arg-card status-OUT"><summary><span class="badge status-OUT">Rejeitado</span> Considerando que “o detento fugiu do sistema prisional” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”, conclui-se que “o detento fugiu do sistema prisional” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”. (A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.)</summary><p class="why-heading">Por que este argumento está rejeitado:</p><ul class="attack-list"><li>Não se sustenta o raciocínio: “A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante”. A omissão do Estado (fuga do preso) não é juridicamente relevante porque o dever de agir (manter a custódia) tornou-se genérico, e não específico. Esse ataque foi aceito e afasta o argumento atacado.</li><li>Não se sustenta o raciocínio: “A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante”. Sendo o latrocínio uma causa superveniente, ele rompe a relevância jurídica da causa anterior (a fuga do preso). Esse ataque foi aceito e afasta o argumento atacado.</li></ul><p class="tech-note"><code>A10: CaFa_FugaPreso_MorteVitima ⊢ LeReCa_FugaPreso_MorteVitima</code> </p></details>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que “o detento cumpria pena em regime fechado” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”, conclui-se que “o detento cumpria pena em regime fechado” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”. (O fato de o detento cumprir pena em regime fechado, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.)<p class="tech-note"><code>A11: CaFa_PresoRegFech_MorteVitima ⊢ LeReCa_PresoRegFech_MorteVitima</code> </p></div>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que “o foragido cometeu latrocínio contra a vítima” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”, conclui-se que “o foragido cometeu latrocínio contra a vítima” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”. (O latrocínio, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.)<p class="tech-note"><code>A12: CaFa_Latrocinio_MorteVitima ⊢ LeReCa_Latrocinio_MorteVitima</code> </p></div>
-<details class="arg-card status-IN"><summary><span class="badge status-IN">Aceito</span> Considerando que A fuga do preso é uma omissão do Estado no dever de custódia. e O dever de manter a custódia do preso tornou-se um dever genérico de segurança pública., conclui-se que não se sustenta o raciocínio: “A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante”. (A omissão do Estado (fuga do preso) não é juridicamente relevante porque o dever de agir (manter a custódia) tornou-se genérico, e não específico.)</summary><p class="attacks-out">Este argumento também ataca conclusões que dependem de: <code>LeReCa_FugaPreso_MorteVitima</code>.</p><p class="tech-note"><code>A13: Om_FugaPreso, ¬Obl_ManterCustodia ⊢ ¬cf2lrc_FugaPreso</code> </p></details>
-<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que “o detento fugiu do sistema prisional” é causa de fato de “a vítima foi morta em decorrência de um latrocínio” e “o foragido cometeu latrocínio contra a vítima” é causa de fato de “a vítima foi morta em decorrência de um latrocínio” e O latrocínio ocorreu três meses após a fuga do preso. e O latrocínio foi um evento inesperado, dada a formação de quadrilha e o lapso temporal. e sem “o foragido cometeu latrocínio contra a vítima”, “a vítima foi morta em decorrência de um latrocínio” não teria ocorrido de jeito nenhum, conclui-se que “o foragido cometeu latrocínio contra a vítima” é causa superveniente, que rompe o nexo anterior. (O latrocínio é caracterizado como causa superveniente porque foi um evento posterior à fuga, necessário para o dano e inesperado (pelo lapso temporal e formação de quadrilha).)<p class="tech-note"><code>A14: After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio ⊢ SupersedingCause_Latrocinio</code> </p></div>
-<details class="arg-card status-IN"><summary><span class="badge status-IN">Aceito</span> Considerando que “o foragido cometeu latrocínio contra a vítima” é causa superveniente, que rompe o nexo anterior, conclui-se que não se sustenta o raciocínio: “A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante”. (Sendo o latrocínio uma causa superveniente, ele rompe a relevância jurídica da causa anterior (a fuga do preso).)</summary><p class="attacks-out">Este argumento também ataca conclusões que dependem de: <code>LeReCa_FugaPreso_MorteVitima</code>.</p><p class="tech-note"><code>A15: After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio ⊢ ¬cf2lrc_FugaPreso</code> </p></details>
+      <div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O latrocínio ocorreu três meses após a fuga do preso..<p class="tech-note"><code>R·A0: After_Latrocinio_FugaPreso ⊢ After_Latrocinio_FugaPreso</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: Sem “o detento fugiu do sistema prisional”, “a vítima foi morta em decorrência de um latrocínio” não teria ocorrido de jeito nenhum.<p class="tech-note"><code>R·A1: ButFor_FugaPreso_MorteVitima ⊢ ButFor_FugaPreso_MorteVitima</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: Sem “o foragido cometeu latrocínio contra a vítima”, “a vítima foi morta em decorrência de um latrocínio” não teria ocorrido de jeito nenhum.<p class="tech-note"><code>R·A2: ButFor_Latrocinio_MorteVitima ⊢ ButFor_Latrocinio_MorteVitima</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: Sem “o detento cumpria pena em regime fechado”, “a vítima foi morta em decorrência de um latrocínio” não teria ocorrido de jeito nenhum.<p class="tech-note"><code>R·A3: ButFor_PresoRegFech_MorteVitima ⊢ ButFor_PresoRegFech_MorteVitima</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: “o detento fugiu do sistema prisional” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”.<p class="tech-note"><code>R·A4: CaFa_FugaPreso_MorteVitima ⊢ CaFa_FugaPreso_MorteVitima</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: “o foragido cometeu latrocínio contra a vítima” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”.<p class="tech-note"><code>R·A5: CaFa_Latrocinio_MorteVitima ⊢ CaFa_Latrocinio_MorteVitima</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: “o detento cumpria pena em regime fechado” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”.<p class="tech-note"><code>R·A6: CaFa_PresoRegFech_MorteVitima ⊢ CaFa_PresoRegFech_MorteVitima</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: A fuga do preso é uma omissão do Estado no dever de custódia..<p class="tech-note"><code>R·A7: Om_FugaPreso ⊢ Om_FugaPreso</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O latrocínio foi um evento inesperado, dada a formação de quadrilha e o lapso temporal..<p class="tech-note"><code>R·A8: Unexpected_Latrocinio ⊢ Unexpected_Latrocinio</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Fato do caso: O dever de manter a custódia do preso tornou-se um dever genérico de segurança pública..<p class="tech-note"><code>R·A9: ¬Obl_ManterCustodia ⊢ ¬Obl_ManterCustodia</code> </p></div>
+<details class="arg-card status-OUT"><summary><span class="badge status-OUT">Rejeitado</span> Considerando que “o detento fugiu do sistema prisional” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”, conclui-se que “o detento fugiu do sistema prisional” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”. (A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.)</summary><p class="why-heading">Por que este argumento está rejeitado:</p><ul class="attack-list"><li>Não se sustenta o raciocínio: “A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante”. A omissão do Estado (fuga do preso) não é juridicamente relevante porque o dever de agir (manter a custódia) tornou-se genérico, e não específico. Esse ataque foi aceito e afasta o argumento atacado.</li><li>Não se sustenta o raciocínio: “A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante”. Sendo o latrocínio uma causa superveniente, ele rompe a relevância jurídica da causa anterior (a fuga do preso). Esse ataque foi aceito e afasta o argumento atacado.</li></ul><p class="tech-note"><code>R·A10: CaFa_FugaPreso_MorteVitima ⊢ LeReCa_FugaPreso_MorteVitima</code> </p></details>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que “o detento cumpria pena em regime fechado” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”, conclui-se que “o detento cumpria pena em regime fechado” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”. (O fato de o detento cumprir pena em regime fechado, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.)<p class="tech-note"><code>R·A11: CaFa_PresoRegFech_MorteVitima ⊢ LeReCa_PresoRegFech_MorteVitima</code> </p></div>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que “o foragido cometeu latrocínio contra a vítima” é causa de fato de “a vítima foi morta em decorrência de um latrocínio”, conclui-se que “o foragido cometeu latrocínio contra a vítima” é causa juridicamente relevante de “a vítima foi morta em decorrência de um latrocínio”. (O latrocínio, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.)<p class="tech-note"><code>R·A12: CaFa_Latrocinio_MorteVitima ⊢ LeReCa_Latrocinio_MorteVitima</code> </p></div>
+<details class="arg-card status-IN"><summary><span class="badge status-IN">Aceito</span> Considerando que A fuga do preso é uma omissão do Estado no dever de custódia. e O dever de manter a custódia do preso tornou-se um dever genérico de segurança pública., conclui-se que não se sustenta o raciocínio: “A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante”. (A omissão do Estado (fuga do preso) não é juridicamente relevante porque o dever de agir (manter a custódia) tornou-se genérico, e não específico.)</summary><p class="attacks-out">Este argumento também ataca conclusões que dependem de: <code>LeReCa_FugaPreso_MorteVitima</code>.</p><p class="tech-note"><code>R·A13: Om_FugaPreso, ¬Obl_ManterCustodia ⊢ ¬cf2lrc_FugaPreso</code> </p></details>
+<div class="arg-card status-IN no-detail"><span class="badge status-IN">Aceito</span> Considerando que “o detento fugiu do sistema prisional” é causa de fato de “a vítima foi morta em decorrência de um latrocínio” e “o foragido cometeu latrocínio contra a vítima” é causa de fato de “a vítima foi morta em decorrência de um latrocínio” e O latrocínio ocorreu três meses após a fuga do preso. e O latrocínio foi um evento inesperado, dada a formação de quadrilha e o lapso temporal. e sem “o foragido cometeu latrocínio contra a vítima”, “a vítima foi morta em decorrência de um latrocínio” não teria ocorrido de jeito nenhum, conclui-se que “o foragido cometeu latrocínio contra a vítima” é causa superveniente, que rompe o nexo anterior. (O latrocínio é caracterizado como causa superveniente porque foi um evento posterior à fuga, necessário para o dano e inesperado (pelo lapso temporal e formação de quadrilha).)<p class="tech-note"><code>R·A14: After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio ⊢ SupersedingCause_Latrocinio</code> </p></div>
+<details class="arg-card status-IN"><summary><span class="badge status-IN">Aceito</span> Considerando que “o foragido cometeu latrocínio contra a vítima” é causa superveniente, que rompe o nexo anterior, conclui-se que não se sustenta o raciocínio: “A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante”. (Sendo o latrocínio uma causa superveniente, ele rompe a relevância jurídica da causa anterior (a fuga do preso).)</summary><p class="attacks-out">Este argumento também ataca conclusões que dependem de: <code>LeReCa_FugaPreso_MorteVitima</code>.</p><p class="tech-note"><code>R·A15: After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio ⊢ ¬cf2lrc_FugaPreso</code> </p></details>
     </div>
     <div class="graph-wrap"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -400,9 +401,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A0 -->
 <g id="node1" class="node argnode status&#45;IN arg&#45;A0">
 <title>A0</title>
-<g id="a_node1"><a xlink:title="A0&#10;After_Latrocinio_FugaPreso (premise)">
+<g id="a_node1"><a xlink:title="R·A0&#10;After_Latrocinio_FugaPreso (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="141.24" cy="-131.25" rx="141.24" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="141.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A0</text>
+<text xml:space="preserve" text-anchor="middle" x="141.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A0</text>
 <text xml:space="preserve" text-anchor="middle" x="141.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">After_Latrocinio_FugaPreso (premise)</text>
 </a>
 </g>
@@ -410,9 +411,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A1 -->
 <g id="node2" class="node argnode status&#45;IN arg&#45;A1">
 <title>A1</title>
-<g id="a_node2"><a xlink:title="A1&#10;ButFor_FugaPreso_MorteVitima (premise)">
+<g id="a_node2"><a xlink:title="R·A1&#10;ButFor_FugaPreso_MorteVitima (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="456.24" cy="-131.25" rx="156.09" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="456.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A1</text>
+<text xml:space="preserve" text-anchor="middle" x="456.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A1</text>
 <text xml:space="preserve" text-anchor="middle" x="456.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">ButFor_FugaPreso_MorteVitima (premise)</text>
 </a>
 </g>
@@ -420,9 +421,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A2 -->
 <g id="node3" class="node argnode status&#45;IN arg&#45;A2">
 <title>A2</title>
-<g id="a_node3"><a xlink:title="A2&#10;ButFor_Latrocinio_MorteVitima (premise)">
+<g id="a_node3"><a xlink:title="R·A2&#10;ButFor_Latrocinio_MorteVitima (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="781.24" cy="-131.25" rx="151.32" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="781.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A2</text>
+<text xml:space="preserve" text-anchor="middle" x="781.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A2</text>
 <text xml:space="preserve" text-anchor="middle" x="781.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">ButFor_Latrocinio_MorteVitima (premise)</text>
 </a>
 </g>
@@ -430,9 +431,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A3 -->
 <g id="node4" class="node argnode status&#45;IN arg&#45;A3">
 <title>A3</title>
-<g id="a_node4"><a xlink:title="A3&#10;ButFor_PresoRegFech_MorteVitima (premise)">
+<g id="a_node4"><a xlink:title="R·A3&#10;ButFor_PresoRegFech_MorteVitima (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1120.24" cy="-131.25" rx="169.88" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1120.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A3</text>
+<text xml:space="preserve" text-anchor="middle" x="1120.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A3</text>
 <text xml:space="preserve" text-anchor="middle" x="1120.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">ButFor_PresoRegFech_MorteVitima (premise)</text>
 </a>
 </g>
@@ -440,9 +441,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A4 -->
 <g id="node5" class="node argnode status&#45;IN arg&#45;A4">
 <title>A4</title>
-<g id="a_node5"><a xlink:title="A4&#10;CaFa_FugaPreso_MorteVitima (premise)">
+<g id="a_node5"><a xlink:title="R·A4&#10;CaFa_FugaPreso_MorteVitima (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1460.24" cy="-131.25" rx="151.85" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1460.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A4</text>
+<text xml:space="preserve" text-anchor="middle" x="1460.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A4</text>
 <text xml:space="preserve" text-anchor="middle" x="1460.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">CaFa_FugaPreso_MorteVitima (premise)</text>
 </a>
 </g>
@@ -450,9 +451,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5 -->
 <g id="node6" class="node argnode status&#45;IN arg&#45;A5">
 <title>A5</title>
-<g id="a_node6"><a xlink:title="A5&#10;CaFa_Latrocinio_MorteVitima (premise)">
+<g id="a_node6"><a xlink:title="R·A5&#10;CaFa_Latrocinio_MorteVitima (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1777.24" cy="-131.25" rx="147.08" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1777.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A5</text>
+<text xml:space="preserve" text-anchor="middle" x="1777.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A5</text>
 <text xml:space="preserve" text-anchor="middle" x="1777.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">CaFa_Latrocinio_MorteVitima (premise)</text>
 </a>
 </g>
@@ -460,9 +461,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A6 -->
 <g id="node7" class="node argnode status&#45;IN arg&#45;A6">
 <title>A6</title>
-<g id="a_node7"><a xlink:title="A6&#10;CaFa_PresoRegFech_MorteVitima (premise)">
+<g id="a_node7"><a xlink:title="R·A6&#10;CaFa_PresoRegFech_MorteVitima (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="2108.24" cy="-131.25" rx="165.64" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="2108.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A6</text>
+<text xml:space="preserve" text-anchor="middle" x="2108.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A6</text>
 <text xml:space="preserve" text-anchor="middle" x="2108.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">CaFa_PresoRegFech_MorteVitima (premise)</text>
 </a>
 </g>
@@ -470,9 +471,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A7 -->
 <g id="node8" class="node argnode status&#45;IN arg&#45;A7">
 <title>A7</title>
-<g id="a_node8"><a xlink:title="A7&#10;Om_FugaPreso (premise)">
+<g id="a_node8"><a xlink:title="R·A7&#10;Om_FugaPreso (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="2392.24" cy="-131.25" rx="99.88" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="2392.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A7</text>
+<text xml:space="preserve" text-anchor="middle" x="2392.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A7</text>
 <text xml:space="preserve" text-anchor="middle" x="2392.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">Om_FugaPreso (premise)</text>
 </a>
 </g>
@@ -480,9 +481,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A8 -->
 <g id="node9" class="node argnode status&#45;IN arg&#45;A8">
 <title>A8</title>
-<g id="a_node9"><a xlink:title="A8&#10;Unexpected_Latrocinio (premise)">
+<g id="a_node9"><a xlink:title="R·A8&#10;Unexpected_Latrocinio (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="2634.24" cy="-131.25" rx="123.74" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="2634.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A8</text>
+<text xml:space="preserve" text-anchor="middle" x="2634.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A8</text>
 <text xml:space="preserve" text-anchor="middle" x="2634.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">Unexpected_Latrocinio (premise)</text>
 </a>
 </g>
@@ -490,9 +491,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A9 -->
 <g id="node10" class="node argnode status&#45;IN arg&#45;A9">
 <title>A9</title>
-<g id="a_node10"><a xlink:title="A9&#10;¬Obl_ManterCustodia (premise)">
+<g id="a_node10"><a xlink:title="R·A9&#10;¬Obl_ManterCustodia (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="2896.24" cy="-131.25" rx="120.56" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="2896.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">A9</text>
+<text xml:space="preserve" text-anchor="middle" x="2896.24" y="-132.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A9</text>
 <text xml:space="preserve" text-anchor="middle" x="2896.24" y="-120.8" font-family="Helvetica,sans-Serif" font-size="11.00">¬Obl_ManterCustodia (premise)</text>
 </a>
 </g>
@@ -500,9 +501,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A10 -->
 <g id="node11" class="node argnode status&#45;OUT arg&#45;A10">
 <title>A10</title>
-<g id="a_node11"><a xlink:title="A10&#10;[CaFa_FugaPreso_MorteVitima]&#10;cf2lrc_FugaPreso ⊢ LeReCa_FugaPreso_MorteVitima">
+<g id="a_node11"><a xlink:title="R·A10&#10;[CaFa_FugaPreso_MorteVitima]&#10;cf2lrc_FugaPreso ⊢ LeReCa_FugaPreso_MorteVitima">
 <path fill="#f6d6d6" stroke="#b71c1c" d="M3513.24,-46.25C3513.24,-46.25 3257.24,-46.25 3257.24,-46.25 3251.24,-46.25 3245.24,-40.25 3245.24,-34.25 3245.24,-34.25 3245.24,-12 3245.24,-12 3245.24,-6 3251.24,0 3257.24,0 3257.24,0 3513.24,0 3513.24,0 3519.24,0 3525.24,-6 3525.24,-12 3525.24,-12 3525.24,-34.25 3525.24,-34.25 3525.24,-40.25 3519.24,-46.25 3513.24,-46.25"/>
-<text xml:space="preserve" text-anchor="middle" x="3385.24" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">A10</text>
+<text xml:space="preserve" text-anchor="middle" x="3385.24" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">R·A10</text>
 <text xml:space="preserve" text-anchor="middle" x="3385.24" y="-19.8" font-family="Helvetica,sans-Serif" font-size="11.00">[CaFa_FugaPreso_MorteVitima]</text>
 <text xml:space="preserve" text-anchor="middle" x="3385.24" y="-7.8" font-family="Helvetica,sans-Serif" font-size="11.00">cf2lrc_FugaPreso ⊢ LeReCa_FugaPreso_MorteVitima</text>
 </a>
@@ -511,9 +512,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A11 -->
 <g id="node12" class="node argnode status&#45;IN arg&#45;A11">
 <title>A11</title>
-<g id="a_node12"><a xlink:title="A11&#10;[CaFa_PresoRegFech_MorteVitima]&#10;cf2lrc_PresoRegFech ⊢ LeReCa_PresoRegFech_MorteVitima">
+<g id="a_node12"><a xlink:title="R·A11&#10;[CaFa_PresoRegFech_MorteVitima]&#10;cf2lrc_PresoRegFech ⊢ LeReCa_PresoRegFech_MorteVitima">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M4321.74,-154.38C4321.74,-154.38 4026.74,-154.38 4026.74,-154.38 4020.74,-154.38 4014.74,-148.38 4014.74,-142.38 4014.74,-142.38 4014.74,-120.12 4014.74,-120.12 4014.74,-114.12 4020.74,-108.12 4026.74,-108.12 4026.74,-108.12 4321.74,-108.12 4321.74,-108.12 4327.74,-108.12 4333.74,-114.12 4333.74,-120.12 4333.74,-120.12 4333.74,-142.38 4333.74,-142.38 4333.74,-148.38 4327.74,-154.38 4321.74,-154.38"/>
-<text xml:space="preserve" text-anchor="middle" x="4174.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">A11</text>
+<text xml:space="preserve" text-anchor="middle" x="4174.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">R·A11</text>
 <text xml:space="preserve" text-anchor="middle" x="4174.24" y="-127.92" font-family="Helvetica,sans-Serif" font-size="11.00">[CaFa_PresoRegFech_MorteVitima]</text>
 <text xml:space="preserve" text-anchor="middle" x="4174.24" y="-115.92" font-family="Helvetica,sans-Serif" font-size="11.00">cf2lrc_PresoRegFech ⊢ LeReCa_PresoRegFech_MorteVitima</text>
 </a>
@@ -522,9 +523,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A12 -->
 <g id="node13" class="node argnode status&#45;IN arg&#45;A12">
 <title>A12</title>
-<g id="a_node13"><a xlink:title="A12&#10;[CaFa_Latrocinio_MorteVitima]&#10;cf2lrc_Latrocinio ⊢ LeReCa_Latrocinio_MorteVitima">
+<g id="a_node13"><a xlink:title="R·A12&#10;[CaFa_Latrocinio_MorteVitima]&#10;cf2lrc_Latrocinio ⊢ LeReCa_Latrocinio_MorteVitima">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M4606.49,-154.38C4606.49,-154.38 4363.99,-154.38 4363.99,-154.38 4357.99,-154.38 4351.99,-148.38 4351.99,-142.38 4351.99,-142.38 4351.99,-120.12 4351.99,-120.12 4351.99,-114.12 4357.99,-108.12 4363.99,-108.12 4363.99,-108.12 4606.49,-108.12 4606.49,-108.12 4612.49,-108.12 4618.49,-114.12 4618.49,-120.12 4618.49,-120.12 4618.49,-142.38 4618.49,-142.38 4618.49,-148.38 4612.49,-154.38 4606.49,-154.38"/>
-<text xml:space="preserve" text-anchor="middle" x="4485.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">A12</text>
+<text xml:space="preserve" text-anchor="middle" x="4485.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">R·A12</text>
 <text xml:space="preserve" text-anchor="middle" x="4485.24" y="-127.92" font-family="Helvetica,sans-Serif" font-size="11.00">[CaFa_Latrocinio_MorteVitima]</text>
 <text xml:space="preserve" text-anchor="middle" x="4485.24" y="-115.92" font-family="Helvetica,sans-Serif" font-size="11.00">cf2lrc_Latrocinio ⊢ LeReCa_Latrocinio_MorteVitima</text>
 </a>
@@ -533,9 +534,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A13 -->
 <g id="node14" class="node argnode status&#45;IN arg&#45;A13">
 <title>A13</title>
-<g id="a_node14"><a xlink:title="A13&#10;[Om_FugaPreso, ¬Obl_ManterCustodia]&#10;unom_FugaPreso ⊢ ¬cf2lrc_FugaPreso">
+<g id="a_node14"><a xlink:title="R·A13&#10;[Om_FugaPreso, ¬Obl_ManterCustodia]&#10;unom_FugaPreso ⊢ ¬cf2lrc_FugaPreso">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M3233.37,-154.38C3233.37,-154.38 3047.12,-154.38 3047.12,-154.38 3041.12,-154.38 3035.12,-148.38 3035.12,-142.38 3035.12,-142.38 3035.12,-120.12 3035.12,-120.12 3035.12,-114.12 3041.12,-108.12 3047.12,-108.12 3047.12,-108.12 3233.37,-108.12 3233.37,-108.12 3239.37,-108.12 3245.37,-114.12 3245.37,-120.12 3245.37,-120.12 3245.37,-142.38 3245.37,-142.38 3245.37,-148.38 3239.37,-154.38 3233.37,-154.38"/>
-<text xml:space="preserve" text-anchor="middle" x="3140.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">A13</text>
+<text xml:space="preserve" text-anchor="middle" x="3140.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">R·A13</text>
 <text xml:space="preserve" text-anchor="middle" x="3140.24" y="-127.92" font-family="Helvetica,sans-Serif" font-size="11.00">[Om_FugaPreso, ¬Obl_ManterCustodia]</text>
 <text xml:space="preserve" text-anchor="middle" x="3140.24" y="-115.92" font-family="Helvetica,sans-Serif" font-size="11.00">unom_FugaPreso ⊢ ¬cf2lrc_FugaPreso</text>
 </a>
@@ -544,7 +545,7 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A13&#45;&gt;A10 -->
 <g id="edge1" class="edge argedge type&#45;undercut defeat from&#45;A13 to&#45;A10">
 <title>A13&#45;&gt;A10</title>
-<g id="a_edge1"><a xlink:title="A13 undercuts A10 on rule cf2lrc_FugaPreso">
+<g id="a_edge1"><a xlink:title="R·A13 undercuts R·A10 on rule cf2lrc_FugaPreso">
 <path fill="none" stroke="#d17a00" stroke-width="2.2" stroke-dasharray="5,2" d="M3192.2,-107.74C3229.88,-91.42 3281.07,-69.25 3321.27,-51.84"/>
 <polygon fill="#d17a00" stroke="#d17a00" stroke-width="2.2" points="3322.52,-55.11 3330.31,-47.92 3319.74,-48.69 3322.52,-55.11"/>
 </a>
@@ -554,9 +555,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A14 -->
 <g id="node15" class="node argnode status&#45;IN arg&#45;A14">
 <title>A14</title>
-<g id="a_node15"><a xlink:title="A14&#10;[After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio]&#10;suca_Latrocinio ⊢ SupersedingCause_Latrocinio">
+<g id="a_node15"><a xlink:title="R·A14&#10;[After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio]&#10;suca_Latrocinio ⊢ SupersedingCause_Latrocinio">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M5358.12,-154.38C5358.12,-154.38 4648.37,-154.38 4648.37,-154.38 4642.37,-154.38 4636.37,-148.38 4636.37,-142.38 4636.37,-142.38 4636.37,-120.12 4636.37,-120.12 4636.37,-114.12 4642.37,-108.12 4648.37,-108.12 4648.37,-108.12 5358.12,-108.12 5358.12,-108.12 5364.12,-108.12 5370.12,-114.12 5370.12,-120.12 5370.12,-120.12 5370.12,-142.38 5370.12,-142.38 5370.12,-148.38 5364.12,-154.38 5358.12,-154.38"/>
-<text xml:space="preserve" text-anchor="middle" x="5003.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">A14</text>
+<text xml:space="preserve" text-anchor="middle" x="5003.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">R·A14</text>
 <text xml:space="preserve" text-anchor="middle" x="5003.24" y="-127.92" font-family="Helvetica,sans-Serif" font-size="11.00">[After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio]</text>
 <text xml:space="preserve" text-anchor="middle" x="5003.24" y="-115.92" font-family="Helvetica,sans-Serif" font-size="11.00">suca_Latrocinio ⊢ SupersedingCause_Latrocinio</text>
 </a>
@@ -565,9 +566,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A15 -->
 <g id="node16" class="node argnode status&#45;IN arg&#45;A15">
 <title>A15</title>
-<g id="a_node16"><a xlink:title="A15&#10;[After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio]&#10;suca_Latrocinio,sc_FugaPreso ⊢ ¬cf2lrc_FugaPreso">
+<g id="a_node16"><a xlink:title="R·A15&#10;[After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio]&#10;suca_Latrocinio,sc_FugaPreso ⊢ ¬cf2lrc_FugaPreso">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M3985.12,-154.38C3985.12,-154.38 3275.37,-154.38 3275.37,-154.38 3269.37,-154.38 3263.37,-148.38 3263.37,-142.38 3263.37,-142.38 3263.37,-120.12 3263.37,-120.12 3263.37,-114.12 3269.37,-108.12 3275.37,-108.12 3275.37,-108.12 3985.12,-108.12 3985.12,-108.12 3991.12,-108.12 3997.12,-114.12 3997.12,-120.12 3997.12,-120.12 3997.12,-142.38 3997.12,-142.38 3997.12,-148.38 3991.12,-154.38 3985.12,-154.38"/>
-<text xml:space="preserve" text-anchor="middle" x="3630.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">A15</text>
+<text xml:space="preserve" text-anchor="middle" x="3630.24" y="-139.93" font-family="Helvetica,sans-Serif" font-size="11.00">R·A15</text>
 <text xml:space="preserve" text-anchor="middle" x="3630.24" y="-127.92" font-family="Helvetica,sans-Serif" font-size="11.00">[After_Latrocinio_FugaPreso, ButFor_Latrocinio_MorteVitima, CaFa_FugaPreso_MorteVitima, CaFa_Latrocinio_MorteVitima, Unexpected_Latrocinio]</text>
 <text xml:space="preserve" text-anchor="middle" x="3630.24" y="-115.92" font-family="Helvetica,sans-Serif" font-size="11.00">suca_Latrocinio,sc_FugaPreso ⊢ ¬cf2lrc_FugaPreso</text>
 </a>
@@ -576,7 +577,7 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A15&#45;&gt;A10 -->
 <g id="edge2" class="edge argedge type&#45;undercut defeat from&#45;A15 to&#45;A10">
 <title>A15&#45;&gt;A10</title>
-<g id="a_edge2"><a xlink:title="A15 undercuts A10 on rule cf2lrc_FugaPreso">
+<g id="a_edge2"><a xlink:title="R·A15 undercuts R·A10 on rule cf2lrc_FugaPreso">
 <path fill="none" stroke="#d17a00" stroke-width="2.2" stroke-dasharray="5,2" d="M3578.29,-107.74C3540.61,-91.42 3489.42,-69.25 3449.22,-51.84"/>
 <polygon fill="#d17a00" stroke="#d17a00" stroke-width="2.2" points="3450.75,-48.69 3440.18,-47.92 3447.97,-55.11 3450.75,-48.69"/>
 </a>
@@ -624,9 +625,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A0 -->
 <g id="node1" class="node argnode status&#45;IN arg&#45;A0">
 <title>A0</title>
-<g id="a_node1"><a xlink:title="A0&#10;CrimeApos3M (premise)">
+<g id="a_node1"><a xlink:title="F·A0&#10;CrimeApos3M (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="94.58" cy="-42.5" rx="94.58" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="94.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">A0</text>
+<text xml:space="preserve" text-anchor="middle" x="94.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">F·A0</text>
 <text xml:space="preserve" text-anchor="middle" x="94.58" y="-32.05" font-family="Helvetica,sans-Serif" font-size="11.00">CrimeApos3M (premise)</text>
 </a>
 </g>
@@ -634,9 +635,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A1 -->
 <g id="node2" class="node argnode status&#45;IN arg&#45;A1">
 <title>A1</title>
-<g id="a_node2"><a xlink:title="A1&#10;DeverEspec (premise)">
+<g id="a_node2"><a xlink:title="F·A1&#10;DeverEspec (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="294.58" cy="-42.5" rx="87.68" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="294.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">A1</text>
+<text xml:space="preserve" text-anchor="middle" x="294.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">F·A1</text>
 <text xml:space="preserve" text-anchor="middle" x="294.58" y="-32.05" font-family="Helvetica,sans-Serif" font-size="11.00">DeverEspec (premise)</text>
 </a>
 </g>
@@ -644,9 +645,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A2 -->
 <g id="node3" class="node argnode status&#45;IN arg&#45;A2">
 <title>A2</title>
-<g id="a_node3"><a xlink:title="A2&#10;FormacaoQuad (premise)">
+<g id="a_node3"><a xlink:title="F·A2&#10;FormacaoQuad (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="498.58" cy="-42.5" rx="98.82" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="498.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">A2</text>
+<text xml:space="preserve" text-anchor="middle" x="498.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">F·A2</text>
 <text xml:space="preserve" text-anchor="middle" x="498.58" y="-32.05" font-family="Helvetica,sans-Serif" font-size="11.00">FormacaoQuad (premise)</text>
 </a>
 </g>
@@ -654,9 +655,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A3 -->
 <g id="node4" class="node argnode status&#45;IN arg&#45;A3">
 <title>A3</title>
-<g id="a_node4"><a xlink:title="A3&#10;FugaPreso (premise)">
+<g id="a_node4"><a xlink:title="F·A3&#10;FugaPreso (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="698.58" cy="-42.5" rx="83.44" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="698.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">A3</text>
+<text xml:space="preserve" text-anchor="middle" x="698.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">F·A3</text>
 <text xml:space="preserve" text-anchor="middle" x="698.58" y="-32.05" font-family="Helvetica,sans-Serif" font-size="11.00">FugaPreso (premise)</text>
 </a>
 </g>
@@ -664,9 +665,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A4 -->
 <g id="node5" class="node argnode status&#45;IN arg&#45;A4">
 <title>A4</title>
-<g id="a_node5"><a xlink:title="A4&#10;PresoRegFech (premise)">
+<g id="a_node5"><a xlink:title="F·A4&#10;PresoRegFech (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="897.58" cy="-42.5" rx="97.23" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="897.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">A4</text>
+<text xml:space="preserve" text-anchor="middle" x="897.58" y="-44.05" font-family="Helvetica,sans-Serif" font-size="11.00">F·A4</text>
 <text xml:space="preserve" text-anchor="middle" x="897.58" y="-32.05" font-family="Helvetica,sans-Serif" font-size="11.00">PresoRegFech (premise)</text>
 </a>
 </g>
@@ -674,9 +675,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5 -->
 <g id="node6" class="node argnode status&#45;IN arg&#45;A5">
 <title>A5</title>
-<g id="a_node6"><a xlink:title="A5&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0 ⊢ Latrocinio">
+<g id="a_node6"><a xlink:title="F·A5&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0 ⊢ Latrocinio">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M1220.2,-65.62C1220.2,-65.62 1024.95,-65.62 1024.95,-65.62 1018.95,-65.62 1012.95,-59.62 1012.95,-53.62 1012.95,-53.62 1012.95,-31.38 1012.95,-31.38 1012.95,-25.38 1018.95,-19.38 1024.95,-19.38 1024.95,-19.38 1220.2,-19.38 1220.2,-19.38 1226.2,-19.38 1232.2,-25.38 1232.2,-31.38 1232.2,-31.38 1232.2,-53.62 1232.2,-53.62 1232.2,-59.62 1226.2,-65.62 1220.2,-65.62"/>
-<text xml:space="preserve" text-anchor="middle" x="1122.58" y="-51.17" font-family="Helvetica,sans-Serif" font-size="11.00">A5</text>
+<text xml:space="preserve" text-anchor="middle" x="1122.58" y="-51.17" font-family="Helvetica,sans-Serif" font-size="11.00">F·A5</text>
 <text xml:space="preserve" text-anchor="middle" x="1122.58" y="-39.17" font-family="Helvetica,sans-Serif" font-size="11.00">[DeverEspec, FugaPreso, PresoRegFech]</text>
 <text xml:space="preserve" text-anchor="middle" x="1122.58" y="-27.18" font-family="Helvetica,sans-Serif" font-size="11.00">r0 ⊢ Latrocinio</text>
 </a>
@@ -685,9 +686,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A6 -->
 <g id="node7" class="node argnode status&#45;IN arg&#45;A6">
 <title>A6</title>
-<g id="a_node7"><a xlink:title="A6&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0,r1 ⊢ MorteVitima">
+<g id="a_node7"><a xlink:title="F·A6&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0,r1 ⊢ MorteVitima">
 <path fill="#d9f2d9" stroke="#2e7d32" d="M1457.2,-65.62C1457.2,-65.62 1261.95,-65.62 1261.95,-65.62 1255.95,-65.62 1249.95,-59.62 1249.95,-53.62 1249.95,-53.62 1249.95,-31.38 1249.95,-31.38 1249.95,-25.38 1255.95,-19.38 1261.95,-19.38 1261.95,-19.38 1457.2,-19.38 1457.2,-19.38 1463.2,-19.38 1469.2,-25.38 1469.2,-31.38 1469.2,-31.38 1469.2,-53.62 1469.2,-53.62 1469.2,-59.62 1463.2,-65.62 1457.2,-65.62"/>
-<text xml:space="preserve" text-anchor="middle" x="1359.58" y="-51.17" font-family="Helvetica,sans-Serif" font-size="11.00">A6</text>
+<text xml:space="preserve" text-anchor="middle" x="1359.58" y="-51.17" font-family="Helvetica,sans-Serif" font-size="11.00">F·A6</text>
 <text xml:space="preserve" text-anchor="middle" x="1359.58" y="-39.17" font-family="Helvetica,sans-Serif" font-size="11.00">[DeverEspec, FugaPreso, PresoRegFech]</text>
 <text xml:space="preserve" text-anchor="middle" x="1359.58" y="-27.18" font-family="Helvetica,sans-Serif" font-size="11.00">r0,r1 ⊢ MorteVitima</text>
 </a>
@@ -741,9 +742,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A0 -->
 <g id="node1" class="node argnode status&#45;IN arg&#45;A0">
 <title>A0</title>
-<g id="a_node1"><a xlink:title="A0&#10;CrimeApos3M (premise)">
+<g id="a_node1"><a xlink:title="F·A0&#10;CrimeApos3M (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="94.58" cy="-120" rx="94.58" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="94.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A0</text>
+<text xml:space="preserve" text-anchor="middle" x="94.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A0</text>
 <text xml:space="preserve" text-anchor="middle" x="94.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">CrimeApos3M (premise)</text>
 </a>
 </g>
@@ -751,9 +752,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A1 -->
 <g id="node2" class="node argnode status&#45;IN arg&#45;A1">
 <title>A1</title>
-<g id="a_node2"><a xlink:title="A1&#10;DeverEspec (premise)">
+<g id="a_node2"><a xlink:title="F·A1&#10;DeverEspec (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="294.58" cy="-120" rx="87.68" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="294.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A1</text>
+<text xml:space="preserve" text-anchor="middle" x="294.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A1</text>
 <text xml:space="preserve" text-anchor="middle" x="294.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">DeverEspec (premise)</text>
 </a>
 </g>
@@ -761,9 +762,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A2 -->
 <g id="node3" class="node argnode status&#45;IN arg&#45;A2">
 <title>A2</title>
-<g id="a_node3"><a xlink:title="A2&#10;FormacaoQuad (premise)">
+<g id="a_node3"><a xlink:title="F·A2&#10;FormacaoQuad (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="498.58" cy="-120" rx="98.82" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="498.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A2</text>
+<text xml:space="preserve" text-anchor="middle" x="498.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A2</text>
 <text xml:space="preserve" text-anchor="middle" x="498.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">FormacaoQuad (premise)</text>
 </a>
 </g>
@@ -771,9 +772,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A3 -->
 <g id="node4" class="node argnode status&#45;OUT arg&#45;A3">
 <title>A3</title>
-<g id="a_node4"><a xlink:title="A3&#10;FugaPreso (premise)">
+<g id="a_node4"><a xlink:title="F·A3&#10;FugaPreso (premise)">
 <ellipse fill="#f6d6d6" stroke="#b71c1c" cx="492.58" cy="-23.12" rx="83.44" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="492.58" y="-24.68" font-family="Helvetica,sans-Serif" font-size="11.00">A3</text>
+<text xml:space="preserve" text-anchor="middle" x="492.58" y="-24.68" font-family="Helvetica,sans-Serif" font-size="11.00">F·A3</text>
 <text xml:space="preserve" text-anchor="middle" x="492.58" y="-12.68" font-family="Helvetica,sans-Serif" font-size="11.00">FugaPreso (premise)</text>
 </a>
 </g>
@@ -781,9 +782,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A4 -->
 <g id="node5" class="node argnode status&#45;IN arg&#45;A4">
 <title>A4</title>
-<g id="a_node5"><a xlink:title="A4&#10;PresoRegFech (premise)">
+<g id="a_node5"><a xlink:title="F·A4&#10;PresoRegFech (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="906.58" cy="-120" rx="97.23" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="906.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A4</text>
+<text xml:space="preserve" text-anchor="middle" x="906.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A4</text>
 <text xml:space="preserve" text-anchor="middle" x="906.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">PresoRegFech (premise)</text>
 </a>
 </g>
@@ -791,9 +792,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5 -->
 <g id="node6" class="node argnode status&#45;IN arg&#45;A5">
 <title>A5</title>
-<g id="a_node6"><a xlink:title="A5&#10;¬FugaPreso (premise)">
+<g id="a_node6"><a xlink:title="F·A5&#10;¬FugaPreso (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="703.58" cy="-120" rx="88.21" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="703.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A5</text>
+<text xml:space="preserve" text-anchor="middle" x="703.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A5</text>
 <text xml:space="preserve" text-anchor="middle" x="703.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">¬FugaPreso (premise)</text>
 </a>
 </g>
@@ -801,7 +802,7 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5&#45;&gt;A3 -->
 <g id="edge1" class="edge argedge type&#45;undermine defeat from&#45;A5 to&#45;A3">
 <title>A5&#45;&gt;A3</title>
-<g id="a_edge1"><a xlink:title="A5 undermines A3 on FugaPreso">
+<g id="a_edge1"><a xlink:title="F·A5 undermines F·A3 on FugaPreso">
 <path fill="none" stroke="#7030a0" stroke-width="2.2" stroke-dasharray="1,5" d="M660.88,-99.8C627.91,-84.98 582.09,-64.38 546.58,-48.41"/>
 <polygon fill="#7030a0" stroke="#7030a0" stroke-width="2.2" points="548.08,-45.25 537.53,-44.34 545.21,-51.63 548.08,-45.25"/>
 </a>
@@ -811,9 +812,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A6 -->
 <g id="node7" class="node argnode status&#45;OUT arg&#45;A6">
 <title>A6</title>
-<g id="a_node7"><a xlink:title="A6&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0 ⊢ Latrocinio">
+<g id="a_node7"><a xlink:title="F·A6&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0 ⊢ Latrocinio">
 <path fill="#f6d6d6" stroke="#b71c1c" d="M801.2,-46.25C801.2,-46.25 605.95,-46.25 605.95,-46.25 599.95,-46.25 593.95,-40.25 593.95,-34.25 593.95,-34.25 593.95,-12 593.95,-12 593.95,-6 599.95,0 605.95,0 605.95,0 801.2,0 801.2,0 807.2,0 813.2,-6 813.2,-12 813.2,-12 813.2,-34.25 813.2,-34.25 813.2,-40.25 807.2,-46.25 801.2,-46.25"/>
-<text xml:space="preserve" text-anchor="middle" x="703.58" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">A6</text>
+<text xml:space="preserve" text-anchor="middle" x="703.58" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">F·A6</text>
 <text xml:space="preserve" text-anchor="middle" x="703.58" y="-19.8" font-family="Helvetica,sans-Serif" font-size="11.00">[DeverEspec, FugaPreso, PresoRegFech]</text>
 <text xml:space="preserve" text-anchor="middle" x="703.58" y="-7.8" font-family="Helvetica,sans-Serif" font-size="11.00">r0 ⊢ Latrocinio</text>
 </a>
@@ -822,7 +823,7 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5&#45;&gt;A6 -->
 <g id="edge2" class="edge argedge type&#45;undermine defeat from&#45;A5 to&#45;A6">
 <title>A5&#45;&gt;A6</title>
-<g id="a_edge2"><a xlink:title="A5 undermines A6 on FugaPreso">
+<g id="a_edge2"><a xlink:title="F·A5 undermines F·A6 on FugaPreso">
 <path fill="none" stroke="#7030a0" stroke-width="2.2" stroke-dasharray="1,5" d="M703.58,-97C703.58,-85.9 703.58,-72.17 703.58,-59.63"/>
 <polygon fill="#7030a0" stroke="#7030a0" stroke-width="2.2" points="707.08,-60 703.58,-50 700.08,-60 707.08,-60"/>
 </a>
@@ -832,9 +833,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A7 -->
 <g id="node8" class="node argnode status&#45;OUT arg&#45;A7">
 <title>A7</title>
-<g id="a_node8"><a xlink:title="A7&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0,r1 ⊢ MorteVitima">
+<g id="a_node8"><a xlink:title="F·A7&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0,r1 ⊢ MorteVitima">
 <path fill="#f6d6d6" stroke="#b71c1c" d="M1038.2,-46.25C1038.2,-46.25 842.95,-46.25 842.95,-46.25 836.95,-46.25 830.95,-40.25 830.95,-34.25 830.95,-34.25 830.95,-12 830.95,-12 830.95,-6 836.95,0 842.95,0 842.95,0 1038.2,0 1038.2,0 1044.2,0 1050.2,-6 1050.2,-12 1050.2,-12 1050.2,-34.25 1050.2,-34.25 1050.2,-40.25 1044.2,-46.25 1038.2,-46.25"/>
-<text xml:space="preserve" text-anchor="middle" x="940.58" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">A7</text>
+<text xml:space="preserve" text-anchor="middle" x="940.58" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">F·A7</text>
 <text xml:space="preserve" text-anchor="middle" x="940.58" y="-19.8" font-family="Helvetica,sans-Serif" font-size="11.00">[DeverEspec, FugaPreso, PresoRegFech]</text>
 <text xml:space="preserve" text-anchor="middle" x="940.58" y="-7.8" font-family="Helvetica,sans-Serif" font-size="11.00">r0,r1 ⊢ MorteVitima</text>
 </a>
@@ -843,7 +844,7 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5&#45;&gt;A7 -->
 <g id="edge3" class="edge argedge type&#45;undermine defeat from&#45;A5 to&#45;A7">
 <title>A5&#45;&gt;A7</title>
-<g id="a_edge3"><a xlink:title="A5 undermines A7 on FugaPreso">
+<g id="a_edge3"><a xlink:title="F·A5 undermines F·A7 on FugaPreso">
 <path fill="none" stroke="#7030a0" stroke-width="2.2" stroke-dasharray="1,5" d="M750.12,-100.37C784.78,-86.49 832.68,-67.32 871.76,-51.67"/>
 <polygon fill="#7030a0" stroke="#7030a0" stroke-width="2.2" points="873.04,-54.93 881.02,-47.96 870.44,-48.43 873.04,-54.93"/>
 </a>
@@ -882,9 +883,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A0 -->
 <g id="node1" class="node argnode status&#45;IN arg&#45;A0">
 <title>A0</title>
-<g id="a_node1"><a xlink:title="A0&#10;CrimeApos3M (premise)">
+<g id="a_node1"><a xlink:title="F·A0&#10;CrimeApos3M (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="94.58" cy="-120" rx="94.58" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="94.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A0</text>
+<text xml:space="preserve" text-anchor="middle" x="94.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A0</text>
 <text xml:space="preserve" text-anchor="middle" x="94.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">CrimeApos3M (premise)</text>
 </a>
 </g>
@@ -892,9 +893,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A1 -->
 <g id="node2" class="node argnode status&#45;IN arg&#45;A1">
 <title>A1</title>
-<g id="a_node2"><a xlink:title="A1&#10;DeverEspec (premise)">
+<g id="a_node2"><a xlink:title="F·A1&#10;DeverEspec (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="294.58" cy="-120" rx="87.68" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="294.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A1</text>
+<text xml:space="preserve" text-anchor="middle" x="294.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A1</text>
 <text xml:space="preserve" text-anchor="middle" x="294.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">DeverEspec (premise)</text>
 </a>
 </g>
@@ -902,9 +903,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A2 -->
 <g id="node3" class="node argnode status&#45;IN arg&#45;A2">
 <title>A2</title>
-<g id="a_node3"><a xlink:title="A2&#10;FormacaoQuad (premise)">
+<g id="a_node3"><a xlink:title="F·A2&#10;FormacaoQuad (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="498.58" cy="-120" rx="98.82" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="498.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A2</text>
+<text xml:space="preserve" text-anchor="middle" x="498.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A2</text>
 <text xml:space="preserve" text-anchor="middle" x="498.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">FormacaoQuad (premise)</text>
 </a>
 </g>
@@ -912,9 +913,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A3 -->
 <g id="node4" class="node argnode status&#45;IN arg&#45;A3">
 <title>A3</title>
-<g id="a_node4"><a xlink:title="A3&#10;FugaPreso (premise)">
+<g id="a_node4"><a xlink:title="F·A3&#10;FugaPreso (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="698.58" cy="-120" rx="83.44" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="698.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A3</text>
+<text xml:space="preserve" text-anchor="middle" x="698.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A3</text>
 <text xml:space="preserve" text-anchor="middle" x="698.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">FugaPreso (premise)</text>
 </a>
 </g>
@@ -922,9 +923,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A4 -->
 <g id="node5" class="node argnode status&#45;IN arg&#45;A4">
 <title>A4</title>
-<g id="a_node5"><a xlink:title="A4&#10;PresoRegFech (premise)">
+<g id="a_node5"><a xlink:title="F·A4&#10;PresoRegFech (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="897.58" cy="-120" rx="97.23" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="897.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A4</text>
+<text xml:space="preserve" text-anchor="middle" x="897.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A4</text>
 <text xml:space="preserve" text-anchor="middle" x="897.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">PresoRegFech (premise)</text>
 </a>
 </g>
@@ -932,9 +933,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5 -->
 <g id="node6" class="node argnode status&#45;IN arg&#45;A5">
 <title>A5</title>
-<g id="a_node6"><a xlink:title="A5&#10;¬Latrocinio (premise)">
+<g id="a_node6"><a xlink:title="F·A5&#10;¬Latrocinio (premise)">
 <ellipse fill="#d9f2d9" stroke="#2e7d32" cx="1096.58" cy="-120" rx="83.44" ry="22.63"/>
-<text xml:space="preserve" text-anchor="middle" x="1096.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">A5</text>
+<text xml:space="preserve" text-anchor="middle" x="1096.58" y="-121.55" font-family="Helvetica,sans-Serif" font-size="11.00">F·A5</text>
 <text xml:space="preserve" text-anchor="middle" x="1096.58" y="-109.55" font-family="Helvetica,sans-Serif" font-size="11.00">¬Latrocinio (premise)</text>
 </a>
 </g>
@@ -942,9 +943,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A6 -->
 <g id="node7" class="node argnode status&#45;OUT arg&#45;A6">
 <title>A6</title>
-<g id="a_node7"><a xlink:title="A6&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0 ⊢ Latrocinio">
+<g id="a_node7"><a xlink:title="F·A6&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0 ⊢ Latrocinio">
 <path fill="#f6d6d6" stroke="#b71c1c" d="M1075.2,-46.25C1075.2,-46.25 879.95,-46.25 879.95,-46.25 873.95,-46.25 867.95,-40.25 867.95,-34.25 867.95,-34.25 867.95,-12 867.95,-12 867.95,-6 873.95,0 879.95,0 879.95,0 1075.2,0 1075.2,0 1081.2,0 1087.2,-6 1087.2,-12 1087.2,-12 1087.2,-34.25 1087.2,-34.25 1087.2,-40.25 1081.2,-46.25 1075.2,-46.25"/>
-<text xml:space="preserve" text-anchor="middle" x="977.58" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">A6</text>
+<text xml:space="preserve" text-anchor="middle" x="977.58" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">F·A6</text>
 <text xml:space="preserve" text-anchor="middle" x="977.58" y="-19.8" font-family="Helvetica,sans-Serif" font-size="11.00">[DeverEspec, FugaPreso, PresoRegFech]</text>
 <text xml:space="preserve" text-anchor="middle" x="977.58" y="-7.8" font-family="Helvetica,sans-Serif" font-size="11.00">r0 ⊢ Latrocinio</text>
 </a>
@@ -953,7 +954,7 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5&#45;&gt;A6 -->
 <g id="edge1" class="edge argedge type&#45;rebut defeat from&#45;A5 to&#45;A6">
 <title>A5&#45;&gt;A6</title>
-<g id="a_edge1"><a xlink:title="A5 rebuts A6 on Latrocinio">
+<g id="a_edge1"><a xlink:title="F·A5 rebuts F·A6 on Latrocinio">
 <path fill="none" stroke="#c0392b" stroke-width="2.2" d="M1070.46,-98.18C1054.52,-85.47 1033.86,-69 1016.07,-54.81"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="2.2" points="1018.31,-52.13 1008.31,-48.63 1013.95,-57.6 1018.31,-52.13"/>
 </a>
@@ -963,9 +964,9 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A7 -->
 <g id="node8" class="node argnode status&#45;OUT arg&#45;A7">
 <title>A7</title>
-<g id="a_node8"><a xlink:title="A7&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0,r1 ⊢ MorteVitima">
+<g id="a_node8"><a xlink:title="F·A7&#10;[DeverEspec, FugaPreso, PresoRegFech]&#10;r0,r1 ⊢ MorteVitima">
 <path fill="#f6d6d6" stroke="#b71c1c" d="M1312.2,-46.25C1312.2,-46.25 1116.95,-46.25 1116.95,-46.25 1110.95,-46.25 1104.95,-40.25 1104.95,-34.25 1104.95,-34.25 1104.95,-12 1104.95,-12 1104.95,-6 1110.95,0 1116.95,0 1116.95,0 1312.2,0 1312.2,0 1318.2,0 1324.2,-6 1324.2,-12 1324.2,-12 1324.2,-34.25 1324.2,-34.25 1324.2,-40.25 1318.2,-46.25 1312.2,-46.25"/>
-<text xml:space="preserve" text-anchor="middle" x="1214.58" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">A7</text>
+<text xml:space="preserve" text-anchor="middle" x="1214.58" y="-31.8" font-family="Helvetica,sans-Serif" font-size="11.00">F·A7</text>
 <text xml:space="preserve" text-anchor="middle" x="1214.58" y="-19.8" font-family="Helvetica,sans-Serif" font-size="11.00">[DeverEspec, FugaPreso, PresoRegFech]</text>
 <text xml:space="preserve" text-anchor="middle" x="1214.58" y="-7.8" font-family="Helvetica,sans-Serif" font-size="11.00">r0,r1 ⊢ MorteVitima</text>
 </a>
@@ -974,7 +975,7 @@ versão viva, com abas e glossário ao passar o mouse, rode
 <!-- A5&#45;&gt;A7 -->
 <g id="edge2" class="edge argedge type&#45;rebut defeat from&#45;A5 to&#45;A7">
 <title>A5&#45;&gt;A7</title>
-<g id="a_edge2"><a xlink:title="A5 rebuts A7 on Latrocinio">
+<g id="a_edge2"><a xlink:title="F·A5 rebuts F·A7 on Latrocinio">
 <path fill="none" stroke="#c0392b" stroke-width="2.2" d="M1122.47,-98.18C1138.35,-85.41 1158.96,-68.84 1176.66,-54.61"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="2.2" points="1178.49,-57.63 1184.09,-48.64 1174.1,-52.18 1178.49,-57.63"/>
 </a>
@@ -1133,7 +1134,7 @@ A fuga deixa de ser fator determinante para o dano diante do lapso temporal e da
 <!-- unom_FugaPreso&#45;&gt;cf2lrc_FugaPreso -->
 <g id="edge11" class="edge argedge defeat from&#45;unom_FugaPreso to&#45;cf2lrc_FugaPreso">
 <title>unom_FugaPreso&#45;&gt;cf2lrc_FugaPreso</title>
-<g id="a_edge11"><a xlink:title="unom_FugaPreso afasta cf2lrc_FugaPreso">
+<g id="a_edge11"><a xlink:title="unom_FugaPreso afasta cf2lrc_FugaPreso&#10;&#10;Voto divergente → comum">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M343.23,-595.58C390.71,-568.17 450.48,-532.05 457,-520.25 535.87,-377.5 421.76,-182.71 362.25,-97.19"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="364.61,-95.68 357.72,-90.75 360.04,-98.91 364.61,-95.68"/>
 </a>
@@ -1178,7 +1179,7 @@ A fuga deixa de ser fator determinante para o dano diante do lapso temporal e da
 <!-- sc_FugaPreso&#45;&gt;cf2lrc_FugaPreso -->
 <g id="edge12" class="edge argedge defeat from&#45;sc_FugaPreso to&#45;cf2lrc_FugaPreso">
 <title>sc_FugaPreso&#45;&gt;cf2lrc_FugaPreso</title>
-<g id="a_edge12"><a xlink:title="sc_FugaPreso afasta cf2lrc_FugaPreso">
+<g id="a_edge12"><a xlink:title="sc_FugaPreso afasta cf2lrc_FugaPreso&#10;&#10;Voto divergente → comum">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M359.6,-437.19C360.6,-429.33 361.48,-421.05 362,-413.3 365.7,-357.6 365.79,-343.39 362,-287.7 357.57,-222.68 346.29,-148.19 338.38,-101.11"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="341.15,-100.73 337.05,-93.31 335.63,-101.67 341.15,-100.73"/>
 </a>
@@ -1213,7 +1214,7 @@ A fuga deixa de ser fator determinante para o dano diante do lapso temporal e da
 <!-- r2&#45;&gt;r0 -->
 <g id="edge9" class="edge argedge defeat from&#45;r2 to&#45;r0">
 <title>r2&#45;&gt;r0</title>
-<g id="a_edge9"><a xlink:title="r2 afasta r0">
+<g id="a_edge9"><a xlink:title="r2 afasta r0&#10;&#10;Recorrente → Recorrido">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M145.48,-296.65C151.19,-282.53 156.98,-264.91 161.52,-248.26"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="164.18,-249.15 163.48,-240.7 158.76,-247.74 164.18,-249.15"/>
 </a>
@@ -1233,7 +1234,7 @@ A fuga deixa de ser fator determinante para o dano diante do lapso temporal e da
 <!-- r3&#45;&gt;r0 -->
 <g id="edge10" class="edge argedge defeat from&#45;r3 to&#45;r0">
 <title>r3&#45;&gt;r0</title>
-<g id="a_edge10"><a xlink:title="r3 afasta r0">
+<g id="a_edge10"><a xlink:title="r3 afasta r0&#10;&#10;Recorrente → Recorrido">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M259.76,-297.61C245.64,-281.82 227.42,-261.42 210.87,-242.89"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="213.13,-241.22 205.71,-237.12 208.95,-244.95 213.13,-241.22"/>
 </a>
@@ -1304,10 +1305,105 @@ A fuga deixa de ser fator determinante para o dano diante do lapso temporal e da
   <code>R·</code> na de relevância jurídica, porque as duas numeram por conta
   própria e um <code>A17</code> solto nomearia dois argumentos diferentes.
   <em>(sem argumento)</em> quer dizer que os antecedentes nunca foram
-  satisfeitos, o que é diferente de a regra ter sido afastada. Passe o mouse
-  para ver a regra completa, a sua leitura e a situação de cada argumento; as
-  duas tabelas abaixo trazem tudo por extenso.</p>
+  satisfeitos, o que é diferente de a regra ter sido afastada.</p>
+  <p class="legend-note">Seta vermelha <strong>tracejada</strong> apontando
+  para a borda de uma caixa: a regra atacada é sustentada também por aquela
+  perspectiva, e o ataque a atinge do mesmo jeito. Ela existe porque um nó
+  mora numa caixa só — a do primeiro titular, e as partes vêm antes dos
+  adjudicadores nessa ordem —, de modo que sem ela um ataque de um ministro à
+  tese de outro apareceria como ataque a uma parte. Ponta vazada: as duas
+  pontas são adjudicadores. Para ver esse embate sem as regras no meio, veja
+  o grafo <em>Quem enfrenta quem</em>, mais abaixo.</p>
 
+
+  <h4>Quem ataca quem</h4>
+  
+  <div class="graph-wrap"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0 (20250608.1624)
+ -->
+<!-- Title: Confrontos Pages: 1 -->
+<svg width="323pt" height="346pt"
+ viewBox="0.00 0.00 323.00 346.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 341.75)">
+<title>Confrontos</title>
+<text xml:space="preserve" text-anchor="middle" x="157.5" y="-319.5" font-family="Helvetica,sans-Serif" font-size="15.00" fill="#8a8a8a">Quem enfrenta quem</text>
+<g id="clust1" class="cluster">
+<title>cluster_c_ADJUDICADORES</title>
+<polygon fill="none" stroke="#bbbbbb" stroke-dasharray="5,2" points="8,-8 8,-225 142.75,-225 142.75,-8 8,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="68.5" y="-209.6" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#8a8a8a">ADJUDICADORES</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_c_PARTES</title>
+<polygon fill="none" stroke="#bbbbbb" stroke-dasharray="5,2" points="32.38,-233 32.38,-306 307,-306 307,-233 32.38,-233"/>
+<text xml:space="preserve" text-anchor="middle" x="64" y="-290.6" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#8a8a8a">PARTES</text>
+</g>
+<!-- relator -->
+<g id="node1" class="node">
+<title>relator</title>
+<path fill="#eef2fb" stroke="#666666" d="M90.38,-52C90.38,-52 60.38,-52 60.38,-52 54.38,-52 48.38,-46 48.38,-40 48.38,-40 48.38,-28 48.38,-28 48.38,-22 54.38,-16 60.38,-16 60.38,-16 90.38,-16 90.38,-16 96.38,-16 102.38,-22 102.38,-28 102.38,-28 102.38,-40 102.38,-40 102.38,-46 96.38,-52 90.38,-52"/>
+<text xml:space="preserve" text-anchor="middle" x="75.38" y="-29.55" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#222222">Relator</text>
+</g>
+<!-- voto_divergente -->
+<g id="node2" class="node">
+<title>voto_divergente</title>
+<path fill="#eef2fb" stroke="#666666" d="M108.88,-124C108.88,-124 41.88,-124 41.88,-124 35.88,-124 29.88,-118 29.88,-112 29.88,-112 29.88,-100 29.88,-100 29.88,-94 35.88,-88 41.88,-88 41.88,-88 108.88,-88 108.88,-88 114.88,-88 120.88,-94 120.88,-100 120.88,-100 120.88,-112 120.88,-112 120.88,-118 114.88,-124 108.88,-124"/>
+<text xml:space="preserve" text-anchor="middle" x="75.38" y="-101.55" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#222222">Voto divergente</text>
+</g>
+<!-- comum -->
+<g id="node6" class="node">
+<title>comum</title>
+<path fill="#666666" stroke="#666666" d="M282.38,-124C282.38,-124 252.38,-124 252.38,-124 246.38,-124 240.38,-118 240.38,-112 240.38,-112 240.38,-100 240.38,-100 240.38,-94 246.38,-88 252.38,-88 252.38,-88 282.38,-88 282.38,-88 288.38,-88 294.38,-94 294.38,-100 294.38,-100 294.38,-112 294.38,-112 294.38,-118 288.38,-124 282.38,-124"/>
+<text xml:space="preserve" text-anchor="middle" x="267.38" y="-101.55" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#222222">comum</text>
+</g>
+<!-- voto_divergente&#45;&gt;comum -->
+<g id="edge2" class="edge argedge confronto from&#45;voto_divergente to&#45;comum">
+<title>voto_divergente&#45;&gt;comum</title>
+<g id="a_edge2"><a xlink:title="Voto divergente → comum (fase de decisão): unom_FugaPreso ⇏ cf2lrc_FugaPreso, sc_FugaPreso ⇏ cf2lrc_FugaPreso">
+<path fill="none" stroke="#b0b0b0" stroke-dasharray="5,2" d="M120.92,-106C154.42,-106 199.71,-106 230.8,-106"/>
+<polygon fill="#b0b0b0" stroke="#b0b0b0" points="230.45,-108.8 238.45,-106 230.45,-103.2 230.45,-108.8"/>
+</a>
+</g>
+</g>
+<!-- stf_final -->
+<g id="node3" class="node">
+<title>stf_final</title>
+<path fill="#eef2fb" stroke="#666666" d="M122.75,-196C122.75,-196 28,-196 28,-196 22,-196 16,-190 16,-184 16,-184 16,-172 16,-172 16,-166 22,-160 28,-160 28,-160 122.75,-160 122.75,-160 128.75,-160 134.75,-166 134.75,-172 134.75,-172 134.75,-184 134.75,-184 134.75,-190 128.75,-196 122.75,-196"/>
+<text xml:space="preserve" text-anchor="middle" x="75.38" y="-173.55" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#222222">Posição final da corte</text>
+</g>
+<!-- recorrente -->
+<g id="node4" class="node">
+<title>recorrente</title>
+<path fill="#ffffff" stroke="#666666" d="M98.38,-277C98.38,-277 52.38,-277 52.38,-277 46.38,-277 40.38,-271 40.38,-265 40.38,-265 40.38,-253 40.38,-253 40.38,-247 46.38,-241 52.38,-241 52.38,-241 98.38,-241 98.38,-241 104.38,-241 110.38,-247 110.38,-253 110.38,-253 110.38,-265 110.38,-265 110.38,-271 104.38,-277 98.38,-277"/>
+<text xml:space="preserve" text-anchor="middle" x="75.38" y="-254.55" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#222222">Recorrente</text>
+</g>
+<!-- recorrido -->
+<g id="node5" class="node">
+<title>recorrido</title>
+<path fill="#ffffff" stroke="#666666" d="M287,-277C287,-277 247.75,-277 247.75,-277 241.75,-277 235.75,-271 235.75,-265 235.75,-265 235.75,-253 235.75,-253 235.75,-247 241.75,-241 247.75,-241 247.75,-241 287,-241 287,-241 293,-241 299,-247 299,-253 299,-253 299,-265 299,-265 299,-271 293,-277 287,-277"/>
+<text xml:space="preserve" text-anchor="middle" x="267.38" y="-254.55" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#222222">Recorrido</text>
+</g>
+<!-- recorrente&#45;&gt;recorrido -->
+<g id="edge1" class="edge argedge confronto from&#45;recorrente to&#45;recorrido">
+<title>recorrente&#45;&gt;recorrido</title>
+<g id="a_edge1"><a xlink:title="Recorrente → Recorrido (fase de argumentação): r2 ⇏ r0, r3 ⇏ r0">
+<path fill="none" stroke="#b0b0b0" stroke-dasharray="5,2" d="M110.78,-259C143.24,-259 191.88,-259 226.12,-259"/>
+<polygon fill="#b0b0b0" stroke="#b0b0b0" points="225.86,-261.8 233.86,-259 225.86,-256.2 225.86,-261.8"/>
+</a>
+</g>
+</g>
+</g>
+</svg>
+</div>
+  <p class="legend-note">Um nó por perspectiva, uma aresta por confronto, lida
+  pelos <strong>titulares</strong> das regras e não pelas caixas do mapa acima.
+  Aresta vermelha cheia: confronto <strong>entre adjudicadores</strong> — é
+  nele que a fase de decisão acontece, e é o que o mapa de regras não consegue
+  desenhar, porque lá a regra atacada mora numa caixa só. Aresta cinza
+  tracejada: confronto em que ao menos uma ponta é parte.</p>
+
+  <p class="lead">Cada par de perspectivas que se enfrenta, lido pelas regras que cada uma sustenta — não pelas caixas do mapa. Uma regra que três vozes sustentam produz três confrontos, e eles não são todos da mesma natureza: <code>dvesp_q0 ⤅ dvgen_q2</code> é o recorrido respondendo ao dissenso na fase de argumentação <em>e</em> o relator respondendo na fase de decisão, conforme o titular de que se lê.</p><p class="lead">Nenhum confronto entre adjudicadores: a fase de decisão deste caso não tem juiz contra juiz.</p><table><thead><tr><th>Ataca</th><th>Quem</th><th>Fase</th><th>Por quais regras</th><th></th></tr></thead><tbody><tr class=""><td><strong>Recorrente</strong></td><td>Recorrido</td><td>argumentação</td><td class="mono">r2 ⇏ r0, r3 ⇏ r0</td><td></td></tr><tr class=""><td><strong>Voto divergente</strong></td><td>comum</td><td>decisão</td><td class="mono">unom_FugaPreso ⇏ cf2lrc_FugaPreso, sc_FugaPreso ⇏ cf2lrc_FugaPreso</td><td></td></tr></tbody></table>
 
   <h4>Legenda das regras</h4>
   <p class="lead">O que cada elipse do mapa diz por extenso. <em>Argumentos</em> lista o que o solver de fato construiu com a regra — vazio quer dizer que os antecedentes nunca foram satisfeitos, que é diferente de a regra ter sido afastada. <em>Força</em> só aparece quando o caso declara pesos (aba <em>Pesos</em>).</p><table><thead><tr><th>Regra</th><th>Corpo</th><th>Leitura</th><th>Quem sustenta</th><th>Argumentos</th><th>Força</th><th>Situação</th></tr></thead><tbody><tr class="case-row"><td colspan="7"><strong>Camada de causa de fato</strong></td></tr><tr><td class="mono">r0</td><td class="mono">FugaPreso AND DeverEspec AND PresoRegFech =&gt; Latrocinio</td><td>A fuga do detento, que estava sob o dever específico de custódia do Estado por cumprir pena em regime fechado, foi a causa do latrocínio.</td><td>Recorrido</td><td class="mono">F·A5</td><td class="num">—</td><td><span class="badge status-IN">de pé</span></td></tr><tr><td class="mono">r1</td><td class="mono">Latrocinio =&gt; MorteVitima</td><td>O latrocínio cometido pelo foragido resultou na morte da vítima.</td><td>incontroverso (todas)</td><td class="mono">F·A6</td><td class="num">—</td><td><span class="badge status-IN">de pé</span></td></tr><tr><td class="mono">r2</td><td class="mono">ProvaMedidas =&gt; ¬r0</td><td>Se o Estado provou ter adotado as medidas cabíveis para evitar a fuga, a regra que o responsabiliza pelo crime do foragido não se aplica.</td><td>Recorrente</td><td class="mono">—</td><td class="num">—</td><td><span class="badge status-UNDEC">não disparou</span></td></tr><tr><td class="mono">r3</td><td class="mono">PrvFatoTerc =&gt; ¬r0</td><td>Se o Estado provou que a própria falha na custódia resultou de um fato de terceiro, ele não pode ser responsabilizado pelo crime posterior.</td><td>Recorrente</td><td class="mono">—</td><td class="num">—</td><td><span class="badge status-UNDEC">não disparou</span></td></tr><tr class="case-row"><td colspan="7"><strong>Camada de relevância jurídica</strong></td></tr><tr><td class="mono">cf2lrc_FugaPreso</td><td class="mono">CaFa_FugaPreso_MorteVitima =&gt; LeReCa_FugaPreso_MorteVitima</td><td>A fuga do preso, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.</td><td>incontroverso (todas)</td><td class="mono">R·A10</td><td class="num">—</td><td><span class="badge status-OUT">não sobreviveu</span></td></tr><tr><td class="mono">cf2lrc_PresoRegFech</td><td class="mono">CaFa_PresoRegFech_MorteVitima =&gt; LeReCa_PresoRegFech_MorteVitima</td><td>O fato de o detento cumprir pena em regime fechado, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.</td><td>incontroverso (todas)</td><td class="mono">R·A11</td><td class="num">—</td><td><span class="badge status-IN">de pé</span></td></tr><tr><td class="mono">cf2lrc_Latrocinio</td><td class="mono">CaFa_Latrocinio_MorteVitima =&gt; LeReCa_Latrocinio_MorteVitima</td><td>O latrocínio, por ser causa de fato da morte da vítima, é presumidamente uma causa juridicamente relevante.</td><td>incontroverso (todas)</td><td class="mono">R·A12</td><td class="num">—</td><td><span class="badge status-IN">de pé</span></td></tr><tr><td class="mono">unom_FugaPreso</td><td class="mono">Om_FugaPreso AND ¬Obl_ManterCustodia =&gt; ¬cf2lrc_FugaPreso</td><td>A omissão do Estado (fuga do preso) não é juridicamente relevante porque o dever de agir (manter a custódia) tornou-se genérico, e não específico.</td><td>Voto divergente</td><td class="mono">R·A13</td><td class="num">—</td><td><span class="badge status-IN">de pé</span></td></tr><tr><td class="mono">suca_Latrocinio</td><td class="mono">CaFa_FugaPreso_MorteVitima AND CaFa_Latrocinio_MorteVitima AND After_Latrocinio_FugaPreso AND Unexpected_Latrocinio AND ButFor_Latrocinio_MorteVitima =&gt; SupersedingCause_Latrocinio</td><td>O latrocínio é caracterizado como causa superveniente porque foi um evento posterior à fuga, necessário para o dano e inesperado (pelo lapso temporal e formação de quadrilha).</td><td>Voto divergente</td><td class="mono">R·A14</td><td class="num">—</td><td><span class="badge status-IN">de pé</span></td></tr><tr><td class="mono">sc_FugaPreso</td><td class="mono">SupersedingCause_Latrocinio =&gt; ¬cf2lrc_FugaPreso</td><td>Sendo o latrocínio uma causa superveniente, ele rompe a relevância jurídica da causa anterior (a fuga do preso).</td><td>Voto divergente</td><td class="mono">R·A15</td><td class="num">—</td><td><span class="badge status-IN">de pé</span></td></tr></tbody></table>

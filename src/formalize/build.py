@@ -54,6 +54,10 @@ _LRC_TEMPLATES = {
                    "{0} não era um evento inesperado"),
     "SupersedingCause": ("{0} é causa superveniente, que rompe o nexo anterior",
                          "{0} não é causa superveniente"),
+    # Mesma leitura, com os três argumentos que o artigo escreve. A escolha é
+    # por aridade, em `_render_lrc_literal`.
+    "SupersedingCause/3": ("{0} é causa superveniente: rompe o nexo entre {1} e {2}",
+                           "{0} não rompe o nexo entre {1} e {2}"),
     "After": ("{0} ocorreu depois de {1}", "{0} não ocorreu depois de {1}"),
     "Foreseeable": ("{1} era previsível a partir de {0}",
                     "{1} não era previsível a partir de {0}"),
@@ -193,7 +197,11 @@ def _render_lrc_literal(literal: str, atom_glosses: Dict[str, str]) -> str:
         # `¬rN` (an undercut target) or a plain atom: leave to the caller.
         return ""
     predicate, arguments = split
-    templates = _LRC_TEMPLATES.get(predicate)
+    # Um predicado pode ter mais de uma aridade (`SupersedingCause`), e a
+    # frase muda com ela: com um argumento só não há como nomear o nexo que
+    # se rompe.
+    templates = (_LRC_TEMPLATES.get(f"{predicate}/{len(arguments)}")
+                 or _LRC_TEMPLATES.get(predicate))
     if not templates:
         return ""
     glossed = [f"“{atom_glosses.get(arg, arg)}”" for arg in arguments]

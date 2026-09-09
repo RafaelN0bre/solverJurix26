@@ -66,7 +66,7 @@
 <!-- r3&#45;&gt;r0 -->
 <g id="edge7" class="edge argedge defeat from&#45;r3 to&#45;r0">
 <title>r3&#45;&gt;r0</title>
-<g id="a_edge7"><a xlink:title="r3 afasta r0">
+<g id="a_edge7"><a xlink:title="r3 afasta r0&#10;&#10;Posição final da corte → Recorrente">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M182.54,-534.02C184.69,-513.83 185.18,-486.25 184,-462.71"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="186.81,-462.75 183.52,-454.94 181.22,-463.1 186.81,-462.75"/>
 </a>
@@ -98,7 +98,7 @@
 <!-- r4&#45;&gt;r1 -->
 <g id="edge8" class="edge argedge defeat from&#45;r4 to&#45;r1">
 <title>r4&#45;&gt;r1</title>
-<g id="a_edge8"><a xlink:title="r4 afasta r1">
+<g id="a_edge8"><a xlink:title="r4 afasta r1&#10;&#10;Posição final da corte → Recorrente">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M383.6,-533.32C380.71,-513 376.79,-485.44 373.45,-462.03"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="376.25,-461.82 372.36,-454.3 370.71,-462.61 376.25,-461.82"/>
 </a>
@@ -149,7 +149,7 @@
 <!-- r6&#45;&gt;r0 -->
 <g id="edge9" class="edge argedge defeat from&#45;r6 to&#45;r0">
 <title>r6&#45;&gt;r0</title>
-<g id="a_edge9"><a xlink:title="r6 afasta r0">
+<g id="a_edge9"><a xlink:title="r6 afasta r0&#10;&#10;Posição final da corte → Recorrente">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M85.39,-536.77C101.04,-515.18 123.75,-483.87 142.22,-458.39"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="144.28,-460.32 146.71,-452.2 139.75,-457.03 144.28,-460.32"/>
 </a>
@@ -169,7 +169,7 @@
 <!-- r7&#45;&gt;r1 -->
 <g id="edge10" class="edge argedge defeat from&#45;r7 to&#45;r1">
 <title>r7&#45;&gt;r1</title>
-<g id="a_edge10"><a xlink:title="r7 afasta r1">
+<g id="a_edge10"><a xlink:title="r7 afasta r1&#10;&#10;Posição final da corte → Recorrente">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M296.32,-535.75C308.64,-514.62 326.11,-484.64 340.57,-459.83"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="342.97,-461.28 344.58,-452.96 338.13,-458.46 342.97,-461.28"/>
 </a>
@@ -239,7 +239,7 @@
 <!-- nwo_AgrQuad&#45;&gt;cf2lrc_AgrQuad -->
 <g id="edge11" class="edge argedge defeat from&#45;nwo_AgrQuad to&#45;cf2lrc_AgrQuad">
 <title>nwo_AgrQuad&#45;&gt;cf2lrc_AgrQuad</title>
-<g id="a_edge11"><a xlink:title="nwo_AgrQuad afasta cf2lrc_AgrQuad">
+<g id="a_edge11"><a xlink:title="nwo_AgrQuad afasta cf2lrc_AgrQuad&#10;&#10;ninguém → ninguém">
 <path fill="none" stroke="#c0392b" stroke-width="1.8" d="M519.75,-147.72C519.75,-133.22 519.75,-116.43 519.75,-101.1"/>
 <polygon fill="#c0392b" stroke="#c0392b" stroke-width="1.8" points="522.55,-101.49 519.75,-93.49 516.95,-101.49 522.55,-101.49"/>
 </a>
