@@ -5,7 +5,7 @@
     "title": "Caso 003 — Responsabilidade do Estado por crime de foragido (formalização final, por votos)",
     "annotator": "izabela-melo",
     "source_file": "docs/formalizacao-caso003.md",
-    "source_sha256": "4924fb0e8984739d3d95237c7e4955d2bd01ab6791ffd6185abeb26827f24de5",
+    "source_sha256": "5e3e5f027a98021ecbdcac897c1eedbfc72a0d781e36aca6d8d6d890d0250a6d",
     "session_id": "formalizacao-manual-2026-09-07",
     "dossier_case_id": "case-003"
   },
@@ -68,42 +68,8 @@
       "abstract_factor": "CondutaEstatal"
     },
     {
-      "code": "LapsoTemp",
-      "label_pt": "o crime foi praticado após três meses da fuga",
-      "kind": "fato",
-      "status": "incontroverso",
-      "perspectives": [
-        "recorrente",
-        "voto_divergente"
-      ],
-      "evidence": [
-        "src_2cc2964892904cf2",
-        "src_f2b9e027898b482e"
-      ],
-      "dossier_refs": [],
-      "established": true,
-      "favors": "exclusao",
-      "abstract_factor": "IntervencaoCausal"
-    },
-    {
-      "code": "FormacaoQuad",
-      "label_pt": "o crime foi praticado em concurso de agentes (quadrilha)",
-      "kind": "fato",
-      "status": "incontroverso",
-      "perspectives": [
-        "voto_divergente"
-      ],
-      "evidence": [
-        "src_f2b9e027898b482e"
-      ],
-      "dossier_refs": [],
-      "established": true,
-      "favors": "exclusao",
-      "abstract_factor": "AutonomiaDeTerceiro"
-    },
-    {
       "code": "Latrocinio",
-      "label_pt": "a quadrilha praticou roubo seguido de morte contra a vítima",
+      "label_pt": "o foragido praticou roubo seguido de morte contra a vítima",
       "kind": "intermediario",
       "status": "incontroverso",
       "perspectives": [
@@ -146,34 +112,38 @@
       "abstract_factor": ""
     },
     {
-      "code": "ProvCabiveis",
-      "label_pt": "o Estado adotou as providências cabíveis",
-      "kind": "prova",
-      "status": "controvertido",
+      "code": "LapsoTemp",
+      "label_pt": "o crime foi praticado após três meses da fuga",
+      "kind": "fato",
+      "status": "incontroverso",
       "perspectives": [
-        "voto_convergente"
+        "recorrente",
+        "voto_divergente"
       ],
       "evidence": [
-        "src_e78c7d363e2f4c61"
+        "src_2cc2964892904cf2",
+        "src_f2b9e027898b482e"
       ],
       "dossier_refs": [],
-      "established": false,
+      "established": true,
       "favors": "exclusao",
-      "abstract_factor": "OnusDaProva"
+      "abstract_factor": "IntervencaoCausal"
     },
     {
-      "code": "MeiosDisp",
-      "label_pt": "o Estado teve meios disponíveis para agir",
-      "kind": "prova",
-      "status": "controvertido",
+      "code": "FormacaoQuad",
+      "label_pt": "o crime foi praticado em concurso de agentes (quadrilha)",
+      "kind": "fato",
+      "status": "incontroverso",
       "perspectives": [
-        "voto_convergente"
+        "voto_divergente"
       ],
-      "evidence": [],
+      "evidence": [
+        "src_f2b9e027898b482e"
+      ],
       "dossier_refs": [],
-      "established": false,
-      "favors": "responsabilizacao",
-      "abstract_factor": "OnusDaProva"
+      "established": true,
+      "favors": "exclusao",
+      "abstract_factor": "AutonomiaDeTerceiro"
     },
     {
       "code": "DeverEspec",
@@ -197,17 +167,14 @@
       "abstract_factor": "NaturezaDoDever"
     },
     {
-      "code": "DeverGener",
-      "label_pt": "o Estado tinha um dever genérico de segurança pública",
+      "code": "OmissaoGen",
+      "label_pt": "a omissão estatal qualifica-se como genérica diante do tempo e do concurso",
       "kind": "dever",
       "status": "controvertido",
       "perspectives": [
         "voto_divergente"
       ],
-      "evidence": [
-        "src_83aefba652654af9",
-        "src_05026afa6a9d4e08"
-      ],
+      "evidence": [],
       "dossier_refs": [],
       "established": false,
       "favors": "exclusao",
@@ -215,7 +182,7 @@
     },
     {
       "code": "AtoTerceiro",
-      "label_pt": "o crime praticado após a fuga é ato de terceiro",
+      "label_pt": "o crime praticado após a fuga é ato de terceiro (causa superveniente independente)",
       "kind": "intermediario",
       "status": "controvertido",
       "perspectives": [
@@ -231,16 +198,66 @@
       "established": false,
       "favors": "exclusao",
       "abstract_factor": "AutonomiaDeTerceiro"
+    },
+    {
+      "code": "PremedAlvo",
+      "label_pt": "o crime contra alvo específico foi premeditado antes da fuga (RE 136.247)",
+      "kind": "fato",
+      "status": "controvertido",
+      "perspectives": [],
+      "evidence": [],
+      "dossier_refs": [],
+      "established": false,
+      "favors": "responsabilizacao",
+      "abstract_factor": "IntervencaoCausal"
+    },
+    {
+      "code": "SeqImediata",
+      "label_pt": "houve sequência lógica e imediata entre a fuga e o crime (RE 136.247)",
+      "kind": "fato",
+      "status": "controvertido",
+      "perspectives": [],
+      "evidence": [],
+      "dossier_refs": [],
+      "established": false,
+      "favors": "responsabilizacao",
+      "abstract_factor": "IntervencaoCausal"
+    },
+    {
+      "code": "ProvCabiveis",
+      "label_pt": "o Estado adotou as providências cabíveis para evitar a fuga",
+      "kind": "prova",
+      "status": "controvertido",
+      "perspectives": [
+        "voto_convergente"
+      ],
+      "evidence": [
+        "src_e78c7d363e2f4c61"
+      ],
+      "dossier_refs": [],
+      "established": false,
+      "favors": "exclusao",
+      "abstract_factor": "OnusDaProva"
+    },
+    {
+      "code": "MeiosDisp",
+      "label_pt": "o Estado teve meios materiais disponíveis para agir",
+      "kind": "prova",
+      "status": "controvertido",
+      "perspectives": [
+        "voto_convergente"
+      ],
+      "evidence": [],
+      "dossier_refs": [],
+      "established": false,
+      "favors": "responsabilizacao",
+      "abstract_factor": "OnusDaProva"
     }
   ],
   "knowledge_base": {
     "premises": [
       "OmiEstatal",
-      "RegFechado",
-      "LapsoTemp",
-      "FormacaoQuad",
-      "¬ProvCabiveis",
-      "¬MeiosDisp"
+      "RegFechado"
     ],
     "axioms": []
   },
@@ -251,11 +268,7 @@
       "r1: OmiEstatal AND RegFechado => FugaPreso",
       "r2: FugaPreso => Latrocinio",
       "r3: Latrocinio => MorteVitima",
-      "r4: MorteVitima => Danos",
-      "r5: LapsoTemp => ¬r2",
-      "r6: LapsoTemp AND FormacaoQuad => Latrocinio",
-      "r7: LapsoTemp AND FormacaoQuad => ¬r2",
-      "r8: ¬ProvCabiveis => ¬r5"
+      "r4: MorteVitima => Danos"
     ]
   },
   "rules_meta": [
@@ -279,7 +292,8 @@
       "perspective": "relator",
       "perspectives": [
         "relator",
-        "voto_convergente"
+        "voto_convergente",
+        "voto_divergente"
       ],
       "evidence": [],
       "dossier_refs": []
@@ -289,12 +303,8 @@
       "rule": "r2: FugaPreso => Latrocinio",
       "kind": "causal",
       "gloss_pt": "A fuga do detento levou ao latrocínio praticado contra a vítima.",
-      "perspective": "recorrido",
-      "perspectives": [
-        "recorrido",
-        "relator",
-        "voto_convergente"
-      ],
+      "perspective": "comum",
+      "perspectives": [],
       "evidence": [],
       "dossier_refs": []
     },
@@ -317,54 +327,6 @@
       "perspectives": [],
       "evidence": [],
       "dossier_refs": []
-    },
-    {
-      "id": "r5",
-      "rule": "r5: LapsoTemp => ¬r2",
-      "kind": "undercut",
-      "gloss_pt": "Passados três meses entre a fuga e o crime, não se sustenta o raciocínio que liga uma coisa à outra.",
-      "perspective": "recorrente",
-      "perspectives": [
-        "recorrente"
-      ],
-      "evidence": [],
-      "dossier_refs": []
-    },
-    {
-      "id": "r6",
-      "rule": "r6: LapsoTemp AND FormacaoQuad => Latrocinio",
-      "kind": "causal",
-      "gloss_pt": "O latrocínio se explica pelo lapso de três meses somado à formação de quadrilha: é a quadrilha, e não a fuga, que o produz.",
-      "perspective": "voto_divergente",
-      "perspectives": [
-        "voto_divergente"
-      ],
-      "evidence": [],
-      "dossier_refs": []
-    },
-    {
-      "id": "r7",
-      "rule": "r7: LapsoTemp AND FormacaoQuad => ¬r2",
-      "kind": "undercut",
-      "gloss_pt": "Havendo lapso de três meses e concurso de agentes, não se sustenta o raciocínio que liga a fuga ao latrocínio.",
-      "perspective": "voto_divergente",
-      "perspectives": [
-        "voto_divergente"
-      ],
-      "evidence": [],
-      "dossier_refs": []
-    },
-    {
-      "id": "r8",
-      "rule": "r8: ¬ProvCabiveis => ¬r5",
-      "kind": "undercut",
-      "gloss_pt": "Se o Estado não adotou as providências cabíveis, não se sustenta a objeção do lapso temporal: o decurso do tempo é consequência da própria inércia.",
-      "perspective": "voto_convergente",
-      "perspectives": [
-        "voto_convergente"
-      ],
-      "evidence": [],
-      "dossier_refs": []
     }
   ],
   "effect": "Danos",
@@ -377,8 +339,8 @@
       "court_rationale_pt": "A tese vencedora entendeu que o lapso de três meses e a execução do crime em concurso de agentes rompem o nexo: o que restava ao Estado era o dever genérico de segurança pública.",
       "evidence": [],
       "solver": {
-        "ness": false,
-        "but_for": false
+        "ness": true,
+        "but_for": true
       },
       "legally_relevant": false
     },
@@ -390,8 +352,8 @@
       "court_rationale_pt": "Mesma razão de decidir: o crime praticado três meses depois, por quadrilha, é ato de terceiro.",
       "evidence": [],
       "solver": {
-        "ness": false,
-        "but_for": false
+        "ness": true,
+        "but_for": true
       },
       "legally_relevant": null
     },
@@ -459,16 +421,29 @@
       },
       {
         "literal": "Latrocinio",
-        "label_pt": "a quadrilha praticou roubo seguido de morte contra a vítima",
+        "label_pt": "o foragido praticou roubo seguido de morte contra a vítima",
         "evidence": [],
         "perspective": "comum",
         "origin_perspective": "",
         "perspectives": []
+      },
+      {
+        "literal": "¬ProvCabiveis",
+        "label_pt": "o Estado não demonstrou as providências cabíveis",
+        "evidence": [],
+        "perspective": "voto_convergente",
+        "origin_perspective": "",
+        "perspectives": [
+          "voto_convergente"
+        ]
       }
     ],
     "bridged_premises": [
-      "CaFa_LapsoTemp_Danos",
-      "CaFa_FormacaoQuad_Danos",
+      "CaFa_OmiEstatal_Danos",
+      "ButFor_OmiEstatal_Danos",
+      "CaFa_RegFechado_Danos",
+      "CaFa_FugaPreso_Danos",
+      "ButFor_FugaPreso_Danos",
       "CaFa_Latrocinio_Danos",
       "ButFor_Latrocinio_Danos"
     ],
@@ -487,31 +462,9 @@
         ]
       },
       {
-        "rule": "dvgen_q1: LapsoTemp AND FormacaoQuad => DeverGener",
-        "scheme": "dvgen",
-        "gloss_pt": "Decorridos três meses e tendo o crime sido praticado em quadrilha, o que restava era o dever genérico de segurança pública.",
-        "evidence": [],
-        "perspective": "voto_divergente",
-        "origin_perspective": "",
-        "perspectives": [
-          "voto_divergente"
-        ]
-      },
-      {
-        "rule": "dvgen_q2: DeverGener => ¬DeverEspec",
-        "scheme": "dvgen",
-        "gloss_pt": "Sendo genérico o dever, não há dever específico de custódia a imputar.",
-        "evidence": [],
-        "perspective": "voto_divergente",
-        "origin_perspective": "",
-        "perspectives": [
-          "voto_divergente"
-        ]
-      },
-      {
-        "rule": "suca_q3: Latrocinio AND LapsoTemp => AtoTerceiro",
+        "rule": "suca_q3: LapsoTemp => AtoTerceiro",
         "scheme": "suca",
-        "gloss_pt": "O latrocínio, praticado três meses depois, é ato de terceiro.",
+        "gloss_pt": "Alegação de parte: decorridos três meses, o crime é ato de terceiro. Vence na fase preliminar por default dialético — falta de réplica eficaz —, não por mérito dogmático.",
         "evidence": [],
         "perspective": "recorrente",
         "origin_perspective": "",
@@ -520,9 +473,31 @@
         ]
       },
       {
+        "rule": "u_corte: LapsoTemp => ¬suca_q3",
+        "scheme": "u_corte",
+        "gloss_pt": "A corte recusa expressamente a tese de que o tempo isolado rompe a causalidade: o mero lapso não autoriza, por si só, a caracterização do ato de terceiro.",
+        "evidence": [],
+        "perspective": "voto_divergente",
+        "origin_perspective": "",
+        "perspectives": [
+          "voto_divergente"
+        ]
+      },
+      {
         "rule": "suca_q4: Latrocinio AND LapsoTemp AND FormacaoQuad => AtoTerceiro",
         "scheme": "suca",
-        "gloss_pt": "O latrocínio, praticado três meses depois e em concurso de agentes, é ato autônomo de terceiro.",
+        "gloss_pt": "Ratio decidendi: o lapso temporal somado ao concurso de agentes superveniente e independente constitui ato de terceiro.",
+        "evidence": [],
+        "perspective": "voto_divergente",
+        "origin_perspective": "",
+        "perspectives": [
+          "voto_divergente"
+        ]
+      },
+      {
+        "rule": "q_reab: PremedAlvo AND SeqImediata => ¬suca_q4",
+        "scheme": "q_reab",
+        "gloss_pt": "Distinguishing do RE 136.247: houvesse premeditação contra alvo certo e sequência imediata entre a fuga e o crime, a caracterização do ato de terceiro não se sustentaria.",
         "evidence": [],
         "perspective": "voto_divergente",
         "origin_perspective": "",
@@ -556,9 +531,21 @@
         ]
       },
       {
-        "rule": "unom_q7: OmiEstatal AND ¬DeverEspec => ¬cf2lrc_q5",
-        "scheme": "unom",
-        "gloss_pt": "Sem dever específico de agir, a omissão do Estado não é juridicamente imputável como causa dos danos.",
+        "rule": "dvpre_q8: DeverEspec => ¬sc_q6",
+        "scheme": "dvpre",
+        "gloss_pt": "Subsistindo o dever específico de custódia, não se sustenta a defesa do ato de terceiro: o risco que se concretizou é exatamente o que o dever existia para conter.",
+        "evidence": [],
+        "perspective": "relator",
+        "origin_perspective": "",
+        "perspectives": [
+          "relator",
+          "voto_convergente"
+        ]
+      },
+      {
+        "rule": "og_q9: OmiEstatal AND LapsoTemp AND FormacaoQuad => OmissaoGen",
+        "scheme": "og",
+        "gloss_pt": "Decorrido o tempo e interposta a deliberação autônoma da quadrilha, a omissão estatal já não é específica àquele resultado: qualifica-se como genérica.",
         "evidence": [],
         "perspective": "voto_divergente",
         "origin_perspective": "",
@@ -567,155 +554,56 @@
         ]
       },
       {
-        "rule": "dvpre_q8: DeverEspec => ¬sc_q6",
-        "scheme": "dvpre",
-        "gloss_pt": "Subsistindo o dever específico de custódia, não se sustenta a defesa do ato de terceiro: o risco que se concretizou é exatamente o que o dever existia para conter.",
+        "rule": "og_q10: OmissaoGen => ¬cf2lrc_q5",
+        "scheme": "og",
+        "gloss_pt": "Omissão genérica não é liame necessário nem determinante do resultado: não sustenta a presunção de relevância jurídica.",
         "evidence": [],
-        "perspective": "relator",
+        "perspective": "voto_divergente",
         "origin_perspective": "",
         "perspectives": [
-          "relator"
+          "voto_divergente"
+        ]
+      },
+      {
+        "rule": "q11: ¬ProvCabiveis => ¬suca_q3",
+        "scheme": "q11",
+        "gloss_pt": "Não tendo o Estado demonstrado as providências cabíveis, não se sustenta a alegação de ato de terceiro deduzida por ele.",
+        "evidence": [],
+        "perspective": "voto_convergente",
+        "origin_perspective": "",
+        "perspectives": [
+          "voto_convergente"
         ]
       }
     ],
     "targets": [
       "LeReCa_OmiEstatal_Danos"
     ],
-    "duty_basis_pt": "Art. 37, § 6º, da Constituição Federal, lido junto ao dever de custódia sobre quem cumpre pena em regime fechado. A controvérsia é exatamente sobre a natureza desse dever: específico de custódia (RDO_, MA_, EF_) ou genérico de segurança pública (AM_).",
+    "duty_basis_pt": "Art. 37, § 6º, da Constituição Federal, lido junto ao dever de custódia sobre quem cumpre pena em regime fechado. A controvérsia é exatamente sobre a natureza desse dever. O vocabulário — dever específico, dever geral, omissão própria — é inteiro do voto convergente (EF_), que firma o dever específico e afasta o geral. Nenhum outro voto o usa: o divergente decide por ruptura do nexo, não por natureza do dever.",
     "relevance": [
       {
         "target": "LeReCa_OmiEstatal_Danos",
         "justified": false,
-        "derivable": false,
-        "status": "nao_formulada",
-        "blocked_by": []
+        "derivable": true,
+        "status": "afastada",
+        "blocked_by": [
+          {
+            "undercut_rule": "cf2lrc_q5",
+            "attacker": "A22",
+            "attacker_rules": [
+              "og_q10",
+              "og_q9"
+            ],
+            "attacked_argument": "A17",
+            "attack_type": "undercut",
+            "scheme": "og",
+            "scheme_pt": "Omissão genérica (regra 14, extensão): decorrido o tempo e interposta a deliberação autônoma de terceiros, a omissão estatal qualifica-se como genérica e não sustenta imputação."
+          }
+        ]
       }
     ]
   },
-  "preferences": {
-    "principle": "weakest",
-    "comparator": "elitist",
-    "dimensions": [
-      {
-        "key": "dever_especifico",
-        "label_pt": "especificidade no dever de agir",
-        "weight": 4.0,
-        "rationale_pt": "Quanto pesa a tese de que o Estado devia àquele preso um dever concreto de custódia, e não o dever difuso de segurança pública que deve a todos."
-      },
-      {
-        "key": "intervencao_causal",
-        "label_pt": "intervenção causal",
-        "weight": 5.0,
-        "rationale_pt": "Quanto pesa o evento interposto entre a conduta e o dano — aqui, os três meses decorridos entre a fuga e o crime."
-      },
-      {
-        "key": "autonomia",
-        "label_pt": "autonomia do terceiro",
-        "weight": 5.0,
-        "rationale_pt": "Quanto pesa a deliberação própria de quem praticou o crime — aqui, a formação de quadrilha, que é decisão de terceiros e não desdobramento da fuga."
-      }
-    ],
-    "profiles": [
-      {
-        "rule": "RegFechado",
-        "coefficients": {
-          "dever_especifico": 1.0
-        },
-        "rationale_pt": "É o fato que torna o dever específico: regime fechado, custódia estrita."
-      },
-      {
-        "rule": "LapsoTemp",
-        "coefficients": {
-          "intervencao_causal": 1.0
-        },
-        "rationale_pt": "É o evento interposto: três meses entre a fuga e o crime."
-      },
-      {
-        "rule": "FormacaoQuad",
-        "coefficients": {
-          "autonomia": 1.0
-        },
-        "rationale_pt": "É a deliberação própria de terceiros: concurso de agentes."
-      },
-      {
-        "rule": "r1",
-        "coefficients": {
-          "dever_especifico": 1.0
-        },
-        "rationale_pt": "Lê o regime fechado, que é o que torna o dever específico."
-      },
-      {
-        "rule": "r5",
-        "coefficients": {
-          "intervencao_causal": 1.0
-        },
-        "rationale_pt": "Opõe o lapso temporal ao elo entre fuga e crime."
-      },
-      {
-        "rule": "r6",
-        "coefficients": {
-          "intervencao_causal": 1.0,
-          "autonomia": 1.0
-        },
-        "rationale_pt": "Explica o crime pelo lapso somado à deliberação da quadrilha."
-      },
-      {
-        "rule": "r7",
-        "coefficients": {
-          "intervencao_causal": 1.0,
-          "autonomia": 1.0
-        },
-        "rationale_pt": "Mesmo fundamento de r6, na forma de undercut."
-      },
-      {
-        "rule": "dvesp_q0",
-        "coefficients": {
-          "dever_especifico": 1.0
-        },
-        "rationale_pt": "É a tese da especificidade do dever, e o único lado dela no conflito ⟨q0, q2⟩."
-      },
-      {
-        "rule": "dvgen_q1",
-        "coefficients": {
-          "intervencao_causal": 1.0,
-          "autonomia": 1.0
-        },
-        "rationale_pt": "É o outro lado de ⟨q0, q2⟩, e se apoia nas duas outras dimensões ao mesmo tempo."
-      },
-      {
-        "rule": "dvgen_q2",
-        "coefficients": {
-          "intervencao_causal": 1.0,
-          "autonomia": 1.0
-        },
-        "rationale_pt": "Tira a consequência de q1, e carrega o fundamento dela. Sob a Def. 21 não existe regra 'neutra' que se pule: a comparação é sobre o conjunto inteiro de DefRules, e um membro sem classificação torna o conjunto incomparável."
-      },
-      {
-        "rule": "suca_q3",
-        "coefficients": {
-          "intervencao_causal": 1.0
-        },
-        "rationale_pt": "Caracteriza o ato de terceiro só pelo lapso."
-      },
-      {
-        "rule": "suca_q4",
-        "coefficients": {
-          "intervencao_causal": 1.0,
-          "autonomia": 1.0
-        },
-        "rationale_pt": "Caracteriza o ato de terceiro pelo lapso e pela quadrilha."
-      },
-      {
-        "rule": "dvpre_q8",
-        "coefficients": {
-          "dever_especifico": 1.0
-        },
-        "rationale_pt": "Faz o dever específico prevalecer sobre a defesa do ato de terceiro."
-      }
-    ],
-    "perspective": "voto_divergente",
-    "notes_pt": "A ordenação básica do ASPIC+ (Definição 2.11) deixa dois argumentos derrotáveis incomparáveis, e o documento marca ⟨q0, q2⟩ como o único ataque ativo por rebutting da formalização: `dvesp_q0` conclui DeverEspec, `dvgen_q2` conclui ¬DeverEspec, e nenhum dos dois undercuta o outro. Sem preferência, os dois ficam UNDEC e a camada de relevância não responde nada.\n\nA comparação segue a Definição 21 de Modgil & Prakken (2013), com o comparador elitista: `B ≺ A` exige `Prem_p(B) ◁ Prem_p(A)` **e** `DefRules(B) ◁ DefRules(A)`. Por isso as premissas também são classificadas — `RegFechado` no eixo do dever, `LapsoTemp` na intervenção causal, `FormacaoQuad` na autonomia. Classificar só as regras, como esta formalização fazia antes, é a anomalia que os próprios autores da definição declararam ter ido corrigir: deixa a ordenação declarar preferência onde o ASPIC+ canônico não declara nenhuma.\n\nDo lado do dever específico, `⟨RegFechado⟩` = 4 e `⟨dvesp_q0⟩` = 4; do outro, `⟨LapsoTemp, FormacaoQuad⟩` = ⟨5, 5⟩ e `⟨dvgen_q1, dvgen_q2⟩` = ⟨10, 10⟩. As duas comparações correm no mesmo sentido, então a conjunção vale e o dever genérico prevalece.\n\nA ordenação é movimento do **voto divergente**, não fato do mundo: é ele que sustenta q2, e é dele o argumento de prioridade. Antes de o voto entrar, o traço roda sob a ordenação básica — de outro modo uma preferência decidiria um rebate entre as partes sem adjudicador nenhum, o que a fase de decisão de Prakken (§4.3) não admite."
-  },
+  "preferences": null,
   "open_questions": [
     "O documento não traz uma posição final da corte separada dos votos, então o registro não a inventa: `stf_final` não aparece como perspectiva.",
     "`¬MeiosDisp` é premissa do voto convergente e nenhuma regra a lê — a validação a reporta como premissa inerte."

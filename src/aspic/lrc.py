@@ -129,6 +129,10 @@ EXTENSION_SCHEMES: Dict[str, str] = {
     "dvesp": "Dever específico (regra 9, extensão): a condição concreta da custódia gera dever específico de agir, e não mero dever genérico.",
     "dvgen": "Dever genérico (regra 10, extensão): o lapso temporal e a atuação autônoma de terceiros degradam o dever específico em dever genérico de segurança pública, afastando aquele.",
     "dvpre": "Prevalência do dever específico (regra 11, extensão): subsistindo o dever específico de custódia, a defesa do ato de terceiro não se sustenta.",
+    "u_corte": "Undercut ex officio (regra 12, extensão): a corte recusa a formulação da parte — o lapso temporal isolado não caracteriza ato de terceiro.",
+    "q_reab": "Reabilitação por imediatidade (regra 13, extensão): premeditação contra alvo certo e sequência imediata entre a fuga e o crime afastam a caracterização do ato de terceiro.",
+    "og": "Omissão genérica (regra 14, extensão): decorrido o tempo e interposta a deliberação autônoma de terceiros, a omissão estatal qualifica-se como genérica e não sustenta imputação.",
+    "q11": "Ônus das cautelas (regra 15, extensão): não demonstradas as providências cabíveis, a alegação de ato de terceiro deduzida pela parte não se sustenta.",
 }
 SCHEMES.update(EXTENSION_SCHEMES)
 
@@ -136,7 +140,7 @@ SCHEMES.update(EXTENSION_SCHEMES)
 #: `dvgen` is one: it does not undercut `cf2lrc` itself, it removes the duty
 #: that `unom` needs to be absent, which is the same blocking move one step
 #: earlier.
-DEFENCE_SCHEMES: Set[str] = {"nwo", "sc", "suca", "nofor", "unom", "dvgen"}
+DEFENCE_SCHEMES: Set[str] = {"nwo", "sc", "suca", "nofor", "unom", "dvgen", "og"}
 
 # ----------------------------------------------------------------------
 # The vocabulary

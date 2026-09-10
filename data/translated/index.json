@@ -32,17 +32,17 @@
     "model": "",
     "summary": {
       "case_id": "case-003-final",
-      "atoms": 13,
-      "premises": 6,
-      "rules": 9,
+      "atoms": 15,
+      "premises": 2,
+      "rules": 5,
       "queries": 3,
       "has_lrc": true,
       "agreement": {
-        "match": 3,
-        "mismatch": 0,
+        "match": 2,
+        "mismatch": 1,
         "indefinido": 0
       },
-      "agreement_rate": 1.0
+      "agreement_rate": 0.667
     }
   },
   {

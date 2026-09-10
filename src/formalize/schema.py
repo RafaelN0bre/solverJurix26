@@ -48,7 +48,7 @@ CourtVerdict = Literal["acolhida", "rejeitada", "nao_decidida"]
 #: Schemes 2-8 of ICAIL 2026, then the duty-qualification extensions of
 #: `aspic.lrc.EXTENSION_SCHEMES`.
 LrcScheme = Literal["cf2lrc", "nwo", "sc", "suca", "nofor", "rpl", "unom",
-                    "dvesp", "dvgen", "dvpre"]
+                    "dvesp", "dvgen", "dvpre", "u_corte", "q_reab", "og", "q11"]
 
 
 # ----------------------------------------------------------------------
@@ -322,11 +322,18 @@ class LRCBlock(BaseModel):
 
     @property
     def knowledge_base(self) -> Dict[str, List[str]]:
+        """A base da LRC, com a ponte em K𝑛 e a doutrina em K𝑝.
+
+        A equação (1) do ICAIL 2026 é explícita: justificado no módulo CIF que
+        φ é causa NESS de ψ, o fato `CaFa(φ,ψ)` entra na LRC **como axioma**,
+        não como premissa ordinária. É o que fecha a fronteira entre os
+        módulos — a camada de relevância qualifica a causa de fato, não a
+        relitiga: axioma não sofre undermining, e não entra em `Prem_p` na
+        comparação de preferências da Def. 21 de Modgil & Prakken.
+        """
         return {
-            "premises": list(dict.fromkeys(
-                [*self.bridged_premises, *(p.literal for p in self.doctrinal_premises)]
-            )),
-            "axioms": [],
+            "premises": list(dict.fromkeys(p.literal for p in self.doctrinal_premises)),
+            "axioms": list(dict.fromkeys(self.bridged_premises)),
         }
 
     @property

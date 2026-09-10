@@ -41,10 +41,11 @@ adjudicação dizer que foi um movimento dela.
 pelo prefixo do identificador (`aspic.lrc.scheme_of`), e as regras do
 documento se chamam q0…q8. Cada uma recebe o prefixo do esquema de que é
 instância, mantendo o nome do documento no sufixo: `cf2lrc_q5`, `sc_q6`,
-`unom_q7`, `suca_q3`. Três movimentos do documento não instanciam esquema
-nenhum do artigo — são sobre a *natureza do dever de agir*, que lá é uma
-premissa `Obl` ligada ou desligada — e por isso `aspic.lrc` ganhou
-`dvesp`/`dvgen`/`dvpre` (`EXTENSION_SCHEMES`).
+`suca_q4`. Dois movimentos do documento não instanciam esquema nenhum do
+artigo — são sobre a *natureza do dever de agir*, que lá é uma premissa `Obl`
+ligada ou desligada — e por isso `aspic.lrc` ganhou `dvesp`/`dvgen`/`dvpre`
+(`EXTENSION_SCHEMES`). Depois da separação de vozes só `dvesp` e `dvpre` têm
+instância aqui; `dvgen` continua no vocabulário, sem uso neste caso.
 
 **Evidência.** O documento não cita passagens. Para os átomos que são
 literalmente a mesma proposição de um átomo do `case-003` do pipeline, a
@@ -53,12 +54,13 @@ correspondência inequívoca, o campo fica vazio, e a Conferência reporta isso
 como não rastreável — que é o que é.
 
 **Pesos.** A tupla ⟨dever específico, intervenção causal, autonomia⟩ =
-⟨4, 5, 5⟩ entra como `FormalizedCase.preferences`. Ela existe porque o
-documento marca ⟨q0, q2⟩ como "rebutting — único ponto ativo": duas regras
-concluindo literais complementares, sem undercut de nenhum lado. Sob a
-ordenação básica isso deixa os dois lados UNDEC e a camada inteira sem
-resposta; com a tupla, `dvgen_q1` (5+5) prevalece sobre `dvesp_q0` (4) e a
-camada decide. Ver `aspic.preferences`.
+⟨4, 5, 5⟩ entra como `FormalizedCase.preferences`. Ela foi escrita para
+resolver ⟨q0, q2⟩, que o documento marcava como "rebutting — único ponto
+ativo". Separadas as vozes, não há mais rebutting na camada LRC — `¬DeverEspec`
+não é conclusão de voto nenhum —, e a ordenação não decide nada neste caso: ela
+permanece porque classifica premissas e regras, o que a Definição 21 de
+Modgil & Prakken exige de qualquer comparação, e porque a camada CIF é onde a
+divergência de fato corre. Ver `aspic.preferences`.
 """
 import argparse
 import hashlib
@@ -130,42 +132,62 @@ def carried_evidence(directory: Path) -> dict:
 #: é o que faz a "balança de fatores" da aba Perspectivas e a resolução de
 #: preferências falarem do mesmo desacordo em vez de dois parecidos.
 ATOMS = [
+    # ------------------------------------------------------------------
+    # Camada CIF -- mecanismo causal de fato. Puramente naturalística: a
+    # controvérsia toda migrou para a LRC, e aqui não há ataque nenhum.
+    # ------------------------------------------------------------------
     ("OmiEstatal", "o Estado foi omisso na custódia do preso", "fato",
      "incontroverso", [RDO, MA, EF, AM], True, "responsabilizacao", "CondutaEstatal"),
     ("RegFechado", "o preso cumpria regime prisional fechado", "fato",
      "incontroverso", [RDO, MA, EF], True, "responsabilizacao", "NaturezaDoDever"),
     ("FugaPreso", "o detento fugiu do sistema prisional", "intermediario",
      "incontroverso", [RTE, AM], False, "responsabilizacao", "CondutaEstatal"),
-    ("LapsoTemp", "o crime foi praticado após três meses da fuga", "fato",
-     "incontroverso", [RTE, AM], True, "exclusao", "IntervencaoCausal"),
-    ("FormacaoQuad", "o crime foi praticado em concurso de agentes (quadrilha)",
-     "fato", "incontroverso", [AM], True, "exclusao", "AutonomiaDeTerceiro"),
-    ("Latrocinio", "a quadrilha praticou roubo seguido de morte contra a vítima",
+    ("Latrocinio", "o foragido praticou roubo seguido de morte contra a vítima",
      "intermediario", "incontroverso", [RTE], False, "neutro", ""),
     ("MorteVitima", "a vítima foi morta em decorrência de latrocínio",
      "intermediario", "incontroverso", [], False, "neutro", ""),
     ("Danos", "a família da vítima sofreu danos materiais e morais", "resultado",
      "incontroverso", [], False, "neutro", ""),
-    ("ProvCabiveis", "o Estado adotou as providências cabíveis", "prova",
-     "controvertido", [EF], False, "exclusao", "OnusDaProva"),
-    ("MeiosDisp", "o Estado teve meios disponíveis para agir", "prova",
-     "controvertido", [EF], False, "responsabilizacao", "OnusDaProva"),
-    # Qualificações jurídicas: vivem na camada de relevância, e nenhuma é
-    # premissa do framework de causa de fato.
+    # ------------------------------------------------------------------
+    # Camada LRC -- qualificações jurídicas e imputação. O lapso temporal e o
+    # concurso de agentes são fatos, mas fatos que só operam aqui: no CIF eles
+    # curto-circuitavam a ponte, fazendo `caFa` nascer morta.
+    # ------------------------------------------------------------------
+    ("LapsoTemp", "o crime foi praticado após três meses da fuga", "fato",
+     "incontroverso", [RTE, AM], True, "exclusao", "IntervencaoCausal"),
+    ("FormacaoQuad", "o crime foi praticado em concurso de agentes (quadrilha)",
+     "fato", "incontroverso", [AM], True, "exclusao", "AutonomiaDeTerceiro"),
     ("DeverEspec", "o Estado tinha um dever específico de custódia sobre o preso",
      "dever", "controvertido", [RDO, MA, EF], False, "responsabilizacao",
      "NaturezaDoDever"),
-    ("DeverGener", "o Estado tinha um dever genérico de segurança pública",
-     "dever", "controvertido", [AM], False, "exclusao", "NaturezaDoDever"),
-    ("AtoTerceiro", "o crime praticado após a fuga é ato de terceiro",
-     "intermediario", "controvertido", [RTE, AM], False, "exclusao",
-     "AutonomiaDeTerceiro"),
+    ("OmissaoGen", "a omissão estatal qualifica-se como genérica diante do tempo "
+     "e do concurso", "dever", "controvertido", [AM], False, "exclusao",
+     "NaturezaDoDever"),
+    ("AtoTerceiro", "o crime praticado após a fuga é ato de terceiro (causa "
+     "superveniente independente)", "intermediario", "controvertido", [RTE, AM],
+     False, "exclusao", "AutonomiaDeTerceiro"),
+    # `PremedAlvo` e `SeqImediata` são o distinguishing do RE 136.247: estão no
+    # vocabulário porque a teoria do acórdão os usa, e fora da base fática
+    # porque nestes autos não ocorreram. `q_reab` fica inerte por isso, e é o
+    # que demonstra que a regra é geral e não um ajuste a este caso.
+    ("PremedAlvo", "o crime contra alvo específico foi premeditado antes da fuga "
+     "(RE 136.247)", "fato", "controvertido", [], False, "responsabilizacao",
+     "IntervencaoCausal"),
+    ("SeqImediata", "houve sequência lógica e imediata entre a fuga e o crime "
+     "(RE 136.247)", "fato", "controvertido", [], False, "responsabilizacao",
+     "IntervencaoCausal"),
+    ("ProvCabiveis", "o Estado adotou as providências cabíveis para evitar a fuga",
+     "prova", "controvertido", [EF], False, "exclusao", "OnusDaProva"),
+    ("MeiosDisp", "o Estado teve meios materiais disponíveis para agir", "prova",
+     "controvertido", [EF], False, "responsabilizacao", "OnusDaProva"),
 ]
 
 #: Premissas da camada de causa de fato, na ordem do documento. `¬X` entra
 #: como premissa negativa: é o que o voto de Fachin afirma.
-PREMISES = ["OmiEstatal", "RegFechado", "LapsoTemp", "FormacaoQuad",
-            "¬ProvCabiveis", "¬MeiosDisp"]
+#: A base do CIF é só o que o mecanismo causal lê. O lapso temporal, o
+#: concurso de agentes e a prova das cautelas passaram à camada LRC, e entram
+#: por `LRC_PREMISES`: no CIF eles curto-circuitavam a ponte.
+PREMISES = ["OmiEstatal", "RegFechado"]
 
 
 # ----------------------------------------------------------------------
@@ -177,27 +199,13 @@ CIF_RULES = [
      "A omissão do Estado na custódia levou à fuga do preso.", [RDO]),
     ("r1", "r1: OmiEstatal AND RegFechado => FugaPreso", "causal",
      "A omissão do Estado sobre quem cumpria regime fechado — e portanto sob "
-     "custódia estrita — levou à fuga.", [MA, EF]),
+     "custódia estrita — levou à fuga.", [MA, EF, AM]),
     ("r2", "r2: FugaPreso => Latrocinio", "causal",
-     "A fuga do detento levou ao latrocínio praticado contra a vítima.",
-     [RDO, MA, EF]),
+     "A fuga do detento levou ao latrocínio praticado contra a vítima.", [TODOS]),
     ("r3", "r3: Latrocinio => MorteVitima", "causal",
      "O latrocínio resultou na morte da vítima.", [TODOS]),
     ("r4", "r4: MorteVitima => Danos", "causal",
      "A morte da vítima causou danos materiais e morais à sua família.", [TODOS]),
-    ("r5", "r5: LapsoTemp => ¬r2", "undercut",
-     "Passados três meses entre a fuga e o crime, não se sustenta o raciocínio "
-     "que liga uma coisa à outra.", [RTE]),
-    ("r6", "r6: LapsoTemp AND FormacaoQuad => Latrocinio", "causal",
-     "O latrocínio se explica pelo lapso de três meses somado à formação de "
-     "quadrilha: é a quadrilha, e não a fuga, que o produz.", [AM]),
-    ("r7", "r7: LapsoTemp AND FormacaoQuad => ¬r2", "undercut",
-     "Havendo lapso de três meses e concurso de agentes, não se sustenta o "
-     "raciocínio que liga a fuga ao latrocínio.", [AM]),
-    ("r8", "r8: ¬ProvCabiveis => ¬r5", "undercut",
-     "Se o Estado não adotou as providências cabíveis, não se sustenta a "
-     "objeção do lapso temporal: o decurso do tempo é consequência da própria "
-     "inércia.", [EF]),
 ]
 
 
@@ -210,18 +218,22 @@ LRC_RULES = [
      "Cumprindo o preso regime fechado, o dever do Estado sobre ele é "
      "específico de custódia, e não o dever difuso de segurança pública.",
      [RDO, MA, EF]),
-    ("dvgen_q1", "dvgen_q1: LapsoTemp AND FormacaoQuad => DeverGener", "dvgen",
-     "Decorridos três meses e tendo o crime sido praticado em quadrilha, o que "
-     "restava era o dever genérico de segurança pública.", [AM]),
-    ("dvgen_q2", "dvgen_q2: DeverGener => ¬DeverEspec", "dvgen",
-     "Sendo genérico o dever, não há dever específico de custódia a imputar.",
-     [AM]),
-    ("suca_q3", "suca_q3: Latrocinio AND LapsoTemp => AtoTerceiro", "suca",
-     "O latrocínio, praticado três meses depois, é ato de terceiro.", [RTE]),
+    ("suca_q3", "suca_q3: LapsoTemp => AtoTerceiro", "suca",
+     "Alegação de parte: decorridos três meses, o crime é ato de terceiro. "
+     "Vence na fase preliminar por default dialético — falta de réplica "
+     "eficaz —, não por mérito dogmático.", [RTE]),
+    ("u_corte", "u_corte: LapsoTemp => ¬suca_q3", "u_corte",
+     "A corte recusa expressamente a tese de que o tempo isolado rompe a "
+     "causalidade: o mero lapso não autoriza, por si só, a caracterização do "
+     "ato de terceiro.", [AM]),
     ("suca_q4", "suca_q4: Latrocinio AND LapsoTemp AND FormacaoQuad => AtoTerceiro",
      "suca",
-     "O latrocínio, praticado três meses depois e em concurso de agentes, é ato "
-     "autônomo de terceiro.", [AM]),
+     "Ratio decidendi: o lapso temporal somado ao concurso de agentes "
+     "superveniente e independente constitui ato de terceiro.", [AM]),
+    ("q_reab", "q_reab: PremedAlvo AND SeqImediata => ¬suca_q4", "q_reab",
+     "Distinguishing do RE 136.247: houvesse premeditação contra alvo certo e "
+     "sequência imediata entre a fuga e o crime, a caracterização do ato de "
+     "terceiro não se sustentaria.", [AM]),
     ("cf2lrc_q5", "cf2lrc_q5: CaFa_OmiEstatal_Danos => LeReCa_OmiEstatal_Danos",
      "cf2lrc",
      "Sendo a omissão estatal causa de fato dos danos, presume-se que seja "
@@ -229,13 +241,21 @@ LRC_RULES = [
     ("sc_q6", "sc_q6: AtoTerceiro => ¬cf2lrc_q5", "sc",
      "Sendo o crime ato de terceiro, rompe-se o nexo de relevância jurídica "
      "entre a omissão e os danos.", [RTE, AM]),
-    ("unom_q7", "unom_q7: OmiEstatal AND ¬DeverEspec => ¬cf2lrc_q5", "unom",
-     "Sem dever específico de agir, a omissão do Estado não é juridicamente "
-     "imputável como causa dos danos.", [AM]),
     ("dvpre_q8", "dvpre_q8: DeverEspec => ¬sc_q6", "dvpre",
      "Subsistindo o dever específico de custódia, não se sustenta a defesa do "
      "ato de terceiro: o risco que se concretizou é exatamente o que o dever "
-     "existia para conter.", [MA]),
+     "existia para conter.", [MA, EF]),
+    ("og_q9", "og_q9: OmiEstatal AND LapsoTemp AND FormacaoQuad => OmissaoGen",
+     "og",
+     "Decorrido o tempo e interposta a deliberação autônoma da quadrilha, a "
+     "omissão estatal já não é específica àquele resultado: qualifica-se como "
+     "genérica.", [AM]),
+    ("og_q10", "og_q10: OmissaoGen => ¬cf2lrc_q5", "og",
+     "Omissão genérica não é liame necessário nem determinante do resultado: "
+     "não sustenta a presunção de relevância jurídica.", [AM]),
+    ("q11", "q11: ¬ProvCabiveis => ¬suca_q3", "q11",
+     "Não tendo o Estado demonstrado as providências cabíveis, não se sustenta "
+     "a alegação de ato de terceiro deduzida por ele.", [EF]),
 ]
 
 #: Premissas da camada LRC que não vêm da ponte. Aqui elas são fatos da camada
@@ -250,112 +270,12 @@ LRC_PREMISES = [
     ("RegFechado", "o preso cumpria regime prisional fechado", [RDO, MA, EF]),
     ("LapsoTemp", "o crime foi praticado após três meses da fuga", [RTE, AM]),
     ("FormacaoQuad", "o crime foi praticado em concurso de agentes", [AM]),
-    ("Latrocinio", "a quadrilha praticou roubo seguido de morte contra a vítima",
+    ("Latrocinio", "o foragido praticou roubo seguido de morte contra a vítima",
      [TODOS]),
+    ("¬ProvCabiveis", "o Estado não demonstrou as providências cabíveis", [EF]),
 ]
 
 LRC_TARGETS = ["LeReCa_OmiEstatal_Danos"]
-
-
-# ----------------------------------------------------------------------
-# Preferências: a tupla ⟨dever específico, intervenção causal, autonomia⟩
-# ----------------------------------------------------------------------
-DIMENSIONS = [
-    PreferenceDimensionOut(
-        key="dever_especifico", weight=4.0,
-        label_pt="especificidade no dever de agir",
-        rationale_pt="Quanto pesa a tese de que o Estado devia àquele preso um "
-                     "dever concreto de custódia, e não o dever difuso de "
-                     "segurança pública que deve a todos."),
-    PreferenceDimensionOut(
-        key="intervencao_causal", weight=5.0,
-        label_pt="intervenção causal",
-        rationale_pt="Quanto pesa o evento interposto entre a conduta e o dano "
-                     "— aqui, os três meses decorridos entre a fuga e o crime."),
-    PreferenceDimensionOut(
-        key="autonomia", weight=5.0,
-        label_pt="autonomia do terceiro",
-        rationale_pt="Quanto pesa a deliberação própria de quem praticou o "
-                     "crime — aqui, a formação de quadrilha, que é decisão de "
-                     "terceiros e não desdobramento da fuga."),
-]
-
-#: `id da regra -> (coeficientes, por quê)`. Uma regra ausente daqui é neutra:
-#: não invoca nenhuma dimensão e não entra na agregação. É o caso das regras
-#: que apenas encadeiam o que já está posto — `dvgen_q2` tira a consequência
-#: de `dvgen_q1`, `sc_q6` aplica a caracterização de `suca_*` — e o é por
-#: desenho: fossem elas pontuadas, o peso do fundamento seria contado duas
-#: vezes e o elo mais fraco passaria a medir o encadeamento, não a razão.
-PROFILES = {
-    # --- premissas ordinárias ------------------------------------------
-    # A Definição 21 de Modgil & Prakken compara `Prem_p` **e** `DefRules`.
-    # Classificar só as regras deixa a ordenação muda: dois conjuntos de
-    # premissas não vazios e não classificados nunca se precedem, e a
-    # conjunção falha qualquer que seja a comparação entre as regras. Estes
-    # três fatos são exatamente os `abstract_factor` que os átomos já
-    # declaram — a balança de fatores e a ordenação passam a falar da mesma
-    # coisa em vez de duas parecidas.
-    "RegFechado": ({"dever_especifico": 1.0},
-                   "É o fato que torna o dever específico: regime fechado, "
-                   "custódia estrita."),
-    "LapsoTemp": ({"intervencao_causal": 1.0},
-                  "É o evento interposto: três meses entre a fuga e o crime."),
-    "FormacaoQuad": ({"autonomia": 1.0},
-                     "É a deliberação própria de terceiros: concurso de agentes."),
-    # --- regras ---------------------------------------------------------
-    "r1": ({"dever_especifico": 1.0},
-           "Lê o regime fechado, que é o que torna o dever específico."),
-    "r5": ({"intervencao_causal": 1.0},
-           "Opõe o lapso temporal ao elo entre fuga e crime."),
-    "r6": ({"intervencao_causal": 1.0, "autonomia": 1.0},
-           "Explica o crime pelo lapso somado à deliberação da quadrilha."),
-    "r7": ({"intervencao_causal": 1.0, "autonomia": 1.0},
-           "Mesmo fundamento de r6, na forma de undercut."),
-    "dvesp_q0": ({"dever_especifico": 1.0},
-                 "É a tese da especificidade do dever, e o único lado dela no "
-                 "conflito ⟨q0, q2⟩."),
-    "dvgen_q1": ({"intervencao_causal": 1.0, "autonomia": 1.0},
-                 "É o outro lado de ⟨q0, q2⟩, e se apoia nas duas outras "
-                 "dimensões ao mesmo tempo."),
-    "dvgen_q2": ({"intervencao_causal": 1.0, "autonomia": 1.0},
-                 "Tira a consequência de q1, e carrega o fundamento dela. "
-                 "Sob a Def. 21 não existe regra 'neutra' que se pule: a "
-                 "comparação é sobre o conjunto inteiro de DefRules, e um "
-                 "membro sem classificação torna o conjunto incomparável."),
-    "suca_q3": ({"intervencao_causal": 1.0},
-                "Caracteriza o ato de terceiro só pelo lapso."),
-    "suca_q4": ({"intervencao_causal": 1.0, "autonomia": 1.0},
-                "Caracteriza o ato de terceiro pelo lapso e pela quadrilha."),
-    "dvpre_q8": ({"dever_especifico": 1.0},
-                 "Faz o dever específico prevalecer sobre a defesa do ato de "
-                 "terceiro."),
-}
-
-PREFERENCE_NOTES = (
-    "A ordenação básica do ASPIC+ (Definição 2.11) deixa dois argumentos "
-    "derrotáveis incomparáveis, e o documento marca ⟨q0, q2⟩ como o único "
-    "ataque ativo por rebutting da formalização: `dvesp_q0` conclui "
-    "DeverEspec, `dvgen_q2` conclui ¬DeverEspec, e nenhum dos dois undercuta "
-    "o outro. Sem preferência, os dois ficam UNDEC e a camada de relevância "
-    "não responde nada.\n\n"
-    "A comparação segue a Definição 21 de Modgil & Prakken (2013), com o "
-    "comparador elitista: `B ≺ A` exige `Prem_p(B) ◁ Prem_p(A)` **e** "
-    "`DefRules(B) ◁ DefRules(A)`. Por isso as premissas também são "
-    "classificadas — `RegFechado` no eixo do dever, `LapsoTemp` na "
-    "intervenção causal, `FormacaoQuad` na autonomia. Classificar só as "
-    "regras, como esta formalização fazia antes, é a anomalia que os próprios "
-    "autores da definição declararam ter ido corrigir: deixa a ordenação "
-    "declarar preferência onde o ASPIC+ canônico não declara nenhuma.\n\n"
-    "Do lado do dever específico, `⟨RegFechado⟩` = 4 e `⟨dvesp_q0⟩` = 4; do "
-    "outro, `⟨LapsoTemp, FormacaoQuad⟩` = ⟨5, 5⟩ e `⟨dvgen_q1, dvgen_q2⟩` = "
-    "⟨10, 10⟩. As duas comparações correm no mesmo sentido, então a conjunção "
-    "vale e o dever genérico prevalece.\n\n"
-    "A ordenação é movimento do **voto divergente**, não fato do mundo: é ele "
-    "que sustenta q2, e é dele o argumento de prioridade. Antes de o voto "
-    "entrar, o traço roda sob a ordenação básica — de outro modo uma "
-    "preferência decidiria um rebate entre as partes sem adjudicador nenhum, "
-    "o que a fase de decisão de Prakken (§4.3) não admite."
-)
 
 
 # ----------------------------------------------------------------------
@@ -455,21 +375,17 @@ def build_record(directory: Path) -> FormalizedCase:
         duty_basis_pt=(
             "Art. 37, § 6º, da Constituição Federal, lido junto ao dever de "
             "custódia sobre quem cumpre pena em regime fechado. A controvérsia "
-            "é exatamente sobre a natureza desse dever: específico de custódia "
-            "(RDO_, MA_, EF_) ou genérico de segurança pública (AM_)."
+            "é exatamente sobre a natureza desse dever. O vocabulário — dever "
+            "específico, dever geral, omissão própria — é inteiro do voto "
+            "convergente (EF_), que firma o dever específico e afasta o geral. "
+            "Nenhum outro voto o usa: o divergente decide por ruptura do nexo, "
+            "não por natureza do dever."
         ),
     )
 
-    preferences = PreferenceBlock(
-        principle="weakest",
-        comparator="elitist",
-        perspective=AM,
-        dimensions=list(DIMENSIONS),
-        profiles=[RuleProfileOut(rule=rule_id, coefficients=dict(coefficients),
-                                 rationale_pt=why)
-                  for rule_id, (coefficients, why) in PROFILES.items()],
-        notes_pt=PREFERENCE_NOTES,
-    )
+    #: A teoria do spec é livre de pesos: todos os ataques da LRC são
+    #: undercutting, e não sobra par de conclusões complementares para ordenar.
+    preferences = None
 
     record = FormalizedCase(
         case=CaseMeta(
