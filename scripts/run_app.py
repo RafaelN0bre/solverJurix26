@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
-"""Run the live case-explorer app (aspic.api:app) with auto-reload.
+"""Entry-point script: runs the live case explorer (`interface.api:app`)
+under uvicorn with auto-reload. The interactive way into the pipeline's
+outputs; the static equivalents are `generate_graphs.py` and
+`render_translated.py`.
+"""
 
-Runs uvicorn programmatically (rather than via `uv run uvicorn aspic.api:app`)
+"""Run the live case-explorer app (interface.api:app) with auto-reload.
+
+Runs uvicorn programmatically (rather than via `uv run uvicorn interface.api:app`)
 because this uv/Python combination leaves the editable install's `.pth` file
 flagged hidden on macOS, which CPython 3.13's site module skips -- so `aspic`
 isn't reliably importable outside of pytest (which sets `pythonpath` itself
@@ -27,5 +33,5 @@ import uvicorn  # noqa: E402
 
 if __name__ == "__main__":
     port = int(os.environ.get("ASPIC_APP_PORT", "8000"))
-    uvicorn.run("aspic.api:app", host="127.0.0.1", port=port, reload=True,
+    uvicorn.run("interface.api:app", host="127.0.0.1", port=port, reload=True,
                 reload_dirs=[str(REPO_ROOT / "src")])

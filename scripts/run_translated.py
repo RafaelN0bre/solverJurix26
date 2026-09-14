@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-"""Re-executa o solver sobre um caso já formalizado, sem chamar o LLM.
+"""Pipeline rerun script: rebuilds each `case.json` framework, recalculates
+verdicts and rewrites `case.json` and `validation.json`. Used to iterate
+after solver changes or manual record edits.
+"""
 
-    uv run python scripts/run_translated.py            # todos os casos
-    uv run python scripts/run_translated.py case-005   # um caso
+"""Reruns the solver on an already formalized case.
 
-Reconstrói os dois frameworks a partir de `data/translated/<caso>/case.json`,
-recalcula os vereditos, regrava `case.json` e `validation.json` e imprime a
-tabela solver × corte. É o laço barato para iterar depois de editar o solver ou
-de ajustar um `case.json` à mão -- e o jeito de detectar que uma mudança no
-solver alterou o resultado de uma formalização já publicada.
+    uv run python scripts/run_translated.py                    # all cases
+    uv run python scripts/run_translated.py case-003-final     # one case
+
+Rebuilds both frameworks from `data/translated/<case>/case.json`, recalculates
+verdicts, rewrites `case.json` and `validation.json`, and prints the
+solver-versus-court table. This inexpensive loop supports solver or record
+edits and detects changes to a published formalization's results. No model
+is called: `scripts/build_case003_final.py` transcribes the record and the
+solver is deterministic.
 """
 import argparse
 import json
@@ -21,10 +27,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from formalize import build  # noqa: E402
-from formalize.cli import print_report  # noqa: E402
-from formalize.pipeline import DEFAULT_OUT_DIR, _update_index  # noqa: E402
 from formalize.schema import FormalizedCase  # noqa: E402
-from formalize.validate import validate_case  # noqa: E402
+from formalize.store import DEFAULT_OUT_DIR, update_index  # noqa: E402
+from formalize.validate import print_report, validate_case  # noqa: E402
 
 
 def main(argv=None) -> int:
@@ -63,7 +68,7 @@ def main(argv=None) -> int:
         if not report.ok:
             failures += 1
     if not args.check:
-        _update_index(args.dir)
+        update_index(args.dir)
     return 1 if failures else 0
 
 

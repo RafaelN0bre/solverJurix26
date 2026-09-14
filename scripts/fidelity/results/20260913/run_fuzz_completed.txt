@@ -1,0 +1,6 @@
+teorias: 366  pares: 16504
+[plena] nosso=T/ref=F: 155   nosso=F/ref=T: 53   (D3: 83)
+[isolada] divergentes: 235  {'ours=T/ref=F': 210, 'ours=F/ref=T': 25}
+    D1 (exigência de atacante IN): 210
+    D2 (Supp difere): 25
+teorias com Supp divergente (D2): 8

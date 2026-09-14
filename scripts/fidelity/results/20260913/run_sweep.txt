@@ -1,0 +1,42 @@
+===== examples::asbestos                 NO DIFFERENCE   (14 literais)
+        OK ness(Ex1,Di) ours=True == ref=True  esperado=True
+        OK ness(Ex2,Di) ours=True == ref=True  esperado=True
+        OK ness(Ex3,Di) ours=True == ref=True  esperado=True
+===== examples::double_shooting          NO DIFFERENCE   (15 literais)
+        OK ness(BuSh,GeDi) ours=True == ref=True  esperado=True
+        OK ness(DlSh,GeDi) ours=False == ref=False  esperado=False
+===== examples::leukaemia                NO DIFFERENCE   (11 literais)
+        OK ness(ChLe,ChDi) ours=True == ref=True  esperado=True
+        OK ness(¬PaCo,ChDi) ours=True == ref=True  esperado=True
+===== examples::car_accident             NO DIFFERENCE   (12 literais)
+        OK ness(¬DrPu,AcHa) ours=True == ref=True  esperado=True
+        OK ness(BrMa,AcHa) ours=False == ref=False  esperado=False
+===== examples::war_crime_soldier_shoots NO DIFFERENCE   (9 literais)
+        OK ness(SoSh,PrDi) ours=True == ref=True  esperado=True
+===== examples::war_crime_soldier_refuses NO DIFFERENCE   (9 literais)
+        OK ness(¬SoSh,PrDi) ours=True == ref=True  esperado=True
+===== examples::kingston                 NO DIFFERENCE   (11 literais)
+        OK ness(DeFi,De) ours=True == ref=True  esperado=True
+        OK ness(UnFi,De) ours=True == ref=True  esperado=True
+===== examples::watson                   NO DIFFERENCE   (7 literais)
+        OK ness(Ga,Ig) ours=True == ref=True  esperado=True
+        OK ness(Ma,Ig) ours=True == ref=True  esperado=True
+===== examples::r_v_jordan               NO DIFFERENCE   (7 literais)
+        OK ness(JoSt,ViDe) ours=True == ref=True  esperado=True
+        OK ness(AdAn,ViDe) ours=True == ref=True  esperado=True
+===== examples::berry_sugar_notch        NO DIFFERENCE   (12 literais)
+        OK ness(PlSp,In) ours=True == ref=True  esperado=True
+        OK ness(TrFa,In) ours=True == ref=True  esperado=True
+===== examples::yania_bigan              NO DIFFERENCE   (5 literais)
+        OK ness(¬YaHe,BiDi) ours=True == ref=True  esperado=True
+===== translated::case-003-final         NO DIFFERENCE   (23 literais)
+        OK ness(OmiEstatal,Danos) ours=True == ref=True
+        OK ness(FugaPreso,Danos) ours=True == ref=True
+        OK ness(Latrocinio,Danos) ours=True == ref=True
+===== translated::case-003-final-cif     NO DIFFERENCE   (17 literais)
+        OK ness(OmiEstatal,Danos) ours=True == ref=True
+        OK ness(FugaPreso,Danos) ours=True == ref=True
+        OK ness(Latrocinio,Danos) ours=True == ref=True
+
+TOTAL pares (phi,psi) divergentes na varredura: 0
+TOTAL pares afetados por truncamento de construção: 0

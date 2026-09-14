@@ -1,29 +1,35 @@
 #!/usr/bin/env python3
-"""Gera um relatório estático, autocontido, de um caso formalizado.
+"""Pipeline output script: writes each catalog formalization's static report
+under `docs/graphs/<case>.html` and standalone figures under `docs/figures/`.
+Uses the same `interface` modules as the live application.
+"""
 
-    uv run python scripts/render_translated.py                    # todos
-    uv run python scripts/render_translated.py case-003-final     # um caso
+"""Generates a self-contained static report for a formalized case.
 
-Escreve `docs/graphs/<caso>.html` — um arquivo só, sem servidor, sem rede,
-com todas as visualizações do explorador empilhadas na mesma ordem das abas
-(Análise, Dossiê, Perspectivas, Pesos, Formalização, Conferência) — e, em
-`docs/figures/`, as figuras isoladas de que o artigo precisa:
+    uv run python scripts/render_translated.py                    # all cases
+    uv run python scripts/render_translated.py case-003-final     # one case
 
-    <caso>-cif.svg          grafo de argumentos da camada de causa de fato
-    <caso>-lrc.svg          grafo de argumentos da camada de relevância
-    <caso>-adjudicacao.svg  mapa de adjudicação (quem move o quê)
-    <caso>-confrontos.svg   quem enfrenta quem, por perspectiva
+Writes `docs/graphs/<case>.html`: a single file with no server or network,
+stacking explorer views in tab order (Analysis, Dossier, Perspectives,
+Weights, Formalization, Validation). Also writes the paper's standalone figures:
 
-`scripts/generate_graphs.py` faz o equivalente para os cinco casos de
-referência do artigo, que são especificados à mão e não têm registro de
-formalização; este faz para os que vieram de dossiê, que têm — e por isso
-têm dossiê, ficha, conferência e, quando declaram pesos, a aba de
-preferências.
+    <case>-cif.svg            cause-in-fact argument graph
+    <case>-lrc.svg            legal-relevance argument graph
+    <case>-adjudication.svg   numbered attack structure with phase/outcome legend
+    <case>-confrontation.svg  perspective-to-perspective confrontations
 
-O HTML é gerado pelos mesmos módulos que a aplicação viva serve
-(`aspic.didactic`, `aspic.dossier_view`, `aspic.perspective_view`,
-`aspic.preference_view`, `aspic.formalization_view`, `aspic.evaluation`), de
-modo que o arquivo estático e a página não podem divergir.
+`scripts/generate_graphs.py` does the equivalent for the paper's five
+reference cases, specified by hand without formalization records. This
+script handles dossier cases, which have records and hence dossier,
+formalization and validation views, plus preferences when weights are declared.
+
+The HTML uses the live application's rendering modules
+(`interface.didactic`, `interface.dossier_view`, `interface.perspective_view`,
+`interface.preference_view`, `interface.formalization_view`, `interface.evaluation`),
+keeping static files and live pages consistent.
+
+Requires Graphviz (`dot`) and librsvg (`rsvg-convert`) for the standalone
+adjudication PDF, whose vector legend is embedded in the SVG before export.
 """
 import argparse
 import html
@@ -34,24 +40,34 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from aspic import catalog  # noqa: E402
-from aspic import perspectives as P  # noqa: E402
-from aspic.didactic import render_case_didactic  # noqa: E402
-from aspic.dossier_view import render_dossier  # noqa: E402
-from aspic.evaluation import render_evaluation  # noqa: E402
-from aspic.formalization_view import render_formalization_fiche  # noqa: E402
-from aspic.graph_export import render_to_file, to_dot  # noqa: E402
-from aspic.perspective_view import render_perspectives  # noqa: E402
-from aspic.preference_view import render_preferences  # noqa: E402
-from aspic.report import GRAPH_INTERACTIVITY_JS, PAGE_CSS  # noqa: E402
+from cases import catalog  # noqa: E402
+from cases.workspace import docs_dir, workspace_root  # noqa: E402
+from analysis import perspectives as P  # noqa: E402
+from interface.architecture_view import render_architecture  # noqa: E402
+from interface.didactic import render_case_didactic  # noqa: E402
+from interface.dossier_view import render_dossier  # noqa: E402
+from interface.evaluation import render_evaluation  # noqa: E402
+from interface.formalization_view import render_formalization_fiche  # noqa: E402
+from interface.graph_export import render_to_file, to_dot  # noqa: E402
+from interface.perspective_view import render_perspectives  # noqa: E402
+from interface.preference_view import render_preferences  # noqa: E402
+from interface.report import GRAPH_INTERACTIVITY_JS, PAGE_CSS  # noqa: E402
 from formalize import build  # noqa: E402
 
-FIGURES_DIR = REPO_ROOT / "docs" / "figures"
-REPORT_DIR = REPO_ROOT / "docs" / "graphs"
+FIGURES_DIR = docs_dir() / "figures"
+REPORT_DIR = docs_dir() / "graphs"
+
+
+def _short(path) -> str:
+    """Path relative to the workspace, where `docs/` now lives."""
+    try:
+        return str(path.relative_to(workspace_root()))
+    except ValueError:
+        return str(path)
 
 
 def write_figures(record) -> list:
-    """As figuras isoladas do caso, em SVG e PDF. Devolve os caminhos."""
+    """Standalone case figures in SVG and PDF. Returns their paths."""
     written = []
     frameworks = [("cif", "F", build.cif_framework(record), "Camada de causa de fato"),
                   ("lrc", "R", build.lrc_framework(record), "Camada de relevância jurídica")]
@@ -69,45 +85,55 @@ def write_figures(record) -> list:
     dot = P.to_adjudication_dot(
         record, title=f"{record.case.title} — adjudicação",
         known=P.perspectives_in(record))
+    from interface.adjudication_translation import translate_adjudication_dot
+
+    dot = translate_adjudication_dot(dot)
     for fmt in ("svg", "pdf"):
-        path = FIGURES_DIR / f"{record.case.id}-adjudicacao.{fmt}"
+        path = FIGURES_DIR / f"{record.case.id}-adjudication.{fmt}"
         render_to_file(dot, path, fmt=fmt)
         written.append(path)
 
     dot = P.to_confrontation_dot(
         record, title=f"{record.case.title} — quem enfrenta quem")
     for fmt in ("svg", "pdf"):
-        path = FIGURES_DIR / f"{record.case.id}-confrontos.{fmt}"
+        path = FIGURES_DIR / f"{record.case.id}-confrontation.{fmt}"
         render_to_file(dot, path, fmt=fmt)
         written.append(path)
     return written
 
 
-#: `(âncora, rótulo, como renderizar)`, na ordem das abas do explorador.
+#: `(anchor, label, renderer, always?)`. The report is a reading of the
+#: case: it keeps what answers “what was decided and
+#: why”: analysis, moves, formalization and validation. The annotated dossier
+#: is raw input and alone accounted for 38% of the file; weights
+#: appear only when declared. Both remain available in the live application
+#: (`scripts/run_app.py`), where readers can consult the source.
 VIEWS = [
+    ("arquitetura", "Arquitetura",
+     lambda record: render_architecture(record), True),
     ("analise", "Análise",
-     lambda record: render_case_didactic(build.to_case_spec(record))),
-    ("dossie", "Dossiê",
-     lambda record: render_dossier(record.case.id, record)),
+     lambda record: render_case_didactic(build.to_case_spec(record)), True),
     ("perspectivas", "Perspectivas",
-     lambda record: render_perspectives(record, title=record.case.title)),
+     lambda record: render_perspectives(record, title=record.case.title), True),
     ("pesos", "Pesos",
-     lambda record: render_preferences(record)),
+     lambda record: render_preferences(record), False),
     ("formalizacao", "Formalização",
      lambda record: render_formalization_fiche(
-         record, catalog.validation_by_id(record.case.id))),
+         record, catalog.validation_by_id(record.case.id)), True),
     ("conferencia", "Conferência",
      lambda record: render_evaluation(
-         record, catalog.validation_by_id(record.case.id), record.case.id)),
+         record, catalog.validation_by_id(record.case.id), record.case.id), True),
 ]
 
 
 def build_report(record) -> str:
     blocks, toc = [], []
-    for anchor, label, render in VIEWS:
+    for anchor, label, render, always in VIEWS:
+        if not always and record.preferences is None:
+            continue
         try:
             body = render(record)
-        except Exception as exc:  # noqa: BLE001 - uma vista quebrada não some com o resto
+        except Exception as exc:  # noqa: BLE001 - a broken view must not suppress the rest
             body = (f'<section><h3>{html.escape(label)}</h3>'
                     f'<p class="notice">Esta vista não pôde ser gerada: '
                     f'{html.escape(str(exc))}</p></section>')
@@ -155,10 +181,10 @@ def main(argv=None) -> int:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     for case_id, record in records.items():
         for path in write_figures(record):
-            print(f"Escrito {path.relative_to(REPO_ROOT)}")
+            print(f"Escrito {_short(path)}")
         report = REPORT_DIR / f"{case_id}.html"
         report.write_text(build_report(record), encoding="utf-8")
-        print(f"Escrito {report.relative_to(REPO_ROOT)}")
+        print(f"Escrito {_short(report)}")
     return 0
 
 

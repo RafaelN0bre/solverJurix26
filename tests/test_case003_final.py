@@ -1,312 +1,282 @@
-"""The Caso 003 formalization by votes, end to end.
-
-`docs/formalizacao-caso003.md` is the only case in the repository whose
-outcome turns on a weighing rather than on an undercut, and the only one with
-five perspectives and rules several of them hold on their own account. That
-makes it the regression guard for three things at once -- the preference
-ordering, multi-holder attribution, and the step-relative bridge -- and the
-place where a change to any of them shows up as a different reading of a real
-judgment rather than as a different number in a fixture.
-
-What is asserted here is the *shape* of the result and the two turns of the
-trace, not every literal: `test_translated_regression` already pins the
-stored verdicts literal by literal for every case on disk.
+"""Checks the transcribed Case 003 records and their pipeline results.
+Exercises layer ordering, legal-relevance resolution and architecture rendering.
 """
+
+"""Case 003, validated against `docs/formalizacao-caso003.md`.
+
+The document is the hand-written formalization of RE 608.880/MT with five
+voices (the two parties and three adjudicators);
+`scripts/build_case003_final.py` transcribes it into
+`data/translated/case-003-final/case.json`. This file enforces two things:
+
+1. **Alignment** — every rule of the document exists in the record, with the
+   same antecedent, the same consequent and the same voices. It is the test
+   that keeps the document and the executable from diverging in silence,
+   which has happened before.
+2. **Resolution** — the record, when run, arrives where the judgment
+   arrived, and arrives along the path the winning vote takes.
+
+The layer order here is `lrc_first`, unlike the paper's cases: the LRC
+qualification rules run first and hand the legal frame to the CIF as an
+axiom. See `formalize.build.qualification_framework`.
+"""
+import re
+
 import pytest
 
-from aspic import lrc as lrc_vocab
-from aspic import perspectives as P
-from aspic import preferences as PR
-from aspic.catalog import DEFAULT_TRANSLATED_DIR
-from aspic.graph_export import argument_status
+from cases import catalog
+from cases.workspace import docs_dir
 from formalize import build
-from formalize.schema import FormalizedCase
 
-CASE_FILE = DEFAULT_TRANSLATED_DIR / "case-003-final" / "case.json"
-pytestmark = pytest.mark.skipif(
-    not CASE_FILE.is_file(),
-    reason="rode scripts/build_case003_final.py para gravar o caso")
-
+DOC = docs_dir() / "formalizacao-caso003.md"
 TARGET = "LeReCa_OmiEstatal_Danos"
 
+#: Long name in the document -> record code (`ATOM_CODE_RE` caps it at 12).
+RENAME = {"LapsoTemporal": "LapsoTemp", "ProvidenciasCabiveis": "ProvCabiveis",
+          "MeiosDisponiveis": "MeiosDisp", "OmissaoGenerica": "OmissaoGen"}
+#: Document abbreviation -> record perspective.
+VOICES = {"RTE_": "recorrente", "RDO_": "recorrido", "MA_": "relator",
+          "EF_": "voto_convergente", "AM_": "voto_divergente"}
+ALL_VOICES = set(VOICES.values())
 
-@pytest.fixture
+
+@pytest.fixture(scope="module")
 def record():
-    return FormalizedCase.model_validate_json(CASE_FILE.read_text(encoding="utf-8"))
+    return catalog.formalized_records()["case-003-final"]
 
 
-def labels(af):
-    extension, _ = af.compute_grounded_extension()
-    status = argument_status(af, extension)
-    return {argument.conclusion: status[argument.id]
-            for argument in af.arguments.values() if argument.defeasible_rules}
+@pytest.fixture(scope="module")
+def document():
+    return DOC.read_text(encoding="utf-8")
+
+
+def parse(document, prefix):
+    """The document's rules: `id -> (antecedent, consequent, voices)`."""
+    out = {}
+    pattern = r"^(" + prefix + r"[\w]*)\s*:\s*(.+?)\s+⇒\s+(.+?)\s+\[(.+?)\]\s*$"
+    for match in re.finditer(pattern, document, re.M):
+        rule_id, antecedent, consequent, voices = match.groups()
+
+        def rename(text):
+            for long, short in RENAME.items():
+                text = text.replace(long, short)
+            return text.replace(" ∧ ", " AND ")
+
+        out[rule_id] = (rename(antecedent), rename(consequent),
+                        {VOICES[v.strip()] for v in voices.split(",")})
+    return out
+
+
+def rules_of(record, layer):
+    """The record's rules: `id -> (antecedent, consequent, voices)`."""
+    if layer == "cif":
+        entries = [(m.id, m.rule, set(m.perspectives) or {m.perspective})
+                   for m in record.rules_meta]
+    else:
+        entries = [(r.rule.split(":", 1)[0].strip(), r.rule,
+                    set(r.perspectives) or {r.perspective}) for r in record.lrc.scheme_rules]
+    out = {}
+    for rule_id, rule, voices in entries:
+        antecedent, _, consequent = rule.split(":", 1)[1].partition(" => ")
+        out[rule_id] = (antecedent.strip(), consequent.strip(),
+                        ALL_VOICES if voices == {"comum"} else voices)
+    return out
 
 
 # ----------------------------------------------------------------------
-# The tuple, and what it decides
+# 1. Document-to-record alignment
 # ----------------------------------------------------------------------
-def test_the_case_declares_the_three_dimensions_with_the_given_weights(record):
-    model = build.preference_model(record)
-    assert model.weights == {"dever_especifico": 4.0,
-                             "intervencao_causal": 5.0, "autonomia": 5.0}
-    assert model.principle == PR.WEAKEST_LINK
+def test_the_cause_in_fact_rules_are_the_documents(record, document):
+    doc_rules, rec_rules = parse(document, "r"), rules_of(record, "cif")
+    assert set(doc_rules) == set(rec_rules)
+    for rule_id, (antecedent, consequent, voices) in doc_rules.items():
+        assert rec_rules[rule_id][0] == antecedent, rule_id
+        assert rec_rules[rule_id][1] == consequent, rule_id
+        assert rec_rules[rule_id][2] == voices, rule_id
 
 
-def test_the_weighing_decides_the_duty_and_only_the_duty(record):
-    """⟨q0, q2⟩ is the document's own "único ponto ativo", and it stays the
-    only one: every other conflict in both layers is an undercut, which no
-    preference touches."""
-    lrc_af = build.lrc_framework(record)
-    resolved = labels(lrc_af)
-    assert resolved["¬DeverEspec"] == "IN"
-    assert resolved["DeverEspec"] == "OUT"
-
-    conflicts = PR.resolved_conflicts(lrc_af)
-    assert {(row["attacker_conclusion"], row["target_conclusion"])
-            for row in conflicts} == {("DeverEspec", "¬DeverEspec"),
-                                      ("¬DeverEspec", "DeverEspec")}
-    # The cause-in-fact layer is decided entirely by undercutting, exactly as
-    # the document's "Pontos sensíveis a preferência: nenhum" says.
-    assert PR.resolved_conflicts(build.cif_framework(record)) == []
-
-
-def test_the_ordering_is_a_move_of_the_dissenting_vote(record):
-    """Prakken §4.3: um argumento de prioridade é **movimento**, não fato.
-
-    A ordenação injetada em toda projeção valia já no passo 0, onde nenhum
-    adjudicador falou -- e ali uma preferência decidiria um rebate entre as
-    partes por autoridade de ninguém. Agora o bloco nomeia quem a move, e uma
-    projeção que ainda não o admitiu roda sob a ordenação básica.
-    """
-    assert record.preferences.perspective == "voto_divergente"
-    ativa = {}
-    admitidas = []
-    for key in ("recorrente", "recorrido", "relator",
-                "voto_convergente", "voto_divergente"):
-        admitidas.append(key)
-        ativa[key] = P.project_lrc(record, list(admitidas)).preferences is not None
-    assert ativa == {"recorrente": False, "recorrido": False, "relator": False,
-                     "voto_convergente": False, "voto_divergente": True}
-    # E o caso inteiro, onde todas as vozes falaram, roda com ela.
-    assert build.preference_model(record) is not None
+def test_the_legal_relevance_rules_are_the_documents(record, document):
+    """Document ids receive scheme prefixes in the record (`q4` ->
+    `suca_q4`), so matching uses the suffix."""
+    doc_rules = parse(document, "q") | parse(document, "u_") | parse(document, "dvesp") \
+        | parse(document, "suca") | parse(document, "cf2lrc") | parse(document, "sc_") \
+        | parse(document, "dvpre") | parse(document, "og_")
+    rec_rules = rules_of(record, "lrc")
+    by_suffix = {rule_id.split("_")[-1]: rule_id for rule_id in rec_rules}
+    assert len(doc_rules) == len(rec_rules)
+    for doc_id, (antecedent, consequent, voices) in doc_rules.items():
+        rec_id = by_suffix[doc_id.split("_")[-1]]
+        rec_antecedent, rec_consequent, rec_voices = rec_rules[rec_id]
+        assert rec_antecedent == antecedent, doc_id
+        # The document's `¬q5` is `¬cf2lrc_q5` in the record.
+        expected = re.sub(r"^¬(\w+)$",
+                          lambda m: "¬" + by_suffix.get(m.group(1).split("_")[-1],
+                                                        m.group(1)), consequent)
+        assert rec_consequent == expected, doc_id
+        assert rec_voices == voices, doc_id
 
 
-def test_the_ordering_follows_definition_21(record):
-    """Premissas **e** regras, conjuntamente -- e por isso as premissas do
-    caso são classificadas nos mesmos três eixos dos átomos."""
-    model = build.preference_model(record)
-    assert model.principle == PR.WEAKEST_LINK
-    assert model.comparator == PR.ELITIST
-    ranked = {p.rule for p in record.preferences.profiles}
-    assert {"RegFechado", "LapsoTemp", "FormacaoQuad"} <= ranked
+def test_every_atom_of_the_document_exists_in_the_record(record, document):
+    block = document[document.index("## Atoms"):document.index("## CIF")]
+    codes = {RENAME.get(m, m) for m in re.findall(r"^([A-Z][A-Za-z]+)\s{2,}\S",
+                                                  block, re.M)}
+    assert codes == {atom.code for atom in record.atoms}
 
+
+# ----------------------------------------------------------------------
+# 2. Layer execution order
+# ----------------------------------------------------------------------
+def test_the_record_declares_the_inverted_order(record):
+    assert record.layer_order == "lrc_first"
+
+
+def test_the_legal_frame_reaches_the_cause_in_fact_layer_as_axioms(record):
+    """Qualifications established independently by LRC enter CIF in K𝑛 and
+    remain in the record: loading it exposes the injection, not `axioms: []`."""
+    frame = build.qualifications(record)
+    assert frame == ["AtoTerceiro", "DeverEspec", "OmissaoGen"]
+    assert set(frame) <= set(record.knowledge_base["axioms"])
+    assert {str(a) for a in build.cif_framework(record).axioms} >= set(frame)
+
+
+def test_only_the_bridge_waits_for_the_facts(record):
+    """Inversion applies to the ten autonomous rules; `cf2lrc` reads `CaFa`
+    and therefore still runs after CIF."""
+    waits = [r.rule.split(":", 1)[0].strip() for r in record.lrc.scheme_rules
+             if build._reads_bridge(r.rule)]
+    assert waits == ["cf2lrc_q5"]
+
+
+def test_the_bridge_still_enters_the_relevance_layer_as_an_axiom(record):
+    """Inversion preserves equation (1): the bridge remains an LRC axiom."""
+    axioms = record.lrc.knowledge_base["axioms"]
+    assert "CaFa_OmiEstatal_Danos" in axioms
+    assert not [p for p in record.lrc.knowledge_base["premises"]
+                if p.startswith(("CaFa_", "ButFor_"))]
+
+
+# ----------------------------------------------------------------------
+# 3. Resolution
+# ----------------------------------------------------------------------
+def test_the_grounded_extension_follows_the_votes(record):
+    """Winning-vote steps in order: Fachin's specific duty becomes `in` and
+    defeats the third-party-act defence; the ex officio undercut cancels the
+    party's claim; generic omission defeats the relevance presumption."""
     af = build.lrc_framework(record)
-    esp = next(a for a in af.arguments.values() if a.conclusion == "DeverEspec")
-    gen = next(a for a in af.arguments.values() if a.conclusion == "¬DeverEspec")
-    assert model.precedes(sorted(esp.ordinary_premises),
-                          sorted(gen.ordinary_premises)) is True
-    assert model.precedes(list(esp.defeasible_rules),
-                          list(gen.defeasible_rules)) is True
-
-    # Só com as regras -- a versão anterior -- a Def. 21 fica muda.
-    so_regras = PR.PreferenceModel(
-        model.dimensions,
-        [pr for pr in model.profiles.values()
-         if pr.rule_id not in ("RegFechado", "LapsoTemp", "FormacaoQuad")])
-    assert so_regras.is_weaker(esp, gen) is False
+    justified = set(af.justified_conclusions())
+    for literal in ("DeverEspec", "¬sc_q6", "¬suca_q3", "OmissaoGen", "¬cf2lrc_q5"):
+        assert literal in justified, literal
+    assert TARGET not in justified
 
 
-def test_without_the_weights_the_layer_answers_nothing(record):
-    """The control. Under the basic ordering the mutual rebut leaves both
-    qualifications UNDEC, and with them the exception (`dvpre_q8`) and the
-    defence that needs the duty absent (`unom_q7`) -- so the layer reports no
-    relevance for a reason that is not a decision."""
-    plain = record.model_copy(deep=True)
-    plain.preferences = None
-    resolved = labels(build.lrc_framework(plain))
-    assert resolved["DeverEspec"] == "UNDEC"
-    assert resolved["¬DeverEspec"] == "UNDEC"
-    assert resolved["¬cf2lrc_q5"] == "UNDEC"
-
-
-def test_the_case_turns_when_the_duty_outweighs_the_other_two(record):
-    """4 against 5 + 5 loses; above 10 it wins. Anyone who wants to defend a
-    different number needs to know that this is where it would matter."""
-    def duty_wins(weight):
-        probed = record.model_copy(deep=True)
-        for dimension in probed.preferences.dimensions:
-            if dimension.key == "dever_especifico":
-                dimension.weight = weight
-        return labels(build.lrc_framework(probed))["DeverEspec"] == "IN"
-
-    assert not duty_wins(4.0)
-    assert not duty_wins(10.0)       # exact tie: incomparable again
-    assert duty_wins(10.5)
-
-
-# ----------------------------------------------------------------------
-# The two layers, and where each one decides
-# ----------------------------------------------------------------------
-def test_the_cause_in_fact_layer_already_denies_the_omission(record):
-    """The document puts the divergence's break in both layers (r7 undercuts
-    r2; q6/q7 undercut q5). In the full framework the first one is enough:
-    with r2 out, the damage is still derived -- through r6 -- but no longer
-    through the State's omission.
-    """
-    af = build.cif_framework(record)
-    assert "Danos" in af.justified_conclusions()
-    assert af.ness_cause("OmiEstatal", "Danos") is False
-    assert af.ness_cause("Latrocinio", "Danos") is True
-    assert lrc_vocab.cafa("OmiEstatal", "Danos") not in record.lrc.bridged_premises
-
-
-def test_the_claim_was_never_formulated_not_defeated(record):
-    """A distinção que o registro publicava errada.
-
-    `LeReCa_OmiEstatal_Danos` não é conclusão de argumento nenhum: sem
-    `CaFa_OmiEstatal_Danos`, `cf2lrc_q5` não tem antecedente e a presunção
-    nunca dispara. As defesas `sc` e `unom` estão no framework e teriam
-    bloqueado a pretensão -- só que não chegaram a fazê-lo. Dizer que a
-    bloquearam credita ao direito um resultado que os fatos já produziram.
-    """
-    entry = next(e for e in record.lrc.relevance if e["target"] == TARGET)
-    assert entry["justified"] is False
-    assert entry["derivable"] is False
-    assert entry["status"] == "nao_formulada"
-    assert entry["blocked_by"] == []
-
-
-def test_a_defence_that_wins_by_rebutting_is_reported_too(record):
-    """`relevance_report` lia só undercuts, e undercut é justamente o que
-    uma preferência não decide -- então a camada ficava cega onde os pesos
-    trabalham. Agora os bloqueios saem dos defeats do framework."""
-    from aspic.solver import ArgumentationFramework
-
-    kb = {"premises": ["CaFa_A_B", "Forte"], "axioms": []}
-    rules = {"strict_rules": [], "defeasible_rules": [
-        "cf2lrc_A: CaFa_A_B => LeReCa_A_B",
-        "nwo_A: Forte => ¬LeReCa_A_B"]}
-
-    # Sem preferência o rebut é mútuo, os dois ficam UNDEC e nada *aceito*
-    # bloqueia: a pretensão não é reconhecida nem afastada.
-    plain = lrc_vocab.relevance_report(ArgumentationFramework(kb, rules),
-                                       ["LeReCa_A_B"])[0]
-    assert plain["derivable"] is True
-    assert plain["blocked_by"] == []
-
-    # Com a defesa preferida, ela vence por rebut -- e é este o caso que a
-    # versão anterior de `relevance_report`, que só lia undercuts, não via.
-    # Premissas e regras, porque a Def. 21 compara as duas.
-    model = PR.PreferenceModel(
-        [PR.Dimension("d", "eixo", 5.0)],
-        [PR.RuleProfile("CaFa_A_B", {"d": 0.2}), PR.RuleProfile("Forte", {"d": 1.0}),
-         PR.RuleProfile("cf2lrc_A", {"d": 0.2}), PR.RuleProfile("nwo_A", {"d": 1.0})])
-    entry = lrc_vocab.relevance_report(
-        ArgumentationFramework(kb, rules, preferences=model), ["LeReCa_A_B"])[0]
+def test_the_claim_is_defeated_not_unformulated(record):
+    """The presumption fired and was defeated. If “not formulated”, the right
+    outcome would have arisen for the wrong reason."""
+    report = {r["target"]: r for r in record.lrc.relevance}
+    entry = report[TARGET]
+    assert entry["derivable"] is True
     assert entry["status"] == "afastada"
-    assert {b["attack_type"] for b in entry["blocked_by"]} == {"rebut"}
-    assert {b["scheme"] for b in entry["blocked_by"]} == {"nwo"}
+    assert [b["scheme"] for b in entry["blocked_by"]] == ["og"]
 
 
-def test_the_solver_lands_where_the_court_landed(record):
-    from formalize.validate import build_comparison
-
-    agreements = {row["agreement"] for row in build_comparison(record)}
-    assert agreements == {"match"}
-
-
-# ----------------------------------------------------------------------
-# Multi-holder attribution
-# ----------------------------------------------------------------------
-def test_a_rule_three_voices_hold_belongs_to_three_theories(record):
-    """r2 is the chain's central step, held by the respondent and by two
-    justices. Read through a single `perspective` it would belong to one of
-    them, and the other two would have a theory that derives nothing."""
-    for key in ("recorrido", "relator", "voto_convergente"):
-        assert "r2" in P.project(record, [key]).rule_ids
-    assert "r2" not in P.project(record, ["recorrente"]).rule_ids
+def test_the_rehabilitation_rule_stays_inert(record):
+    """`q_reab` distinguishes RE 136.247. Its premises are outside the factual
+    base, so no argument uses it: this demonstrates a general rule rather
+    than a rule tailored to this case."""
+    af = build.lrc_framework(record)
+    used = {rule for argument in af.arguments.values()
+            for rule in argument.defeasible_rules}
+    assert "q_reab" not in used
+    assert "q_reab" in {r.rule.split(":", 1)[0].strip() for r in record.lrc.scheme_rules}
 
 
-def test_every_voice_of_the_document_is_on_the_roll_call(record):
-    assert P.perspectives_in(record) == [
-        "recorrente", "recorrido", "relator", "voto_convergente", "voto_divergente"]
+def test_the_theory_needs_no_preferences(record):
+    """All disagreement is undercutting: no complementary conclusions need
+    ordering, and the record declares no weights."""
+    assert record.preferences is None
+    af = build.lrc_framework(record)
+    assert not [a for a in af.attacks if "rebut" in str(getattr(a, "attack_type", ""))]
 
 
-def test_a_move_counts_only_what_it_adds_to_the_graph(record):
-    """The concurring vote holds r1 and r2 as well, but both are already in
-    play when it speaks; its move is r8 alone."""
-    trace = P.adjudication_trace(record)
-    by_vote = {step["added"]: step["new_rules"] for step in trace}
-    assert by_vote["voto_convergente"] == ["r8"]
-    assert by_vote["voto_divergente"] == ["r6", "r7"]
+def test_the_state_is_not_liable(record):
+    """The case asks whether state omission is a legally relevant cause of
+    the damage. The majority judgment and the framework both answer no."""
+    query = next(q for q in record.queries
+                 if (q.phi, q.psi) == ("OmiEstatal", "Danos"))
+    assert query.solver.ness is True and query.solver.but_for is True
+    assert query.legally_relevant is False
+    assert query.court_verdict == "rejeitada"
 
 
 # ----------------------------------------------------------------------
-# The step-relative bridge
+# 4. Architecture section
 # ----------------------------------------------------------------------
-def test_the_claim_lives_in_exactly_one_window_of_the_decision_phase(record):
-    """The whole point of re-deriving the bridge per step: the claim is not
-    dead from the start and alive at the end, it is alive between the
-    concurring vote -- which removes the appellant's undercut and lets the
-    omission become a cause in fact -- and the dissent."""
-    trace = P.decision_trace(record)
-    relevant = [step["added"] for step in trace if step["relevance"][TARGET]]
-    assert relevant == ["voto_convergente"]
+def test_the_architecture_section_is_drawn_from_the_record(record):
+    """The high-level diagram is generated from the record: its three blocks,
+    boundary outputs and verdict all come from `case.json`. This prevents
+    the diagram from becoming stale."""
+    from interface.architecture_view import render_architecture
 
-    released = [step["added"] for step in trace if step["newly_relevant"]]
-    blocked = [step["added"] for step in trace if step["newly_blocked"]]
-    assert released == ["voto_convergente"]
-    assert blocked == ["voto_divergente"]
-
-
-def test_the_bridge_of_a_step_is_the_solvers_word_for_that_step(record):
-    """Before the concurring vote there is no `CaFa_OmiEstatal_Danos` to
-    presume relevant, and the stored (whole-case) list does not have one
-    either -- but for the one step in between, it does."""
-    trace = {step["added"]: step["bridged"] for step in P.decision_trace(record)}
-    cafa = lrc_vocab.cafa("OmiEstatal", "Danos")
-    assert cafa not in trace["relator"]
-    assert cafa in trace["voto_convergente"]
-    assert cafa not in trace["voto_divergente"]
+    html = render_architecture(record)
+    assert "Arquitetura — LRC → CIF → LRC" in html
+    assert "1. LRC — qualificação" in html
+    assert "2. CIF — causa de fato" in html
+    assert "3. LRC — ponte e imputação" in html
+    # What each boundary delivers, and where the bridge crosses.
+    for literal in ("AtoTerceiro", "DeverEspec", "OmissaoGen",
+                    "CaFa_OmiEstatal_Danos", "cf2lrc_q5"):
+        assert literal in html, literal
+    assert "afastada" in html
 
 
-def test_the_parties_alone_establish_no_cause_in_fact(record):
-    """The argumentation phase ends with the appellant's undercut unanswered,
-    so the graph the parties hand over derives no damage at all. That is
-    Prakken's point: the adjudicator has something left to decide."""
-    assert P.bridged_for(record, ["recorrente", "recorrido"]) == []
+def test_the_paper_order_draws_two_blocks(record):
+    """A `cif_first` record, as in the ICAIL 2025/2026 cases, has no prior
+    qualification phase: two blocks, crossed only by equation (1)."""
+    import copy
+
+    from interface.architecture_view import render_architecture
+
+    paper = copy.deepcopy(record)
+    paper.layer_order = "cif_first"
+    html = render_architecture(paper)
+    assert "Arquitetura — CIF → LRC" in html
+    assert "1. CIF — causa de fato" in html
+    assert "2. LRC — ponte e imputação" in html
+    assert "qualificação" not in html
 
 
 # ----------------------------------------------------------------------
-# The view
+# 5. Both execution-order variants, side by side
 # ----------------------------------------------------------------------
-def test_the_weights_view_shows_the_tuple_the_conflict_and_the_control(record):
-    from aspic.preference_view import render_preferences
+def test_both_orderings_are_published_from_the_same_document(record):
+    """`case-003-final` and `case-003-final-cif` come from the same
+    `formalizacao-caso003.md`, changing only layer execution order. This pair
+    measures the order's effect: any result difference is due solely to it."""
+    other = catalog.formalized_records()["case-003-final-cif"]
+    assert record.layer_order == "lrc_first"
+    assert other.layer_order == "cif_first"
+    assert record.case.source_sha256 == other.case.source_sha256
 
-    body = render_preferences(record)
-    assert "especificidade no dever de agir" in body
-    assert "dvgen_q1" in body
-    assert "UNDEC" in body            # the control run, without the weights
-    assert "Vira em" in body          # the sensitivity table
+    # Same rules, same premises, same document.
+    assert ([m.rule for m in record.rules_meta]
+            == [m.rule for m in other.rules_meta])
+    assert ([r.rule for r in record.lrc.scheme_rules]
+            == [r.rule for r in other.lrc.scheme_rules])
+    assert record.knowledge_base["premises"] == other.knowledge_base["premises"]
+
+    # The only difference is what LRC delivers to CIF.
+    assert record.knowledge_base["axioms"] == ["AtoTerceiro", "DeverEspec",
+                                               "OmissaoGen"]
+    assert other.knowledge_base["axioms"] == []
 
 
-def test_the_map_draws_the_contradiction_and_marks_the_rule_that_lost(record):
-    """A rebut settled by preference has to be visible: the losing rule is
-    not undercut by anything, so a map that only drew undercuts would show
-    it standing while the solver has it OUT."""
-    dot = P.to_adjudication_dot(record)
-    assert '"dvgen_q2" -> "dvesp_q0"' in dot or '"dvesp_q0" -> "dvgen_q2"' in dot
-    assert "rebut from-" in dot
-    fallen = P.defeated_rules(record)
-    assert {"dvesp_q0", "dvpre_q8"} <= fallen      # lost the weighing
-    assert {"r2", "r5"} <= fallen                  # undercut
-    assert "dvgen_q2" not in fallen
-
-
-def test_the_dossier_of_the_original_formalization_is_reachable(record):
-    """Two formalizations of one judgment; the second must not lose the
-    annotator's evidence just because it has a different case id."""
-    from aspic import catalog
-
-    assert record.case.dossier_id == "case-003"
-    assert catalog.dossier_by_id("case-003-final") is not None
+def test_the_ordering_does_not_change_the_verdicts(record):
+    """Legal context enters CIF as axioms, but no r0–r4 rule reads it, so both
+    orders answer alike. For order to matter, the causal mechanism needs a
+    rule consuming a qualification."""
+    other = catalog.formalized_records()["case-003-final-cif"]
+    for mine, theirs in zip(record.queries, other.queries):
+        assert (mine.solver.ness, mine.solver.but_for, mine.legally_relevant) == \
+               (theirs.solver.ness, theirs.solver.but_for, theirs.legally_relevant)
+    assert ([r["status"] for r in record.lrc.relevance]
+            == [r["status"] for r in other.lrc.relevance])

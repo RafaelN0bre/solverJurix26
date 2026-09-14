@@ -1,0 +1,1411 @@
+"""Projects a formalized case into one argumentation framework per
+perspective and reads the votes as adjudication moves: attacks, phases and
+outcomes. Consumes the record assembled by `formalize.build` and the solver
+(`aspic`); feeds `interface.perspective_view` (the adjudication tab) and the
+adjudication/confrontation figures written by `scripts/render_translated.py`.
+"""
+
+"""One framework per perspective, and the votes as adjudication moves.
+
+The pipeline produces a single framework per case, and the grounded extension
+of that framework reports the court's final position. What it cannot report is
+the *disagreement*: `interface.didactic` shows an argument as OUT without saying
+that three of five perspectives sustained it and two knocked it down.
+
+This module reads the perspective metadata the formalization already carries
+-- `RuleMeta.perspective` on every rule, `AtomOut.perspectives` on every atom
+-- and projects the record into one `ArgumentationFramework` per perspective,
+following the three-player model of
+
+    Prakken, H. "A Formal Model of Adjudication Dialogues." AI & Law, 2008
+    (docs/papers/2008_Prakken_FormalModel_AILaw.pdf).
+
+There, an adjudication dialogue has an *argumentation phase*, in which the
+adversaries build the argument graph, and a *decision phase*, in which only
+the adjudicator moves -- and moves only arguments: premise attacks,
+undercutters (internal validity) and priority arguments (dialectical
+validity), §4.3. Silence is itself a decision: an argument the adjudicator
+does not attack is endorsed.
+
+Two things follow for this codebase.
+
+* A vote is not a label on the outcome; it is a **set of rules injected into
+  the graph**. Projecting the record by `perspective` is therefore exactly the
+  paper's move-by-player decomposition, done after the fact.
+* A priority argument ("A > B, since ...") stops B from defeating A. Under
+  the solver's default ordering there are no preferences between defeasible
+  arguments (`aspic.solver._is_weaker`), so the only way to stop a defeat is
+  to undercut the losing rule -- and a priority argument is then already
+  expressible as an undercutter whose author is the adjudicator rather than a
+  party. A case that instead declares weights (`aspic.preferences`) gets the
+  other route as well: the priority becomes an ordering the whole framework
+  carries, and `Theory` passes it into every projection so a perspective's
+  own reading is weighed exactly as the case is.
+"""
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Sequence, Set
+
+from interface.graph_export import argument_status
+from aspic.solver import ArgumentationFramework
+
+#: The two adversaries, then the votes, then the court's final position --
+#: reading order of the dossier and, not by accident, the order in which an
+#: adjudication dialogue unfolds.
+ADVERSARIES = ("recorrente", "recorrido")
+ADJUDICATORS = ("relator", "voto_convergente", "voto_divergente", "stf_final")
+
+#: A rule nobody disputes belongs to every theory.
+SHARED = "comum"
+
+
+@dataclass(frozen=True)
+class Theory:
+    """One perspective's argumentation theory, ready for the solver."""
+    key: str
+    label: str
+    premises: List[str]
+    rules: List[str]
+    rule_ids: List[str] = field(default_factory=list)
+    #: The case's ordering between defeasible arguments, carried so that a
+    #: projected theory is weighed exactly as the whole case is. A preference
+    #: that only applied to the full framework would make every per-
+    #: perspective reading here quietly disagree with the case it came from.
+    preferences: Optional[object] = None
+
+    @property
+    def knowledge_base(self) -> dict:
+        return {"premises": list(self.premises), "axioms": []}
+
+    @property
+    def causal_model(self) -> dict:
+        return {"strict_rules": [], "defeasible_rules": list(self.rules)}
+
+    def framework(self) -> ArgumentationFramework:
+        return ArgumentationFramework(self.knowledge_base, self.causal_model,
+                                      preferences=self.preferences)
+
+
+def _label(key: str) -> str:
+    from formalize.dossier import perspective_label
+    return perspective_label(key)
+
+
+def _canon(key: str) -> str:
+    """The pipeline's spelling. The annotation tool writes `convergente`
+    where the prompts say `voto_convergente`, and a perspective spelled two
+    ways is two perspectives to every grouping in this module."""
+    from formalize.dossier import canonical_perspective
+    return canonical_perspective(key)
+
+
+def _holders(entity) -> Set[str]:
+    """Every perspective that holds a rule or premise, canonically spelled.
+
+    `RuleMeta`/`LrcRuleOut`/`LrcPremiseOut` all answer `holders()`: the
+    multi-holder list when the record fills it in, the single `perspective`
+    otherwise. Reading holders rather than `perspective` is what lets a rule
+    three voices assert on their own account belong to three theories instead
+    of one -- which is the difference between a runnable theory and an empty
+    one for everybody but the first holder.
+    """
+    getter = getattr(entity, "holders", None)
+    if getter is not None:
+        return {_canon(key) for key in getter() if key}
+    return {_canon(entity.perspective)} if getattr(entity, "perspective", "") else set()
+
+
+def _admits(selected: Set[str], held: Set[str]) -> bool:
+    """Whether a rule belongs to the theory of `selected`.
+
+    Unattributed (`held` empty) and undisputed (`comum`) rules belong to
+    every theory; anything else belongs to the theories of its holders.
+    """
+    return not held or SHARED in held or bool(selected & held)
+
+
+def _preferences(record, keys: Optional[Sequence[str]] = None):
+    """The record's ordering, or None when the perspectives in `keys` do not
+    yet include whoever moves it.
+
+    In Prakken's model a priority argument is a **move** of the decision
+    phase (§4.3), not a standing fact. An ordering injected into every
+    projection applies at step 0 too, where no adjudicator has spoken -- and
+    then a preference can settle a rebut *between the parties* on nobody's
+    authority. So the block names its holder, and a projection that has not
+    admitted them runs under the basic ordering.
+
+    `keys=None` means "the whole case", which is what the single-framework
+    view is: there every voice is present, so every move has been made.
+
+    Imported lazily: `formalize` imports `aspic`, so a module-level import
+    here would close the cycle.
+    """
+    from formalize.build import preference_model
+
+    model = preference_model(record)
+    if model is None or keys is None:
+        return model
+    block = getattr(record, "preferences", None)
+    holder = _canon(getattr(block, "perspective", "") or "")
+    if not holder or holder == SHARED:
+        return model
+    return model if holder in {_canon(key) for key in keys} else None
+
+
+def perspectives_in(record) -> List[str]:
+    """Every perspective the record actually names, in reading order.
+
+    Both layers are scanned: after the doctrinal defences moved to the
+    legal-relevance layer, a court that decides the case may contribute no
+    rule at all to the cause-in-fact one, and looking only there would report
+    that it took no part in the judgment.
+    """
+    found: Set[str] = set()
+    for meta in record.rules_meta:
+        found |= _holders(meta)
+    found |= {_canon(p) for atom in record.atoms for p in atom.perspectives}
+    if record.lrc is not None:
+        for rule in record.lrc.scheme_rules:
+            found |= _holders(rule) | {_canon(getattr(rule, "origin_perspective", ""))}
+        for premise in record.lrc.doctrinal_premises:
+            found |= _holders(premise) | {_canon(getattr(premise, "origin_perspective", ""))}
+    found.discard(SHARED)
+    found.discard("")
+    ordered = [p for p in (*ADVERSARIES, *ADJUDICATORS) if p in found]
+    return ordered + sorted(found - set(ordered))
+
+
+def project(record, keys: Sequence[str]) -> Theory:
+    """The theory held by `keys` together (plus whatever nobody disputes).
+
+    Premises are the record's premises that either (a) some selected rule
+    reads, or (b) the perspective itself asserts. (a) is what keeps the
+    theory *runnable* -- a rule whose antecedent is not a premise never fires,
+    and a theory that derives nothing says nothing. (b) is what keeps it
+    *honest*: a fact a perspective asserts belongs to its theory even when no
+    rule of that perspective happens to use it.
+    """
+    from formalize.validate import base_literal, parse_rule
+
+    selected = {_canon(key) for key in keys}
+    rules = [meta for meta in record.rules_meta if _admits(selected, _holders(meta))]
+    needed: Set[str] = set()
+    for meta in rules:
+        try:
+            needed |= {base_literal(ant) for ant in parse_rule(meta.rule).antecedents}
+        except ValueError:
+            continue
+    asserted = {atom.code for atom in record.atoms
+                if selected & {_canon(p) for p in atom.perspectives}}
+
+    declared = record.knowledge_base.get("premises", [])
+    premises = [p for p in declared if base_literal(p) in needed | asserted]
+    label = " + ".join(_label(key) for key in keys)
+    return Theory(key="+".join(keys), label=label, premises=premises,
+                  rules=[meta.rule for meta in rules],
+                  rule_ids=[meta.id for meta in rules],
+                  preferences=_preferences(record, keys))
+
+
+def verdicts(theory: Theory, queries: Sequence) -> Dict[str, dict]:
+    """What this theory concludes about each of the case's causal questions.
+
+    The same two notions the single-framework view reports, so a
+    perspective's answer is comparable line by line with the court's.
+
+    A question whose effect this theory does not even derive comes back with
+    `derivable: False` and both verdicts `None` -- *not* `False`. The
+    difference matters: "this theory does not reach the damage" is not the same
+    statement as "it reaches the damage and the omission did not cause it", and a trace that
+    conflated them reported a perspective as denying causation when it had
+    said nothing about it (see `perspective_view._verdict_delta`).
+    """
+    af = theory.framework()
+    extension, _ = af.compute_grounded_extension()
+    justified = af.justified_conclusions()
+    out: Dict[str, dict] = {}
+    for query in queries:
+        key = f"{query.phi}->{query.psi}"
+        if query.psi not in justified:
+            out[key] = {"derivable": False, "ness": None, "but_for": None}
+            continue
+        out[key] = {
+            "derivable": True,
+            "ness": af.ness_cause(query.phi, query.psi),
+            "but_for": af.but_for(query.phi, query.psi),
+        }
+    return out
+
+
+def adjudication_trace(record) -> List[dict]:
+    """The dispute rebuilt move by move, in the paper's two phases.
+
+    Step 0 is the argumentation phase: both adversaries' theories together,
+    with no vote yet. Each further step admits one adjudicator's rules, in
+    procedural order, and reports what changed -- which conclusions became
+    justified and which stopped being so.
+
+    This is the measurement the single framework cannot give: not *whether*
+    the court's position wins (it does, by construction), but **at which move
+    it starts to win**, and on whose rules that turn depends.
+    """
+    present = perspectives_in(record)
+    adversaries = [key for key in ADVERSARIES if key in present]
+    votes = [key for key in ADJUDICATORS if key in present]
+
+    steps: List[dict] = []
+    admitted: List[str] = list(adversaries)
+    previous: Optional[Set[str]] = None
+    previous_rules: Set[str] = set()
+    for index, added in enumerate([None, *votes]):
+        if added is not None:
+            admitted = [*admitted, added]
+        theory = project(record, admitted)
+        af = theory.framework()
+        extension, _ = af.compute_grounded_extension()
+        justified = af.justified_conclusions()
+        steps.append({
+            "step": index,
+            "added": added,
+            "added_label": _label(added) if added else "fase de argumentação",
+            "admitted": list(admitted),
+            "rules": theory.rule_ids,
+            # What this move adds to the graph, not everything its author
+            # holds: a rule three voices share is already in play when the
+            # second one speaks, and reporting it again would make a vote
+            # that changed nothing look like it moved.
+            "new_rules": [rule_id for rule_id in theory.rule_ids
+                          if rule_id not in previous_rules] if added else [],
+            "justified": sorted(justified),
+            "gained": sorted(justified - previous) if previous is not None else [],
+            "lost": sorted(previous - justified) if previous is not None else [],
+            "outcome_justified": record.effect in justified,
+            "status": argument_status(af, extension),
+            "verdicts": verdicts(theory, record.queries),
+        })
+        previous = set(justified)
+        previous_rules = set(theory.rule_ids)
+    return steps
+
+
+def by_perspective(record) -> List[Theory]:
+    """Each perspective's own theory, standing alone."""
+    return [project(record, [key]) for key in perspectives_in(record)]
+
+
+# ----------------------------------------------------------------------
+# The decision phase: the legal-relevance layer, admitted vote by vote
+# ----------------------------------------------------------------------
+def project_lrc(record, keys: Sequence[str],
+                bridged: Optional[Sequence[str]] = None) -> Optional[Theory]:
+    """The legal-relevance theory held by `keys`, over the solver's facts.
+
+    Three kinds of ingredient are separated here, and the separation is the
+    whole point:
+
+    * the **bridge premises** are solver output, not anybody's position, so
+      they are always admitted;
+    * the `cf2lrc` presumption is the paper's general rule, held by nobody in
+      particular, so it is admitted too;
+    * every **defence** (`nwo`, `sc`, `suca`, `nofor`, `unom`) is a move by a
+      party or by the court, and is admitted only when its perspective is.
+
+    An unattributed defence -- no holder at all, which is what records
+    formalized before the field existed carry -- is admitted at every step.
+    That keeps old records readable while making their flatness visible: a
+    trace where nothing ever flips is a trace whose moves were never
+    attributed.
+
+    `bridged` overrides the record's stored bridge premises with the ones a
+    particular set of cause-in-fact theories establishes -- see
+    `bridged_for`. The stored list is what the *whole* case yields, which is
+    the right answer for the record and the wrong one for a step: a claim
+    that only becomes a cause in fact once one vote removes another's
+    undercut has no `CaFa_*` before that vote, and pretending it does would
+    show the legal-relevance layer deciding a question the facts had not yet
+    posed.
+    """
+    from aspic.lrc import scheme_of
+
+    layer = record.lrc
+    if layer is None or not layer.scheme_rules:
+        return None
+    selected = {_canon(key) for key in keys}
+
+    def admitted(entity, scheme: Optional[str] = None) -> bool:
+        if scheme == "cf2lrc":
+            return True
+        return _admits(selected, _holders(entity))
+
+    rules = [rule for rule in layer.scheme_rules
+             if admitted(rule, scheme_of(_rule_id(rule.rule)))]
+    premises = [*(layer.bridged_premises if bridged is None else bridged)]
+    premises += [p.literal for p in layer.doctrinal_premises if admitted(p)]
+    label = " + ".join(_label(key) for key in keys) if keys else "sem votos"
+    return Theory(key="+".join(keys) or "base", label=label,
+                  premises=list(dict.fromkeys(premises)),
+                  rules=[rule.rule for rule in rules],
+                  rule_ids=[_rule_id(rule.rule) for rule in rules],
+                  preferences=_preferences(record, keys))
+
+
+def _rule_id(rule: str) -> str:
+    return rule.split(":", 1)[0].strip()
+
+
+def cif_keys_for(record, admitted: Sequence[str]) -> List[str]:
+    """The cause-in-fact theories standing behind a decision-phase step.
+
+    Both adversaries, always -- the argumentation phase is over before the
+    decision phase begins -- plus every adjudicator admitted so far. A party
+    that only moves in the legal-relevance layer changes nothing here, which
+    is correct: it took no position on what happened.
+    """
+    present = set(perspectives_in(record))
+    parties = [key for key in ADVERSARIES if key in present]
+    votes = [key for key in ADJUDICATORS
+             if key in present and _canon(key) in {_canon(k) for k in admitted}]
+    return [*parties, *votes]
+
+
+def bridged_for(record, keys: Sequence[str], _cache: Optional[Dict] = None) -> List[str]:
+    """The `CaFa_*`/`ButFor_*` literals the theories in `keys` establish.
+
+    The same computation `formalize.bridge` runs for the whole case, run over
+    a projection of it. This is the determinism boundary again -- the facts
+    the legal-relevance layer reasons over are the solver's word, not
+    anybody's claim -- only now it can answer the question the stored list
+    cannot: *at which move* did this become a cause in fact?
+    """
+    from formalize.bridge import candidate_literals, evaluate, target_literals
+    from formalize.build import non_candidate_codes
+
+    signature = tuple(sorted(_canon(key) for key in keys))
+    if _cache is not None and signature in _cache:
+        return _cache[signature]
+    theory = project(record, keys)
+    facts = evaluate(
+        theory.framework(),
+        candidate_literals({"premises": theory.premises}, record.queries,
+                           exclude=non_candidate_codes(record)),
+        target_literals(record.effect, record.queries),
+    )
+    premises = facts.premises()
+    if _cache is not None:
+        _cache[signature] = premises
+    return premises
+
+
+def relevance_of(theory: Theory, targets: Sequence[str]) -> Dict[str, bool]:
+    from aspic.lrc import relevance_report
+    report = relevance_report(theory.framework(), list(targets))
+    return {entry["target"]: entry["justified"] for entry in report}
+
+
+def decision_trace(record) -> List[dict]:
+    """The legal-relevance layer rebuilt one adjudicator at a time.
+
+    Step 0 admits only the general presumption: every cause in fact is
+    presumed legally relevant. Each further step admits one perspective's
+    doctrinal defences and reports which `LeReCa_*` stopped being justified.
+
+    This is the "breaking point" the single framework hides -- the exact move
+    at which a claim that survived the facts stops surviving the law, and
+    whose reasons that turn rests on.
+
+    Each step also re-derives the cause-in-fact facts from the theories
+    admitted *at that step* (`bridged_for`), so the two layers advance
+    together. A claim can therefore turn twice in one trace: once when the
+    facts start supporting it, and once when the law stops.
+    """
+    layer = record.lrc
+    if layer is None or not layer.scheme_rules:
+        return []
+    present = perspectives_in(record)
+    attributed: Set[str] = set()
+    for rule in layer.scheme_rules:
+        attributed |= _holders(rule)
+    votes = [key for key in (*ADVERSARIES, *ADJUDICATORS)
+             if key in present and key in attributed]
+
+    steps: List[dict] = []
+    admitted: List[str] = []
+    previous: Optional[Dict[str, bool]] = None
+    cache: Dict = {}
+    for index, added in enumerate([None, *votes]):
+        if added is not None:
+            admitted = [*admitted, added]
+        cif_keys = cif_keys_for(record, admitted)
+        bridged = bridged_for(record, cif_keys, cache)
+        theory = project_lrc(record, admitted, bridged=bridged)
+        if theory is None:
+            return []
+        relevance = relevance_of(theory, layer.targets)
+        steps.append({
+            "step": index,
+            "added": added,
+            "added_label": _label(added) if added else "presunção geral (cf2lrc)",
+            "admitted": list(admitted),
+            "rules": theory.rule_ids,
+            "cif_admitted": cif_keys,
+            "bridged": list(bridged),
+            "relevance": relevance,
+            "blocked": sorted(t for t, ok in relevance.items() if not ok),
+            "newly_blocked": sorted(
+                t for t, ok in relevance.items()
+                if not ok and previous is not None and previous.get(t)),
+            "newly_relevant": sorted(
+                t for t, ok in relevance.items()
+                if ok and previous is not None and previous.get(t) is False),
+        })
+        previous = relevance
+    return steps
+
+
+def unattributed_lrc_rules(record) -> List[str]:
+    """Defences whose author the record does not name.
+
+    They are admitted at every step of `decision_trace`, so each one is a
+    move the trace cannot place -- the honest measure of how much of the
+    adjudication is still invisible.
+    """
+    from aspic.lrc import scheme_of
+
+    layer = record.lrc
+    if layer is None:
+        return []
+    return [_rule_id(rule.rule) for rule in layer.scheme_rules
+            if not _holders(rule) and scheme_of(_rule_id(rule.rule)) != "cf2lrc"]
+
+
+# ----------------------------------------------------------------------
+# The adjudication map: rules in their author's lane, attacks crossing them
+# ----------------------------------------------------------------------
+#: Lane grouping. The adjudicators sit above the parties because that is the
+#: direction the attacks run: in the decision phase the court moves arguments
+#: against what the parties built, never the reverse.
+LANES = (
+    ("ADJUDICADORES", ADJUDICATORS),
+    ("PARTES", ADVERSARIES),
+    ("INCONTROVERSO", (SHARED,)),
+)
+
+#: How the legal-relevance vocabulary reads on a diagram. The full literal is
+#: precise and unreadable at node size (`CaFa_FugaPreso_MorteVitima`); the
+#: effect is the same in every literal of a case, so dropping it loses nothing
+#: a reader of *this* map needs. The untouched rule stays in the tooltip.
+_SHORT = {
+    "CaFa": "causa({0})", "ButFor": "só-por({0})", "LeReCa": "relevante({0})",
+    "Om": "omissão({0})", "Obl": "dever({0})", "Tortious": "ilícito({0})",
+    "Unexpected": "inesperado({0})", "SupersedingCause": "superveniente({0})",
+    "SupersedingCause/3": "superveniente({0}) entre {1} e {2}",
+    "After": "{0} após {1}", "Foreseeable": "previsível({0})",
+    "ForeseeableRisk": "risco({0})", "Playout": "concretiza({0})",
+}
+
+#: Antecedents drawn before the node is cut short. `suca` takes five, and a
+#: node listing all of them is a circle nobody reads.
+_MAX_ANTECEDENTS = 3
+
+_LANE_STYLE = {
+    "cif": {"shape": "ellipse", "fill": "#ffffff"},
+    "lrc": {"shape": "ellipse", "fill": "#f4f0fa"},
+}
+
+
+@dataclass(frozen=True)
+class MappedRule:
+    """One rule, placed in a lane and told whether it survived."""
+    id: str
+    body: str
+    layer: str
+    perspective: str
+    gloss: str
+    attacks: Optional[str]
+    defeated: bool
+    label: str = ""
+    consequent: str = ""
+    antecedents: List[str] = field(default_factory=list)
+    #: Every perspective that holds the rule, in reading order. `perspective`
+    #: is the lane the node is drawn in -- a node can only sit in one box --
+    #: and this is what the tooltip says so the other holders are not lost.
+    holders: List[str] = field(default_factory=list)
+
+
+def defeated_rules(record) -> Set[str]:
+    """Rule ids that did not survive, across both layers.
+
+    Two ways to not survive, and the map has to show both:
+
+    * some accepted argument **undercuts** the rule, i.e. concludes `¬<id>`;
+    * every argument the rule tops is out of the grounded extension. That is
+      what a lost **rebut** looks like, and until a case declared preferences
+      it never happened -- two defeasible arguments were incomparable, so a
+      mutual rebut left both UNDEC and neither was refuted. With an ordering
+      one of them is now OUT, and a map that only drew undercuts would show
+      the losing rule standing.
+
+    A rule with no argument at all is *not* reported: its antecedents were
+    never satisfied, which is a rule that did not fire, not one that fell.
+
+    Read off the frameworks rather than off the record's own verdicts, so the
+    map never claims a rule fell for a reason the solver does not produce.
+    """
+    from formalize import build
+
+    out: Set[str] = set()
+    for framework in (build.cif_framework(record), build.lrc_framework(record)):
+        if framework is None:
+            continue
+        extension, _ = framework.compute_grounded_extension()
+        topped: Dict[str, List[bool]] = {}
+        for arg_id, argument in framework.arguments.items():
+            if (argument.conclusion.startswith("¬")
+                    and argument.conclusion[1:] in framework.rules
+                    and arg_id in extension):
+                out.add(argument.conclusion[1:])
+            if argument.top_rule is not None:
+                topped.setdefault(argument.top_rule.id, []).append(arg_id in extension)
+        out |= {rule_id for rule_id, accepted in topped.items() if not any(accepted)}
+    return out
+
+
+#: How a layer reads on screen, and which framework builds it.
+LAYER_LABELS = {"cif": "causa de fato", "lrc": "relevância jurídica"}
+
+#: One-letter tag for an argument id. The two frameworks number independently
+#: -- both start at A0 -- so on any surface that shows both layers at once, a
+#: bare `A17` names two different arguments. The adjudication map is exactly
+#: such a surface: it drew `A17` twice, once for the concurring vote's `r8`
+#: and once for the reporting judge's `dvpre_q8`.
+LAYER_TAGS = {"cif": "F", "lrc": "R"}
+
+
+@dataclass(frozen=True)
+class MappedArgument:
+    """One argument of one layer, with everything needed to trace it back.
+
+    The id is the solver's own (`A0`, `A1`, ...), deliberately: it is the
+    same id the argument graph of the Analysis tab draws, the same one
+    `LRCBlock.relevance` names in `blocked_by.attacker`, and the same one
+    `aspic.preferences.resolved_conflicts` reports. Renumbering per view
+    would make each view internally tidy and mutually untraceable.
+
+    Ids repeat across the two layers -- both frameworks number from A0 -- so
+    `layer` is part of the identity and every rendering shows it.
+    """
+    id: str
+    layer: str
+    conclusion: str
+    premises: List[str]
+    rules: List[str]
+    top_rule: Optional[str]
+    status: str
+    #: Perspectives able to build it: those holding *every* rule it uses.
+    holders: List[str]
+    strength: Optional[float] = None
+    #: Where an atomic argument comes from. “Bridge” marks the `CaFa_*` /
+    #: `ButFor_*` premises the cause-in-fact solver produced: they are
+    #: nobody's claim, and listing every perspective as holding them would
+    #: read as unanimity where there was no assertion at all.
+    origin: str = ""
+
+    @property
+    def label(self) -> str:
+        """The id as every view prints it: `F·A17` in the cause-in-fact
+        layer, `R·A17` in the legal-relevance one. What follows the dot is
+        the solver's own id inside that layer, so it still matches the
+        argument graph and the relevance report."""
+        return f"{LAYER_TAGS.get(self.layer, self.layer)}·{self.id}"
+
+
+def _rule_holders(record) -> Dict[str, Set[str]]:
+    """`{rule id: perspectives that hold it}`, across both layers."""
+    out: Dict[str, Set[str]] = {}
+    for meta in record.rules_meta:
+        out[meta.id] = _holders(meta)
+    if record.lrc is not None:
+        for rule in record.lrc.scheme_rules:
+            out[_rule_id(rule.rule)] = _holders(rule)
+    return out
+
+
+def mapped_arguments(record) -> List[MappedArgument]:
+    """Every argument of both layers, named and attributed.
+
+    Attribution is the interesting part. A perspective can build an argument
+    exactly when it holds every defeasible rule the argument uses -- an
+    argument is not "moved" by anyone, it is what a theory can construct. A
+    rule nobody disputes (`comum`) or nobody claimed belongs to all theories,
+    so it never narrows the set.
+
+    Atomic arguments (a bare premise) use no rule and are therefore available
+    to every perspective that asserts the premise; they are reported with the
+    perspectives the record's atoms attribute the premise to.
+    """
+    from formalize import build
+
+    holders_of = _rule_holders(record)
+    present = perspectives_in(record)
+    asserted: Dict[str, Set[str]] = {}
+    for atom in record.atoms:
+        asserted[atom.code] = {_canon(p) for p in atom.perspectives}
+
+    preferences = _preferences(record)
+    bridged = set(record.lrc.bridged_premises) if record.lrc is not None else set()
+    out: List[MappedArgument] = []
+    for layer, af in (("cif", build.cif_framework(record)),
+                      ("lrc", build.lrc_framework(record))):
+        if af is None:
+            continue
+        extension, _ = af.compute_grounded_extension()
+        status = argument_status(af, extension)
+        for argument in af.arguments.values():
+            used = list(argument.defeasible_rules) + list(argument.strict_rules)
+            if used:
+                holders = set(present)
+                for rule_id in used:
+                    held = holders_of.get(rule_id, set())
+                    if held and SHARED not in held:
+                        holders &= held
+            else:
+                base = argument.conclusion.lstrip("¬")
+                holders = asserted.get(base, set()) or set(present)
+            origin = ""
+            if not used and layer == "lrc" and argument.conclusion in bridged:
+                origin, holders = "ponte", set()
+            out.append(MappedArgument(
+                id=argument.id, layer=layer, conclusion=argument.conclusion,
+                premises=sorted(argument.premises), rules=used,
+                top_rule=argument.top_rule.id if argument.top_rule else None,
+                status=status[argument.id],
+                holders=[k for k in present if k in holders],
+                strength=(preferences.argument_strength(argument)
+                          if preferences is not None else None),
+                origin=origin,
+            ))
+    return out
+
+
+def arguments_by_rule(record) -> Dict[str, List[MappedArgument]]:
+    """`{rule id: the arguments it tops}` -- the trace from the map's nodes,
+    which are rules, to the arguments the solver actually built with them."""
+    out: Dict[str, List[MappedArgument]] = {}
+    for argument in mapped_arguments(record):
+        if argument.top_rule:
+            out.setdefault(argument.top_rule, []).append(argument)
+    return out
+
+
+def mapped_rules(record) -> List[MappedRule]:
+    """Every rule of both layers, with its author and its fate."""
+    from formalize.validate import parse_rule
+
+    fallen = defeated_rules(record)
+    rules: List[MappedRule] = []
+
+    def add(rule_text: str, layer: str, entity, gloss: str) -> None:
+        held = _holders(entity)
+        ordered = [key for key in (*ADVERSARIES, *ADJUDICATORS) if key in held]
+        ordered += sorted(held - set(ordered))
+        perspective = ordered[0] if ordered else SHARED
+        try:
+            parsed = parse_rule(rule_text)
+        except ValueError:
+            return
+        # `ParsedRule.is_undercutter` only recognises `¬r…`; the
+        # legal-relevance layer undercuts named schemes (`¬cf2lrc_X`), so any
+        # negated consequent that names a rule is an undercut here.
+        target = (parsed.consequent[1:]
+                  if parsed.consequent.startswith("¬") else None)
+        parsed_rules.append((parsed, layer, perspective or SHARED, gloss, target,
+                             rule_text, ordered))
+
+    parsed_rules = []
+    for meta in record.rules_meta:
+        add(meta.rule, "cif", meta, meta.gloss_pt)
+    if record.lrc is not None:
+        for rule in record.lrc.scheme_rules:
+            add(rule.rule, "lrc", rule, rule.gloss_pt)
+
+    known = {parsed.id for parsed, *_ in parsed_rules}
+    for parsed, layer, perspective, gloss, target, rule_text, held in parsed_rules:
+        rules.append(MappedRule(
+            id=parsed.id, body=rule_text, layer=layer,
+            perspective=_canon(perspective) or SHARED,
+            gloss=gloss, attacks=target if target in known else None,
+            defeated=parsed.id in fallen, label=_rule_label(parsed, known),
+            consequent=parsed.consequent, antecedents=list(parsed.antecedents),
+            holders=list(held),
+        ))
+    return rules
+
+
+def short_literal(literal: str) -> str:
+    """A legal-relevance literal at a size a diagram can carry."""
+    from aspic.lrc import split_lrc_literal
+
+    negated = literal.startswith("¬")
+    body = literal[1:] if negated else literal
+    split = split_lrc_literal(body)
+    if split is None:
+        return literal
+    predicate, arguments = split
+    template = (_SHORT.get(f"{predicate}/{len(arguments)}")
+                or _SHORT.get(predicate))
+    if not template:
+        return literal
+    try:
+        rendered = template.format(*arguments)
+    except IndexError:
+        return literal
+    return f"¬{rendered}" if negated else rendered
+
+
+def _rule_label(parsed, known_rules: Set[str]) -> str:
+    """The rule as the map draws it: short literals, capped antecedents, and
+    no consequent for an undercut -- the arrow already says what it hits."""
+    antecedents = [short_literal(ant) for ant in parsed.antecedents]
+    if len(antecedents) > _MAX_ANTECEDENTS:
+        hidden = len(antecedents) - _MAX_ANTECEDENTS
+        antecedents = antecedents[:_MAX_ANTECEDENTS] + [f"(+{hidden})"]
+    head = " AND ".join(antecedents)
+    consequent = parsed.consequent
+    if consequent.startswith("¬") and consequent[1:] in known_rules:
+        return f"{head}\n⇒ afasta"
+    return f"{head}\n⇒ {short_literal(consequent)}"
+
+
+def _wrap_label(text: str, width: int = 26) -> str:
+    """Fold only the lines that are too long; the label already carries its
+    own break between antecedents and consequent."""
+    return "\\n".join(_wrap(line, width) for line in text.split("\\n"))
+
+
+def _wrap(text: str, width: int = 24) -> str:
+    words, lines, current = text.split(" "), [], ""
+    for word in words:
+        if current and len(current) + len(word) + 1 > width:
+            lines.append(current)
+            current = word
+        else:
+            current = f"{current} {word}".strip()
+    if current:
+        lines.append(current)
+    return "\\n".join(lines)
+
+
+#: What a lane shows when its owner moved nothing. Prakken's decision phase
+#: makes this a substantive statement, not a gap: an adjudicator who moves no
+#: argument has endorsed what is already there (§4.3, "all these decisions can
+#: be made by either remaining silent or moving an argument").
+SILENT_NOTE = "sem movimento"
+
+
+@dataclass(frozen=True)
+class MappedAttack:
+    """One attack, attributed to the perspectives on each end.
+
+    The map draws a rule inside a single box -- the first holder's, in
+    reading order -- because a node cannot sit in two boxes. Parties come
+    before adjudicators in that order, so a rule the reporting judge shares
+    with the respondent is drawn in the respondent's box, and every attack on
+    it *looks* like an attack on a party.
+
+    In `case-003-final` that hid the entire decision phase: six of the seven
+    attacks are substantively between adjudicators, and the diagram showed a
+    party on one end of all six. This is what says who is really on each end.
+    """
+    source: str
+    target: str
+    kind: str                       # "undercut" | "rebut"
+    source_holders: List[str]
+    target_holders: List[str]
+    #: Box the edge is drawn between, which is not the same thing.
+    source_box: str
+    target_box: str
+
+    @property
+    def source_adjudicators(self) -> List[str]:
+        return [k for k in self.source_holders if k in ADJUDICATORS]
+
+    @property
+    def target_adjudicators(self) -> List[str]:
+        return [k for k in self.target_holders if k in ADJUDICATORS]
+
+    @property
+    def between_adjudicators(self) -> bool:
+        """Both ends held by an adjudicator: a decision-phase confrontation,
+        which is the move Prakken's model is about and the one the lanes
+        flatten."""
+        return bool(self.source_adjudicators and self.target_adjudicators)
+
+    @property
+    def phase(self) -> str:
+        """Whose move it is. An attack is made by whoever holds the attacking
+        rule; when a party and an adjudicator both hold it, the party raised
+        it and the adjudicator adopted it, so the argumentation phase is
+        where it enters."""
+        parties = [k for k in self.source_holders if k in ADVERSARIES]
+        return "argumentação" if parties else "decisão"
+
+
+def mapped_attacks(record) -> List[MappedAttack]:
+    """Every attack of the map, with the perspectives actually on each end."""
+    rules = {rule.id: rule for rule in mapped_rules(record)}
+    out: List[MappedAttack] = []
+    for rule in rules.values():
+        if rule.attacks and rule.attacks in rules:
+            target = rules[rule.attacks]
+            out.append(MappedAttack(
+                rule.id, target.id, "undercut", list(rule.holders),
+                list(target.holders), rule.perspective, target.perspective))
+    for source, target in _rebutting_pairs(list(rules.values())):
+        out.append(MappedAttack(
+            source.id, target.id, "rebut", list(source.holders),
+            list(target.holders), source.perspective, target.perspective))
+    return out
+
+
+def confrontations(record) -> List[dict]:
+    """`quem ataca quem`, perspective by perspective.
+
+    Read off the holders, not off the boxes. One row per ordered pair of
+    perspectives that actually confront each other, with the rules involved.
+    """
+    tally: Dict[tuple, dict] = {}
+    for attack in mapped_attacks(record):
+        for source in attack.source_holders or [SHARED]:
+            for target in attack.target_holders or [SHARED]:
+                if source == target:
+                    continue        # a voice does not attack itself
+                # Classified per *pair*, not per attack. One rule several
+                # voices hold produces several confrontations, and they are
+                # not all of the same kind: `dvesp_q0 ⤅ dvgen_q2` is the
+                # respondent answering the dissent in the argumentation
+                # phase *and* the reporting judge answering it in the
+                # decision phase, depending on which holder you read it from.
+                entry = tally.setdefault((source, target), {
+                    "source": source, "target": target, "rules": [],
+                    "between_adjudicators": (source in ADJUDICATORS
+                                             and target in ADJUDICATORS),
+                    "phase": "decisão" if source in ADJUDICATORS else "argumentação",
+                })
+                notation = (f"{attack.source} ⇏ {attack.target}"
+                            if attack.kind == "undercut"
+                            else f"{attack.source} ⤅ {attack.target}")
+                if notation not in entry["rules"]:
+                    entry["rules"].append(notation)
+    order = [*ADVERSARIES, *ADJUDICATORS]
+
+    def sort_key(entry):
+        def rank(key):
+            return order.index(key) if key in order else len(order)
+        return (rank(entry["source"]), rank(entry["target"]))
+
+    return sorted(tally.values(), key=sort_key)
+
+
+#: Labels numbering each attack in the map and legend table.
+_CIRCLED_NUMBERS = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳"
+
+
+def _attack_number(index: int) -> str:
+    return (_CIRCLED_NUMBERS[index] if index < len(_CIRCLED_NUMBERS)
+            else f"({index + 1})")
+
+
+@dataclass(frozen=True)
+class AdjudicationAttack:
+    """One adjudication-map attack, numbered with its actual phase and outcome.
+
+    Nothing is handwritten: `inert` means the attacking rule never built an
+    argument; `neutralised` means it was itself defeated; `decisive` means it
+    survives unanswered and defeats the rule concluding the theory's target.
+    The map legend prints this table, reflecting the case's decisive structure
+    rather than merely describing arrows.
+    """
+    number: str
+    attack: MappedAttack
+    source_rule: MappedRule
+    target_rule: MappedRule
+    inert: bool
+    neutralised: bool
+    decisive: bool
+    #: Numbers of attacks that defeated the attacking rule (empty if none).
+    answered_by: List[str]
+    #: No party attacks the attacking rule: in the argumentation phase the move
+    #: prevails by dialectical default: absence of a reply, not substantive merit.
+    unreplied_by_parties: bool
+
+    @property
+    def phase(self) -> str:
+        return self.attack.phase
+
+    def movers_pt(self) -> str:
+        """Who makes the move, with the phase in which each voice makes it."""
+        parties = [k for k in self.attack.source_holders if k in ADVERSARIES]
+        votes = [k for k in self.attack.source_holders if k in ADJUDICATORS]
+        pieces = []
+        if parties:
+            pieces.append(", ".join(_label(k) for k in parties)
+                          + " (argumentação)")
+        if votes:
+            note = "adota na decisão" if parties else "decisão"
+            pieces.append(", ".join(_label(k) for k in votes) + f" ({note})")
+        return "; ".join(pieces) or "—"
+
+    def outcome_pt(self) -> str:
+        """The move's outcome in the grounded extension, in one line."""
+        pieces = []
+        if self.phase == "argumentação" and self.unreplied_by_parties:
+            pieces.append("prevalece na argumentação sem réplica das partes")
+        if self.inert:
+            fora = ", ".join(short_literal(a)
+                             for a in self.source_rule.antecedents)
+            pieces.append(f"inerte: {fora} fora da base fática — "
+                          "nenhum argumento se constrói")
+        elif self.neutralised:
+            por = f" por {', '.join(self.answered_by)}" if self.answered_by else ""
+            pieces.append(f"não subsiste: afastado na decisão{por}")
+        elif self.decisive:
+            alvo = short_literal(self.target_rule.consequent)
+            pieces.append(f"decisivo: afasta {self.attack.target} sem receber "
+                          f"resposta — {alvo} sai da extensão fundada")
+        elif self.target_rule.defeated:
+            pieces.append(f"prevalece: afasta {self.attack.target}")
+        else:
+            pieces.append(f"não afasta {self.attack.target}")
+        return "; ".join(pieces)
+
+
+def adjudication_attacks(record) -> List[AdjudicationAttack]:
+    """All case attacks, numbered in dialogue order.
+
+    Follows Prakken's (2008) two phases: argumentation moves first, then
+    decision moves in lane order (reporting judge, concurring vote, dissenting
+    vote). Within each group, record order applies. Each move's outcome is
+    read from the grounded extension.
+    """
+    rules = {rule.id: rule for rule in mapped_rules(record)}
+    by_rule = arguments_by_rule(record)
+    attacks = mapped_attacks(record)
+    targets = set(record.lrc.targets) if record.lrc is not None else set()
+    order = [*ADVERSARIES, *ADJUDICATORS]
+
+    def rank(attack: MappedAttack):
+        lanes = [order.index(k) for k in attack.source_holders if k in order]
+        return (0 if attack.phase == "argumentação" else 1,
+                min(lanes) if lanes else len(order))
+
+    ordered = sorted(enumerate(attacks), key=lambda pair: (*rank(pair[1]), pair[0]))
+    number_of = {index: _attack_number(position)
+                 for position, (index, _) in enumerate(ordered)}
+
+    out: List[AdjudicationAttack] = []
+    for position, (index, attack) in enumerate(ordered):
+        source = rules[attack.source]
+        target = rules[attack.target]
+        inert = not by_rule.get(attack.source)
+        neutralised = source.defeated
+        # Who defeated the attacker: attacks against it that have an argument.
+        answered_by = sorted(
+            number_of[i] for i, other in enumerate(attacks)
+            if other.target == attack.source and by_rule.get(other.source)
+        ) if neutralised else []
+        unreplied = not any(
+            other.target == attack.source
+            and any(k in ADVERSARIES for k in other.source_holders)
+            for other in attacks)
+        decisive = (not inert and not neutralised and target.defeated
+                    and target.consequent in targets)
+        out.append(AdjudicationAttack(
+            number=number_of[index], attack=attack,
+            source_rule=source, target_rule=target, inert=inert,
+            neutralised=neutralised, decisive=decisive,
+            answered_by=answered_by, unreplied_by_parties=unreplied))
+    return out
+
+
+#: Synthetic node summarizing an entire attack-free layer.
+_FACT_NODE = "__fato__"
+
+
+# Shared attributes keep diagram edges and legend samples visually consistent.
+_ADJUDICATION_STYLES = {
+    "standing": ("#c0392b", "solid", 2.0, 0.8, "tee"),
+    "decisive": ("#c0392b", "solid", 3.4, 0.8, "tee"),
+    "neutralised": ("#c0392b", "dashed", 1.4, 0.8, "tee"),
+    "inert": ("#8a8a8a", "dotted", 1.2, 0.8, "tee"),
+    "support": ("#b0b0b0", "dashed", 1.0, 0.6, "normal"),
+    "co-holder": ("#c0392b", "dashed", 1.6, 0.7, "empty"),
+}
+
+
+def _adjudication_style(kind: str, penwidth=None) -> str:
+    """DOT edge attributes shared by map edges and visual legend samples."""
+    color, style, pen, size, head = _ADJUDICATION_STYLES[kind]
+    return (f'color="{color}", style="{style}", '
+            f'penwidth={pen if penwidth is None else penwidth}, '
+            f'arrowsize={size}, arrowhead="{head}"')
+
+
+def to_adjudication_dot(record, title: str = "", known: Sequence[str] = ()) -> str:
+    """High-level adjudication map in Graphviz DOT.
+
+    Retains one box per perspective, grouped into adjudicator and party lanes.
+    Boxes show only the main attack structure: one node per attacking or
+    attacked move, with no individual arguments. The solver builds more
+    arguments than a figure can hold; partial listings misrepresented their
+    completeness. The attack skeleton is complete within this scope.
+    Each attack is numbered, and the legend table names its mover, phase and
+    outcome from the grounded extension: the case's actual decisive structure,
+    rather than a symbol key. Support without attacks is folded into the move
+    it feeds and documented in its tooltip. An entire attack-free layer
+    (cause in fact) collapses into one node, linked to the other by the bridge.
+    """
+    from interface.graph_export import _dot_escape
+    import html as _html
+
+    rules = mapped_rules(record)
+    rule_of = {rule.id: rule for rule in rules}
+    by_rule = arguments_by_rule(record)
+    numbered = adjudication_attacks(record)
+    participants = ({entry.attack.source for entry in numbered}
+                    | {entry.attack.target for entry in numbered})
+    drawn = [rule for rule in rules if rule.id in participants]
+    folded = [rule for rule in rules if rule.id not in participants]
+
+    moved = {rule.perspective for rule in rules}
+    # Everyone the case knows about, whether or not they moved a rule: a
+    # silent adjudicator is a finding, and an invisible one is a bug.
+    present = moved | {_canon(key) for key in known} | set(perspectives_in(record))
+    by_perspective: Dict[str, List[MappedRule]] = {}
+    for rule in drawn:
+        by_perspective.setdefault(rule.perspective, []).append(rule)
+
+    #: What each folded move feeds. Attack-free support is not a node in an
+    #: attack-structure map, but must remain traceable: it becomes
+    #: a note in the supported move's tooltip.
+    fed_by: Dict[str, List[MappedRule]] = {}
+    for support in folded:
+        if not support.consequent or support.consequent.startswith("¬"):
+            continue
+        for rule in drawn:
+            if support.consequent in rule.antecedents:
+                fed_by.setdefault(rule.id, []).append(support)
+
+    #: A whole layer outside the attack structure (in `case-003`, cause
+    #: in fact, with no attacks between facts) collapses into one node.
+    fact_rules = ([rule for rule in folded if rule.layer == "cif"]
+                  if not any(rule.layer == "cif" for rule in drawn) else [])
+    bridged = set(record.lrc.bridged_premises) if record.lrc is not None else set()
+
+    # Transparent canvas so the card's background shows through in either
+    # theme; lane and title text in a mid grey that reads on both, node text
+    # left dark because the fills are light by design (a defeated rule has to
+    # look defeated, and that is carried by colour).
+    lines = ["digraph Adjudicacao {", "  compound=true;", '  rankdir="TB";',
+             '  bgcolor="transparent";', '  fontname="Helvetica";',
+             '  fontcolor="#8a8a8a";',
+             '  node [fontname="Helvetica", fontsize=10, fontcolor="#222222"];',
+             '  edge [fontname="Helvetica", fontsize=9, fontcolor="#8a8a8a"];',
+             "  nodesep=0.4;", "  ranksep=0.8;"]
+    if title:
+        lines.append(f'  labelloc="t"; label="{_dot_escape(title)}"; fontsize=15;')
+
+    def node(rule: MappedRule) -> str:
+        style = _LANE_STYLE[rule.layer]
+        fill = "#fdecea" if rule.defeated else style["fill"]
+        color = "#c0392b" if rule.defeated else "#444444"
+        pen = 1.8 if rule.defeated else 1.0
+        inert = not by_rule.get(rule.id)
+        tip = f"{rule.id}: {rule.body}"
+        if rule.gloss:
+            tip += f"\n\n{rule.gloss}"
+        others = [key for key in rule.holders if key != rule.perspective]
+        if others:
+            tip += ("\n\nSustentada também por: "
+                    + ", ".join(_label(key) for key in others))
+        for support in fed_by.get(rule.id, []):
+            tip += (f"\n\nAlimentada por {support.id}: "
+                    f"{support.gloss or support.body}")
+        if inert:
+            tip += "\n\nInerte: os antecedentes nunca foram satisfeitos."
+        css = (f"argnode rulenode arg-{rule.id} layer-{rule.layer} "
+               f'{"defeated" if rule.defeated else "standing"}')
+        # A rule several voices hold on their own account is drawn in the
+        # first holder's box -- a node sits in one box or none -- so the
+        # count goes on the node itself. Without it the map reads as one
+        # perspective's move, which is precisely what it is not.
+        label = f"{rule.id}\\n{_wrap_label(rule.label)}"
+        if len(rule.holders) > 1:
+            label += f"\\n({len(rule.holders)} vozes)"
+        if inert:
+            label += "\\n(inerte)"
+        return (f'    "{rule.id}" [shape={style["shape"]}, style="filled", '
+                f'fillcolor="{fill}", color="{color}", penwidth={pen}, '
+                f'label="{_dot_escape(label)}", '
+                f'tooltip="{_dot_escape(tip)}", class="{css}"];')
+
+    def fact_node() -> str:
+        effect = getattr(record, "effect", "") or "o resultado"
+        label = (f"camada de causa de fato\\ncadeia causal até {effect}"
+                 "\\n(nenhum ataque)")
+        tip = ("A camada de causa de fato não contém ataque nenhum; toda a "
+               "controvérsia do caso é de imputação. As regras dela:")
+        for rule in fact_rules:
+            quem = ("incontroversa" if rule.perspective == SHARED
+                    else ", ".join(_label(k) for k in rule.holders))
+            tip += f"\n{rule.id}: {rule.body} — {quem}"
+        return (f'    "{_FACT_NODE}" [shape=ellipse, style="filled,dashed", '
+                'fillcolor="#ffffff", color="#999999", penwidth=1.0, '
+                f'label="{_dot_escape(label)}", '
+                f'tooltip="{_dot_escape(tip)}", class="argnode factnode"];')
+
+    for lane_label, keys in LANES:
+        members = [key for key in keys if key in present]
+        if keys == (SHARED,):
+            if not by_perspective.get(SHARED) and not fact_rules:
+                continue
+            # Nobody's move: one box, no inner lane for a single perspective.
+            lines.append('  subgraph "cluster_lane_comum" {')
+            lines.append(f'    label="{lane_label}"; fontsize=12; '
+                         'color="#bbbbbb"; fontcolor="#8a8a8a"; style="dotted"; '
+                         'labeljust="l";')
+            for rule in by_perspective.get(SHARED, []):
+                lines.append("  " + node(rule))
+            if fact_rules:
+                lines.append("  " + fact_node())
+            lines.append("  }")
+            continue
+        if not members:
+            continue
+        lines.append(f'  subgraph "cluster_lane_{lane_label}" {{')
+        lines.append(f'    label="{lane_label}"; fontsize=13; color="#999999"; '
+                     'fontcolor="#8a8a8a"; style="dashed"; labeljust="l";')
+        for key in members:
+            lines.append(f'    subgraph "cluster_p_{key}" {{')
+            lines.append(f'      label="{_dot_escape(_label(key).upper())}"; '
+                         'fontsize=11; color="#bbbbbb"; fontcolor="#8a8a8a"; '
+                         'style="dashed";')
+            members_rules = by_perspective.get(key, [])
+            for rule in members_rules:
+                lines.append("  " + node(rule))
+            if not members_rules:
+                # An empty box means different things, and saying “no
+                # move” for all of them misrepresents two: the perspective
+                # may hold drawn moves that live in an earlier holder's box,
+                # or move only rules outside the attack structure, folded
+                # into the tooltips of the map.
+                elsewhere = [rule.id for rule in drawn if key in rule.holders]
+                folded_own = [rule.id for rule in folded if key in rule.holders]
+                if elsewhere:
+                    note = (f"sustenta {len(elsewhere)} lance(s),\\nna caixa "
+                            "de outro titular")
+                elif folded_own:
+                    note = ("move só regras sem ataque\\n("
+                            + ", ".join(folded_own) + ")")
+                else:
+                    note = SILENT_NOTE
+                lines.append(
+                    f'      "silent_{key}" [shape=plaintext, fontsize=9, '
+                    f'fontcolor="#8a8a8a", label="{_dot_escape(note)}"];')
+            lines.append("    }")
+        lines.append("  }")
+
+    #: `{perspective: node inside its box}`. Graphviz clips an
+    #: edge to a cluster boundary with `lhead`, but still needs a real node
+    #: as its logical destination: this anchor supplies one.
+    anchor_of = {key: (by_perspective[key][0].id if by_perspective.get(key)
+                       else f"silent_{key}")
+                 for _, keys in LANES for key in keys
+                 if key in present and key != SHARED}
+    anchors = [anchor_of[key] for _, keys in LANES for key in keys
+               if key in anchor_of]
+    if by_perspective.get(SHARED):
+        anchors.append(by_perspective[SHARED][0].id)
+    elif fact_rules:
+        anchors.append(_FACT_NODE)
+    for upper, lower in zip(anchors, anchors[1:]):
+        lines.append(f'  "{upper}" -> "{lower}" [style=invis, weight=10];')
+
+    # Support: one rule's conclusion feeding another's antecedent. Drawn
+    # faintly, because it is the plumbing -- but without it `suca` looks
+    # unconnected when it is precisely what makes the `sc` defences fire.
+    for source in drawn:
+        if not source.consequent or source.consequent.startswith("¬"):
+            continue
+        for target in drawn:
+            if target.id == source.id or source.consequent not in target.antecedents:
+                continue
+            lines.append(
+                f'  "{source.id}" -> "{target.id}" [{_adjudication_style("support")}, '
+                f'tooltip="{_dot_escape(source.id + " sustenta " + target.id)}", '
+                f'class="argedge support from-{source.id} to-{target.id}"];')
+
+    # The bridge between layers: a justified cause in fact enters here as
+    # an axiom. Without this edge the factual-layer node floats free and the
+    # relevance presumption appears to arise from nothing.
+    if fact_rules:
+        for rule in drawn:
+            if not any(a in bridged for a in rule.antecedents):
+                continue
+            lines.append(
+                f'  "{_FACT_NODE}" -> "{rule.id}" [{_adjudication_style("support")}, '
+                'label="ponte", '
+                'tooltip="A causa de fato justificada na camada de fato '
+                f'entra como axioma no antecedente de {rule.id}.", '
+                f'class="argedge support bridge to-{rule.id}"];')
+
+    # Numbered attacks. Edge style encodes outcome: solid when the move
+    # survives, thick when decisive, dashed when its author
+    # was itself defeated, and dotted gray when it never built an
+    # argument. The legend repeats numbers and spells out outcomes.
+    for entry in numbered:
+        attack = entry.attack
+        entre = attack.between_adjudicators
+        kind = ("inert" if entry.inert else "neutralised" if entry.neutralised
+                else "decisive" if entry.decisive else "standing")
+        colour, _, pen, _, _ = _ADJUDICATION_STYLES[kind]
+        if kind == "standing" and entre:
+            pen = 2.6
+        rebut = attack.kind == "rebut"
+        extra = 'arrowhead="normal", constraint=false, ' if rebut else ""
+        quem = lambda keys: ", ".join(_label(k) for k in keys) or "ninguém"
+        tip = (f"{entry.number} {attack.source} "
+               f"{'⤅' if rebut else '⇏'} {attack.target}\n\n"
+               f"{quem(attack.source_holders)} → {quem(attack.target_holders)}")
+        if entry.source_rule.gloss:
+            tip += f"\n\n{entry.source_rule.gloss}"
+        tip += f"\n\nDesfecho: {entry.outcome_pt()}"
+        css = (f'argedge {"rebut" if rebut else "defeat"} '
+               f"from-{attack.source} to-{attack.target}"
+               f'{" between-adjudicators" if entre else ""}'
+               f'{" decisive" if entry.decisive else ""}')
+        lines.append(
+            f'  "{attack.source}" -> "{attack.target}" '
+            f'[{_adjudication_style(kind, pen)}, {extra}'
+            f'label="{entry.number}", fontsize=14, fontcolor="{colour}", '
+            f'tooltip="{_dot_escape(tip)}", class="{css}"];')
+
+    # Shared ownership is recorded on nodes and in tooltips. Extra edges to
+    # perspective boxes would look like ASPIC attacks on those perspectives.
+
+    # Legend: attacks in full, with movers, phases and outcomes read from
+    # the record itself: the case's decisive structure, rather than a symbol
+    # key. The visual key appears in the same table's footer.
+    esc = _html.escape
+
+    rows = ['<TR><TD ALIGN="LEFT"><B>nº</B></TD>'
+            '<TD ALIGN="LEFT"><B>quem move</B></TD>'
+            '<TD ALIGN="LEFT"><B>lance</B></TD>'
+            '<TD ALIGN="LEFT"><B>desfecho na extensão fundada</B></TD></TR>']
+    for entry in numbered:
+        seta = "⤅" if entry.attack.kind == "rebut" else "⇏"
+        rows.append(
+            f'<TR><TD ALIGN="LEFT">{esc(entry.number)}</TD>'
+            f'<TD ALIGN="LEFT">{esc(entry.movers_pt())}</TD>'
+            f'<TD ALIGN="LEFT">{esc(entry.attack.source)} {seta} '
+            f'{esc(entry.attack.target)}</TD>'
+            f'<TD ALIGN="LEFT">{esc(entry.outcome_pt())}</TD></TR>')
+    from interface.adjudication_legend import legend_key_html
+
+    rows.append('<TR><TD COLSPAN="4" ALIGN="LEFT">'
+                + legend_key_html() + '</TD></TR>')
+    attack_types = ', '.join(sorted({entry.attack.kind for entry in numbered}))
+    rows.append('<TR><TD COLSPAN="4" ALIGN="LEFT">'
+                '<FONT COLOR="#666666" POINT-SIZE="7">'
+                f'ASPIC+: {attack_types}. Barra: aplicação da regra contestada. '
+                'Pontilhado: ataque potencial, sem argumento. <BR ALIGN="LEFT"/>'
+                'todos os ataques do caso estão no mapa; argumentos individuais '
+                'não são desenhados</FONT></TD></TR>')
+    table = ('<<TABLE BGCOLOR="#ffffff" COLOR="#bbbbbb" BORDER="1" '
+             'CELLBORDER="0" CELLSPACING="0" CELLPADDING="4">'
+             + "".join(rows) + "</TABLE>>")
+    lines.append('  subgraph "cluster_legenda" {')
+    lines.append('    label="LEGENDA — OS ATAQUES E O DESFECHO"; fontsize=10; '
+                 'color="#bbbbbb"; fontcolor="#8a8a8a"; style="dotted"; '
+                 'labeljust="l";')
+    lines.append('    "__legenda__" [shape=plaintext, fontsize=8, '
+                 f'label={table}, class="legendnode"];')
+    lines.append("  }")
+    if anchors:
+        lines.append(f'  "{anchors[-1]}" -> "__legenda__" '
+                     "[style=invis, weight=10];")
+
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def to_confrontation_dot(record, title: str = "") -> str:
+    """Perspective confrontations, without intermediate rules.
+
+    The adjudication map concerns rules: each ellipse represents one inside
+    its mover's box. This answers “what does each voice support?” but poorly
+    answers “who confronts whom?”, since a rule supported by three voices
+    occupies only one box. This graph projects the same data differently:
+    one node per perspective and one edge per confrontation, read through
+    rule holders. Conflicts between judges appear as conflicts between judges.
+    """
+    from interface.graph_export import _dot_escape
+
+    rows = confrontations(record)
+    present = perspectives_in(record)
+    lines = ["digraph Confrontos {", '  rankdir="LR";', '  bgcolor="transparent";',
+             '  fontname="Helvetica";', '  fontcolor="#8a8a8a";',
+             '  node [fontname="Helvetica", fontsize=11, shape=box, '
+             'style="rounded,filled", color="#666666", fontcolor="#222222"];',
+             '  edge [fontname="Helvetica", fontsize=8, fontcolor="#8a8a8a"];',
+             "  nodesep=0.5;", "  ranksep=1.4;"]
+    if title:
+        lines.append(f'  labelloc="t"; label="{_dot_escape(title)}"; fontsize=15;')
+
+    for lane_label, keys, fill in (("ADJUDICADORES", ADJUDICATORS, "#eef2fb"),
+                                   ("PARTES", ADVERSARIES, "#ffffff")):
+        members = [key for key in keys if key in present]
+        if not members:
+            continue
+        lines.append(f'  subgraph "cluster_c_{lane_label}" {{')
+        lines.append(f'    label="{lane_label}"; fontsize=12; color="#bbbbbb"; '
+                     'fontcolor="#8a8a8a"; style="dashed"; labeljust="l";')
+        for key in members:
+            lines.append(f'    "{key}" [label="{_dot_escape(_label(key))}", '
+                         f'fillcolor="{fill}"];')
+        lines.append("  }")
+
+    for row in rows:
+        entre = row["between_adjudicators"]
+        rotulo = ", ".join(row["rules"])
+        tip = (f"{_label(row['source'])} → {_label(row['target'])} "
+               f"(fase de {row['phase']}): {rotulo}")
+        lines.append(
+            f'  "{row["source"]}" -> "{row["target"]}" '
+            f'[color="{"#c0392b" if entre else "#b0b0b0"}", '
+            f'penwidth={2.2 if entre else 1.0}, arrowsize=0.8, '
+            f'style="{"solid" if entre else "dashed"}", '
+            f'label="{_dot_escape(rotulo if entre else "")}", '
+            f'tooltip="{_dot_escape(tip)}", '
+            f'class="argedge confronto from-{row["source"]} to-{row["target"]}'
+            f'{" between-adjudicators" if entre else ""}"];')
+
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def _rebutting_pairs(rules: Sequence[MappedRule]):
+    """Unordered pairs of rules whose consequents are complementary."""
+    from aspic.solver import negate_literal
+
+    seen = set()
+    for source in rules:
+        for target in rules:
+            if source.id == target.id or not source.consequent:
+                continue
+            if target.consequent != negate_literal(source.consequent):
+                continue
+            key = tuple(sorted((source.id, target.id)))
+            if key in seen:
+                continue
+            seen.add(key)
+            yield source, target

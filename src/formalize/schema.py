@@ -1,22 +1,26 @@
-"""Pydantic contracts for the dossier -> ASPIC+ formalization pipeline.
+"""The pydantic contracts of the persisted record
+`data/translated/<case>/case.json` (`FormalizedCase` and friends).
+Everything in the pipeline speaks through this schema: the transcription
+scripts write it, `formalize.build` executes it, the interface reads it.
+"""
 
-Two families of models live here:
+"""Pydantic contracts for the formalization record persisted under
+`data/translated/<case>/case.json`.
 
-* **Stage models** (`AtomsStageOut`, `RulesStageOut`, `QueriesStageOut`,
-  `LrcStageOut`, `RepairStageOut`) are the JSON schemas handed to Gemini as
-  `response_schema`. They are deliberately flat: Gemini's structured-output
-  schema subset has no open-ended objects, so every "map" is a list of
-  key/value records, and every field is required.
+`FormalizedCase` and friends are what gets persisted; that file is the
+single artifact the interface reads and the solver consumes --
+`knowledge_base` and `causal_model` are already in
+`aspic.solver.ArgumentationFramework`'s exact input shape, so no adapter
+sits between the formalization and the solver.
 
-* **Record models** (`FormalizedCase` and friends) are what gets persisted to
-  `data/translated/<case>/case.json`. That file is the single artifact the
-  interface reads and the solver consumes -- `knowledge_base` and
-  `causal_model` are already in `aspic.solver.ArgumentationFramework`'s exact
-  input shape, so no adapter sits between the formalization and the solver.
-
-Everything the LLM produces carries `evidence` (ids of `source_passages`) and
-`dossier_refs` (ids of the dossier records it came from), so every literal and
-every rule in the final framework can be traced back to a passage of the PDF.
+The records are hand-transcribed from the consolidated formalization
+document (`scripts/build_case003_final.py`); no model is involved. Every
+atom and rule carries `evidence` (ids of `source_passages`) and
+`dossier_refs` (ids of the dossier records it came from), so every literal
+and every rule in the final framework can be traced back to a passage of
+the PDF. `Provenance`/`PromptRef` remain in the schema as legacy metadata:
+records produced by the retired LLM pipeline carried them, nothing writes
+them anymore, and the interface renders them only when present.
 """
 from typing import Dict, List, Literal, Optional
 
@@ -35,16 +39,24 @@ def undercut_gloss(rule_gloss: str) -> str:
     return f"não se sustenta o raciocínio: “{rule_gloss.strip().rstrip('.')}”"
 
 AtomKind = Literal["fato", "intermediario", "resultado", "prova", "dever"]
-#: Which side a factor favours, in the sense of CATO's `pFactor`/`dFactor`
-#: (Aleven & Ashley; formalized in Prakken, Wyner, Bench-Capon & Atkinson,
-#: "A formalization of argumentation schemes for legal case-based reasoning in
-#: ASPIC+", JLC 2015). Named for the substantive question rather than for the
-#: procedural position, because `recorrente`/`recorrido` swap depending on who
-#: appealed while "does this fact push towards liability?" does not.
+#: Legacy atom annotations retained for compatibility with stored records.
+#: The removed factor presentation no longer consumes these fields; they
+#: do not participate in argument construction or causal verdicts.
 FactorSide = Literal["responsabilizacao", "exclusao", "neutro"]
 AtomStatus = Literal["incontroverso", "controvertido", "rejeitado"]
 RuleKind = Literal["causal", "excecao", "undercut", "rebut"]
 CourtVerdict = Literal["acolhida", "rejeitada", "nao_decidida"]
+#: Execution order of the two layers.
+#:
+#: `cif_first` follows ICAIL 2026: CIF resolves, then `CaFa(φ,ψ)` enters
+#: LRC as an axiom (equation 1). This is the default used by the paper's cases.
+#:
+#: `lrc_first` reverses what can be reversed: LRC qualification rules
+#: that do not read bridge literals run first and deliver the legal
+#: context to CIF as axioms; only the bridge waits for facts. The order is
+#: LRC qualification → CIF → LRC bridge. Opt-in per record because it departs
+#: from the paper.
+LayerOrder = Literal["cif_first", "lrc_first"]
 #: Schemes 2-8 of ICAIL 2026, then the duty-qualification extensions of
 #: `aspic.lrc.EXTENSION_SCHEMES`.
 LrcScheme = Literal["cf2lrc", "nwo", "sc", "suca", "nofor", "rpl", "unom",
@@ -52,7 +64,7 @@ LrcScheme = Literal["cf2lrc", "nwo", "sc", "suca", "nofor", "rpl", "unom",
 
 
 # ----------------------------------------------------------------------
-# Stage 1 -- atoms
+# Atoms
 # ----------------------------------------------------------------------
 class AtomOut(BaseModel):
     """One atom of the logical language, with its provenance in the dossier."""
@@ -65,56 +77,11 @@ class AtomOut(BaseModel):
     dossier_refs: List[str] = Field(description="Ids de registros do dossie (divg_*, unit_*, prec_*, synth_*) de onde o atomo foi extraido.")
     established: bool = Field(description="True se o atomo entra como premissa do framework (fato dado por posto, ainda que contestado por regra).")
     favors: FactorSide = Field(default="neutro", description="Para que lado o fato pesa: responsabilizacao, exclusao, ou neutro se nao pesa para nenhum.")
-    abstract_factor: str = Field(default="", description="Codigo CamelCase do ponto abstrato que este fato instancia (ex.: DeverDeAgir, NexoCausal, Prova). Dois fatos de lados opostos sob o mesmo ponto abstrato se anulam.")
-
-
-class AtomsStageOut(BaseModel):
-    case_title: str
-    narrative_pt: str
-    central_question: str
-    outcome_code: str = Field(description="Codigo do atomo que representa o resultado danoso a ser explicado.")
-    atoms: List[AtomOut]
-    open_questions: List[str]
+    abstract_factor: str = Field(default="", description="Codigo CamelCase do ponto abstrato que este fato instancia (ex.: DeverDeAgir, NexoCausal, Prova). Metadado legado; nao participa dos vereditos do solver.")
 
 
 # ----------------------------------------------------------------------
-# Stage 2 -- rules
-# ----------------------------------------------------------------------
-class RuleOut(BaseModel):
-    rule: str = Field(description="Regra no formato 'rN: Ant1 AND Ant2 => Cons' (ou '->' para regra estrita).")
-    kind: RuleKind
-    gloss_pt: str
-    perspective: str
-    evidence: List[str]
-    dossier_refs: List[str]
-
-
-class RulesStageOut(BaseModel):
-    premises: List[str]
-    axioms: List[str]
-    strict_rules: List[RuleOut]
-    defeasible_rules: List[RuleOut]
-    modelling_notes_pt: str
-
-
-# ----------------------------------------------------------------------
-# Stage 3 -- causal queries
-# ----------------------------------------------------------------------
-class QueryOut(BaseModel):
-    phi: str = Field(description="Literal da causa candidata (pode vir com o sinal de negacao).")
-    psi: str = Field(description="Literal do resultado examinado.")
-    question_pt: str
-    court_verdict: CourtVerdict
-    court_rationale_pt: str
-    evidence: List[str]
-
-
-class QueriesStageOut(BaseModel):
-    queries: List[QueryOut]
-
-
-# ----------------------------------------------------------------------
-# Stage 4 -- legally relevant causation (ICAIL 2026)
+# Legally relevant causation (ICAIL 2026)
 # ----------------------------------------------------------------------
 class LrcPremiseOut(BaseModel):
     literal: str = Field(description="Premissa doutrinaria: Om_X, Obl_X, Unexpected_X, After_X_Y, ForeseeableRisk_X_R, Playout_R_Y, Tortious_X (ou sua negacao).")
@@ -127,10 +94,9 @@ class LrcPremiseOut(BaseModel):
     def holders(self) -> List[str]:
         """Every perspective that holds this premise on its own account.
 
-        A single `perspective` is what the stages emit and cannot express a
-        thesis three voices assert independently; `perspectives`, filled in
-        at record level, can. Empty means "just `perspective`", so records
-        written before the field existed read exactly as they did.
+        A single `perspective` cannot express a thesis three voices assert
+        independently; `perspectives` can. Empty means "just `perspective`",
+        so records written before the field existed read exactly as they did.
         """
         return list(self.perspectives) or ([self.perspective] if self.perspective else [])
 
@@ -147,19 +113,6 @@ class LrcRuleOut(BaseModel):
     def holders(self) -> List[str]:
         """See `LrcPremiseOut.holders`."""
         return list(self.perspectives) or ([self.perspective] if self.perspective else [])
-
-
-class LrcStageOut(BaseModel):
-    doctrinal_premises: List[LrcPremiseOut]
-    scheme_rules: List[LrcRuleOut]
-    targets: List[str] = Field(description="Literais LeReCa_* cuja aceitacao deve ser avaliada.")
-    duty_basis_pt: str = Field(description="Fundamento normativo do dever de agir, quando houver.")
-
-
-class RepairStageOut(BaseModel):
-    """Correction of a previously rejected stage: the same payload, re-emitted."""
-    corrected_json: str = Field(description="O JSON corrigido do estagio, como string, com o mesmo formato exigido originalmente.")
-    changes_pt: List[str]
 
 
 # ----------------------------------------------------------------------
@@ -186,7 +139,7 @@ class RuleMeta(BaseModel):
     """One rule of the cause-in-fact layer, with its author and provenance.
 
     `perspective` names *the* perspective a stage attributed the rule to, and
-    stays the primary field: it is what the LLM stages emit and what every
+    stays the primary field: it is what older records carry and what every
     record formalized so far carries. `perspectives` is the record-level
     refinement -- a rule several voices hold on their own account, which a
     single string cannot say. A judgment where the reporting judge and two
@@ -266,7 +219,7 @@ class RuleProfileOut(BaseModel):
 class PreferenceBlock(BaseModel):
     """The case's ordering between defeasible arguments, as data.
 
-    Never authored by an LLM stage: the weights are somebody's reading of the
+    The weights are somebody's reading of the
     judgment, and the point of writing them into the record is that another
     reader can disagree and re-run. Applies to both layers -- rule ids are
     disjoint across them -- and is silent about any element it does not rank.
@@ -310,7 +263,7 @@ class LRCBlock(BaseModel):
     """The ICAIL 2026 legal-relevance layer as a second framework.
 
     `bridged_premises` is computed by `formalize.bridge` from the cause-in-fact
-    solver run and is never authored by the LLM -- the same determinism
+    solver run and is never authored by hand -- the same determinism
     boundary that keeps the counterfactual test honest.
     """
     doctrinal_premises: List[LrcPremiseOut] = Field(default_factory=list)
@@ -322,14 +275,14 @@ class LRCBlock(BaseModel):
 
     @property
     def knowledge_base(self) -> Dict[str, List[str]]:
-        """A base da LRC, com a ponte em K𝑛 e a doutrina em K𝑝.
+        """LRC knowledge base, with the bridge in K𝑛 and doctrine in K𝑝.
 
-        A equação (1) do ICAIL 2026 é explícita: justificado no módulo CIF que
-        φ é causa NESS de ψ, o fato `CaFa(φ,ψ)` entra na LRC **como axioma**,
-        não como premissa ordinária. É o que fecha a fronteira entre os
-        módulos — a camada de relevância qualifica a causa de fato, não a
-        relitiga: axioma não sofre undermining, e não entra em `Prem_p` na
-        comparação de preferências da Def. 21 de Modgil & Prakken.
+        ICAIL 2026 equation (1) is explicit: when the CIF module justifies φ
+        as a NESS cause of ψ, `CaFa(φ,ψ)` enters LRC **as an axiom**, not an
+        ordinary premise. This closes the module boundary: legal relevance
+        qualifies cause in fact rather than relitigating it. Axioms cannot
+        be undermined and do not enter `Prem_p` in the preference comparison
+        of Modgil & Prakken Def. 21.
         """
         return {
             "premises": list(dict.fromkeys(p.literal for p in self.doctrinal_premises)),
@@ -370,6 +323,7 @@ class FormalizedCase(BaseModel):
     effect: str = ""
     queries: List[Query] = Field(default_factory=list)
     lrc: Optional[LRCBlock] = None
+    layer_order: LayerOrder = "cif_first"
     preferences: Optional[PreferenceBlock] = None
     open_questions: List[str] = Field(default_factory=list)
     modelling_notes_pt: str = ""
@@ -380,10 +334,10 @@ class FormalizedCase(BaseModel):
         argument's conclusion.
 
         That is the atoms and their negations -- generated here rather than
-        asked of the LLM -- **and** the rule negations `¬rN`, which is what an
+        kept out of the record -- **and** the rule negations `¬rN`, which is what an
         undercutting argument concludes. Without the latter the didactic view
         would print a bare `¬r0` in the middle of a sentence; with it, the
-        card reads "conclui-se que não se sustenta o raciocínio: ...".
+        card reads "the reasoning is not supported: ...".
         """
         glosses: Dict[str, str] = {}
         for atom in self.atoms:

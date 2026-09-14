@@ -1,3 +1,7 @@
+"""Checks the built-in ICAIL 2025 cases against their declared causal verdicts.
+Loads `cases.examples` and verifies the results produced by `aspic.solver`.
+"""
+
 """Reliability test: reproduce the cause-in-fact conclusions of Section 5
 of Pisano, Prakken, Sartor & Liepina, "Modelling Cause-in-Fact in Legal
 Cases through Defeasible Argumentation" (ICAIL 2025), against the ported
@@ -8,14 +12,14 @@ Each test builds the argumentation theory exactly as given in the paper
 1. The grounded extension matches the paper's stated justified conclusions.
 2. ness_cause(phi, psi) matches the paper's explicit cause / non-cause claims.
 
-The five cases' knowledge bases/rule models live in `aspic.examples` --
+The five cases' knowledge bases/rule models live in `cases.examples` --
 the same source `scripts/generate_graphs.py` uses to render their argument
 graphs -- so this file only wires them up to the solver and its assertions.
 
 Section 6 (Event Calculus reformulation with time points and first-order
 rule instantiation) is out of scope: the solver is propositional.
 """
-from aspic.examples import case_by_id
+from cases.examples import case_by_id
 from aspic.solver import ArgumentationFramework
 
 

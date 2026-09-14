@@ -1,17 +1,23 @@
+"""Normalizes an annotated dossier export into a markdown case brief with
+the evidence resolved inline. Feeds `interface.dossier_view` (display and
+audit) and gives downstream citations their passage ids; nothing in the
+solver path depends on it.
+"""
+
 """Deterministic normalization of an annotated dossier into a case brief.
 
 The dossiers in `data/<annotator>/` are exports of an annotation tool: dozens
 of fields, most of them empty for any given case, free-text values that are
 really numbered lists, and a `source_links` table that connects passages of
-the PDF to individual *fields* of individual records. Feeding that raw JSON to
-an LLM wastes context on nulls and hides the evidence structure.
+the PDF to individual *fields* of individual records. Read raw, that JSON
+buries the evidence structure under nulls.
 
-This module turns it into a markdown brief -- no LLM involved, so it is cheap,
-diffable and testable -- that keeps only what is filled in, resolves every
-`source_links` row into an inline evidence marker next to the field it
-supports, and ends with a catalog of the passages so later stages can cite
-them by id. The same brief is the input of every LLM stage, and it is written
-to `runs/<run_id>/00_brief.md` as part of the run's provenance.
+This module turns it into a markdown brief -- cheap, diffable and testable --
+that keeps only what is filled in, resolves every `source_links` row into an
+inline evidence marker next to the field it supports, and ends with a catalog
+of the passages so anything downstream can cite them by id. The interface is
+its consumer: `interface.dossier_view` renders the dossier (or falls back to
+the brief) so a formalization can be audited against what the annotator wrote.
 """
 import hashlib
 import json
@@ -165,7 +171,7 @@ def perspective_label(perspective_type: str) -> str:
     """Human label for a `perspective_type` (`recorrente`, `stf_final`, ...).
 
     Public counterpart of `field_label`, so the interface layer
-    (`aspic.dossier_view`) names perspectives exactly as the brief does
+    (`interface.dossier_view`) names perspectives exactly as the brief does
     instead of keeping a second, drifting copy of the table.
     """
     canonical = canonical_perspective(perspective_type)

@@ -1,3 +1,11 @@
+"""Preference orderings between defeasible arguments, computed from a
+declared tuple of doctrinal dimensions. Loaded from
+`FormalizedCase.preferences` by `formalize.build` and passed into
+`aspic.solver.ArgumentationFramework`, where it refines only the
+preference-dependent defeats (rebut/undermine); `interface.preference_view`
+renders its numbers.
+"""
+
 """Preferences between defeasible arguments, computed from a tuple of
 doctrinal dimensions.
 
@@ -8,13 +16,13 @@ arguments are **incomparable**. Incomparability is a deliberate choice, and
 it has a consequence the interface has to keep saying out loud: a mutual
 rebut leaves both sides UNDEC, so a judgment whose ratio is "this reason
 prevails over that one" cannot be reproduced as a rebut -- only as an
-undercut (see `docs/formalizacao.md`, "A restrição de modelagem que decide o
-resultado").
+undercut (see `docs/formalizacao.md`, "The modeling restriction that determines the
+outcome").
 
 That is the right default for the ICAIL cases, which are built exactly that
 way. It is *not* enough for a judgment that resolves a head-on conflict of
 qualifications by weighing reasons, which is what
-`docs/formalizacao.md`'s Caso 003 does at ⟨q0, q2⟩: the specific duty of
+`docs/formalizacao.md`'s Case 003 does at ⟨q0, q2⟩: the specific duty of
 custody against the generic duty of public security, two rules concluding
 complementary literals, with no undercut on either side. Somebody has to be
 preferred, and ASPIC+ has the room for it: Definition 2.10 makes rebutting
@@ -27,7 +35,7 @@ Definition 19 for comparing two sets, Definition 20 for last-link and
 Definition 21 for weakest-link. It computes the ranking from an explicit,
 auditable tuple rather than from a bare number:
 
-* a **dimension** is one doctrinal axis the judgment weighs (for Caso 003:
+* a **dimension** is one doctrinal axis the judgment weighs (for Case 003:
   the specificity of the duty to act, the causal intervention of a later
   event, the autonomy of the third party who acted), each with the weight the
   reader assigns to it;
@@ -64,7 +72,7 @@ solver. `sensitivity` exists for exactly that: it reports the weight at which
 a given conflict would flip.
 
 Who *moves* the ordering is `PreferenceBlock.perspective`, and
-`aspic.perspectives` honours it: a projection that has not admitted that
+`analysis.perspectives` honours it: a projection that has not admitted that
 voice runs under the basic ordering. In Prakken's adjudication model a
 priority argument is a move of the decision phase, so an ordering that
 applied from step 0 would let a preference settle a dispute between the
@@ -89,8 +97,8 @@ PRINCIPLE_LABELS = {
                "regra derrotável de nenhum dos lados",
 }
 
-#: Comparadores de conjunto da Definição 19. `elitist` é o padrão do ASPIC+ e
-#: o padrão da implementação de referência (`orderingComparator(elitist)`).
+#: Definition 19 set comparators. `elitist` is the ASPIC+ default and
+#: the reference implementation's default (`orderingComparator(elitist)`).
 ELITIST = "elitist"
 DEMOCRAT = "democrat"
 COMPARATORS = (ELITIST, DEMOCRAT)
@@ -185,7 +193,7 @@ class PreferenceModel:
 
     def tuple_for(self, rule_id: str) -> Tuple[float, ...]:
         """The rule's coefficients as a tuple, in dimension order -- the
-        `⟨dever específico, intervenção causal, autonomia⟩` a reader of the
+        `⟨specific duty, causal intervention, autonomy⟩` a reader of the
         formalization sees written out."""
         profile = self.profiles.get(rule_id)
         if profile is None:

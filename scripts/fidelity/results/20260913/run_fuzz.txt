@@ -1,0 +1,15 @@
+teorias: 366  pares (phi,psi): 16504
+
+[plena]  nosso x ness/3 completo da referência:
+  nosso=T / ref=F : 155
+  nosso=F / ref=T : 53
+  (pares em que só a intervenção conjunta da referência dá causa -- lacuna D3 nossa: 83)
+
+[isolada]  singleton dos dois lados:
+  divergentes: 235  ({'ours=T/ref=F': 210, 'ours=F/ref=T': 25})
+    D1 (exigência de atacante IN): 210
+    D2 (Supp difere): 25
+
+teorias em que Supp(psi) difere (D2): 8 de 366
+
+exemplo D1 -- Kp=['c']; regras=['r0: a => b', 'r1: c => ¬r0', 'r2: ¬a => b', 'r3: a AND b => ¬c', 'r4: a => b', 'r5: b => ¬c']; ness(a,c): nosso=True, referência=False

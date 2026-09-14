@@ -1,0 +1,13 @@
+== clone x oráculos: ness_intervention (22) ==
+  22 ok, 0 falhas
+== clone x oráculos: ness/3 (18) ==
+  18 ok, 0 falhas
+== clone x oráculos: but_for (5) ==
+  5 ok, 0 falhas
+== NOSSO ness_cause x os mesmos 18 oráculos ==
+  XX theory2: ness_cause(b, c) = False, esperado True -- conjunta (D3, esperada)
+  XX complex: ness_cause(¬d, ¬b) = False, esperado True -- conjunta (D3, esperada)
+  XX complex: ness_cause(¬e, ¬b) = False, esperado True -- conjunta (D3, esperada)
+  15/18 ok; falhas: 3 (todas são os oráculos de intervenção conjunta)
+
+RESULTADO: clone reproduz 40/40 oráculos ICAIL25 (+5/5 but_for)

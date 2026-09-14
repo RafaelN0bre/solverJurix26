@@ -1,3 +1,9 @@
+"""Computes sufficient sets: which sets of conditions suffice for an effect,
+and which members of each are individually necessary. Pure forward-chaining
+over a framework's rule base; `interface.causal_report` renders the result
+as the explanation beside each NESS verdict.
+"""
+
 """Sufficient sets: *why* a NESS verdict came out the way it did.
 
 The NESS test -- Hart & Honoré's, developed by Wright -- says:
@@ -12,8 +18,8 @@ ICAIL 2025 / Definition 3.4 of ICAIL 2026, and `ness/3` in the authors'
 implementation). This module does not re-decide it. What it supplies is the
 *decomposition* the verdict is silent about: which sets of conditions are in
 fact sufficient for the effect, and which members of each are individually
-necessary. That is what makes a NESS answer readable -- "é causa" is a
-verdict, "porque {Ex1, Ex2} basta e sem Ex1 não basta" is an explanation.
+necessary. That is what makes a NESS answer readable -- "is a cause" is a
+verdict, "because {Ex1, Ex2} suffices and without Ex1 it does not" is an explanation.
 
 Everything here is forward-chaining over the rule base: monotonic,
 defeat-agnostic, and deliberately independent of attacks and axiom-expansion.

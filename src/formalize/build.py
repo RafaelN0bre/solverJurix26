@@ -1,17 +1,23 @@
+"""Deterministic assembly of a record: `FormalizedCase` -> the two solver
+frameworks -> the `CaseSpec` the interface consumes. It is the join point of
+the pipeline: past it, a dossier case and a hardcoded paper case are
+indistinguishable to every renderer.
+"""
+
 """Deterministic assembly: `FormalizedCase` -> solver frameworks -> `CaseSpec`.
 
-Nothing here calls a model. Given the record produced by the LLM stages, this
-module builds the two argumentation frameworks, runs them, writes the verdicts
-back into the record, and adapts it to the `aspic.examples.CaseSpec` the
-interface and the report renderers already consume -- so a case formalized
-from a dossier renders through exactly the same code path as the five ICAIL
-cases hardcoded in `aspic.examples`.
+Nothing here calls a model. Given a formalization record (hand-transcribed
+by `scripts/build_case003_final.py`), this module builds the two
+argumentation frameworks, runs them, writes the verdicts back into the
+record, and adapts it to the `cases.examples.CaseSpec` the interface and the
+report renderers already consume -- so a formalized case renders through
+exactly the same code path as the ICAIL cases hardcoded in `cases.examples`.
 
 Two things worth knowing about the adaptation:
 
 * `CausalQuery.expect_*` is filled with what the solver *did* compute, not
-  with a prediction. Those fields drive no rendering (`aspic.didactic` and
-  `aspic.causal_report` recompute the three notions live); they exist so a
+  with a prediction. Those fields drive no rendering (`interface.didactic` and
+  `interface.causal_report` recompute the three notions live); they exist so a
   regression test can catch a solver change silently altering the verdicts of
   an already-published formalization.
 * The `LeReCa_*`/`CaFa_*` literals of the LRC layer get their Portuguese
@@ -22,7 +28,7 @@ Two things worth knowing about the adaptation:
 from typing import Dict, List, Optional
 
 from aspic import lrc as lrc_vocab
-from aspic.examples import CaseSpec, CausalQuery, LRCLayer
+from cases.examples import CaseSpec, CausalQuery, LRCLayer
 from aspic.solver import ArgumentationFramework
 
 from .bridge import (
@@ -54,8 +60,8 @@ _LRC_TEMPLATES = {
                    "{0} não era um evento inesperado"),
     "SupersedingCause": ("{0} é causa superveniente, que rompe o nexo anterior",
                          "{0} não é causa superveniente"),
-    # Mesma leitura, com os três argumentos que o artigo escreve. A escolha é
-    # por aridade, em `_render_lrc_literal`.
+    # Same reading with the paper's three arguments. The choice is
+    # determined by arity in `_render_lrc_literal`.
     "SupersedingCause/3": ("{0} é causa superveniente: rompe o nexo entre {1} e {2}",
                            "{0} não rompe o nexo entre {1} e {2}"),
     "After": ("{0} ocorreu depois de {1}", "{0} não ocorreu depois de {1}"),
@@ -81,9 +87,74 @@ def preference_model(case: FormalizedCase):
     return case.preferences.model() if case.preferences is not None else None
 
 
+def _reads_bridge(rule: str) -> bool:
+    """True for an LRC rule whose antecedent reads a cause-in-fact literal."""
+    antecedent = rule.split(":", 1)[-1].split("=>")[0]
+    return "CaFa_" in antecedent or "ButFor_" in antecedent
+
+
+def qualification_framework(case: FormalizedCase) -> Optional[ArgumentationFramework]:
+    """The LRC *before* the bridge: the qualification rules alone.
+
+    Only `cf2lrc` reads a cause-in-fact literal; every other scheme of the
+    layer -- the duty, the third-party act, the generic omission -- stands on
+    the doctrinal premises by itself. So the legal frame can be fixed first,
+    which is the order a judgment actually runs in: what duty was owed and
+    what counts as an intervening act are settled before one asks whether the
+    conduct produced the harm.
+    """
+    if case.lrc is None or not case.lrc.scheme_rules:
+        return None
+    rules = [r.rule for r in case.lrc.scheme_rules if not _reads_bridge(r.rule)]
+    if not rules:
+        return None
+    base = {"premises": [p.literal for p in case.lrc.doctrinal_premises], "axioms": []}
+    return lrc_vocab.build_framework(base, {"strict_rules": [], "defeasible_rules": rules},
+                                     preferences=preference_model(case))
+
+
+def qualifications(case: FormalizedCase) -> List[str]:
+    """The qualifications the LRC settles on its own, to be fed to the CIF.
+
+    Rule-name literals (`¬sc_q6`) are dropped: they are moves inside the LRC,
+    not facts of the world, and the cause-in-fact layer has no rule of that
+    name to undercut.
+    """
+    af = qualification_framework(case)
+    if af is None:
+        return []
+    names = {r.rule.split(":", 1)[0].strip() for r in case.lrc.scheme_rules}
+    given = {p.literal for p in case.lrc.doctrinal_premises}
+    derived = {r.rule.split("=>")[-1].strip()
+               for r in case.lrc.scheme_rules if not _reads_bridge(r.rule)}
+    out = []
+    for literal in af.justified_conclusions():
+        text = str(literal)
+        # Only what the layer *derives*: neither its received premise (an ordinary
+        # premise in CIF, which would prevent interventions if made an axiom,
+        # killing but-for and NESS) nor the rule name it
+        # undercuts, which is not a fact about the world.
+        if text in given or text.lstrip("¬") in names or text not in derived:
+            continue
+        out.append(text)
+    return sorted(out)
+
+
 def cif_framework(case: FormalizedCase) -> ArgumentationFramework:
-    """The cause-in-fact layer, straight from the record's own dicts."""
-    return ArgumentationFramework(case.knowledge_base, case.causal_model,
+    """The cause-in-fact layer, with the LRC's qualifications as axioms.
+
+    Only when the record declares `layer_order = "lrc_first"`. The default is
+    the paper's order: the CIF runs first and `CaFa` enters the LRC as an axiom
+    (eq. 1), with nothing flowing the other way. A record that opts in gets the
+    legal frame fixed first, entering the causal layer the same way -- as
+    axioms, not as attackable premises -- and only the bridge waits for facts.
+    """
+    base = dict(case.knowledge_base)
+    frame = qualifications(case) if case.layer_order == "lrc_first" else []
+    if frame:
+        base = {"premises": list(base.get("premises", [])),
+                "axioms": list(dict.fromkeys([*base.get("axioms", []), *frame]))}
+    return ArgumentationFramework(base, case.causal_model,
                                   preferences=preference_model(case))
 
 
@@ -121,6 +192,16 @@ def annotate(case: FormalizedCase) -> FormalizedCase:
     per-query NESS/but-for, per-query legal relevance, and the LRC
     layer's relevance report."""
     annotated = case.model_copy(deep=True)
+    # Store the legal context delivered by LRC to CIF in the knowledge base,
+    # so the record alone states its execution order. A reader sees the
+    # axioms rather than an `axioms: []` hiding the injection.
+    frame = qualifications(annotated) if annotated.layer_order == "lrc_first" else []
+    if frame:
+        annotated.knowledge_base = {
+            "premises": list(annotated.knowledge_base.get("premises", [])),
+            "axioms": list(dict.fromkeys([*annotated.knowledge_base.get("axioms", []),
+                                          *frame])),
+        }
     af = cif_framework(annotated)
 
     for query in annotated.queries:
@@ -176,7 +257,7 @@ def lrc_atom_glosses(case: FormalizedCase) -> Dict[str, str]:
             glosses[literal] = rendered
         elif literal in base:
             # A qualification rule may read or conclude a plain atom of the
-            # case ("regime fechado ⇒ dever específico"). It carries no LRC
+            # case ("closed regime ⇒ specific duty"). It carries no LRC
             # predicate, so `_render_lrc_literal` declines it -- but the case
             # already says what it means, and repeating the code raw on
             # screen would be the only alternative.
@@ -197,9 +278,9 @@ def _render_lrc_literal(literal: str, atom_glosses: Dict[str, str]) -> str:
         # `¬rN` (an undercut target) or a plain atom: leave to the caller.
         return ""
     predicate, arguments = split
-    # Um predicado pode ter mais de uma aridade (`SupersedingCause`), e a
-    # frase muda com ela: com um argumento só não há como nomear o nexo que
-    # se rompe.
+    # A predicate can have multiple arities (`SupersedingCause`), and the
+    # wording changes accordingly: one argument cannot identify the link that
+    # is broken.
     templates = (_LRC_TEMPLATES.get(f"{predicate}/{len(arguments)}")
                  or _LRC_TEMPLATES.get(predicate))
     if not templates:

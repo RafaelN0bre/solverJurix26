@@ -1,3 +1,10 @@
+"""The core ASPIC+ solver: arguments, attacks, defeats, the grounded
+extension, and the two causal tests (`ness_cause`, `but_for`). Everything in
+the pipeline runs through it -- `formalize.build` instantiates it from a
+record, `formalize.bridge` reads the causal verdicts off it, and `analysis`
+and `interface` re-run and render what it computes.
+"""
+
 """ASPIC+ argumentation solver with cause-in-fact detection.
 
 Ported and adapted from a TCC (UnB) project's standalone ASPIC+ solver, and
@@ -147,6 +154,10 @@ class Argument:
         self.defeasible_rules = defeasible_rules
         self.sub_arguments = sub_arguments or []
         self.top_rule = top_rule
+        #: Conc(Sub(A)): every conclusion drawn anywhere in this argument's
+        #: derivation. Read by the acyclic-chaining guard in `_apply_rule`.
+        self.subtree_conclusions = frozenset({conclusion}).union(
+            *(sub.subtree_conclusions for sub in self.sub_arguments))
 
     @property
     def premises(self) -> FrozenSet[str]:
@@ -356,10 +367,17 @@ class ArgumentationFramework:
         MAX_ITER = 1000
         changed = True
         iteration = 0
+        # Iterate to a fixpoint of *arguments*, not of conclusions: a pass
+        # that adds no new conclusion can still add new derivations of
+        # existing ones, and explanations/support sets (Def. 3.3) see the
+        # difference -- an earlier stop makes the argument set depend on
+        # rule order, and an axiom-expanded framework can silently lack
+        # derivations its base framework had. Termination is guaranteed by
+        # the acyclic-chaining guard in `_apply_rule`; MAX_ITER is only a
+        # safety valve.
         while changed and iteration < MAX_ITER:
             iteration += 1
             changed = False
-            previous_conclusions = {a.conclusion for a in self.arguments.values()}
 
             for rule in all_rules:
                 try:
@@ -367,10 +385,6 @@ class ArgumentationFramework:
                         changed = True
                 except Exception as e:
                     logger.error(f"Error applying rule {rule.id}: {e}")
-
-            new_conclusions = {a.conclusion for a in self.arguments.values()}
-            if new_conclusions == previous_conclusions:
-                break
 
         if iteration >= MAX_ITER:
             logger.warning("Argument construction stopped after reaching MAX_ITER limit")
@@ -390,9 +404,13 @@ class ArgumentationFramework:
 
         created = False
         for combo in product(*antecedent_args):
-            # Def. 2.6 step 2 acyclicity guard: psi must not already be a
-            # conclusion among the antecedent arguments themselves.
-            if rule.consequent in {a.conclusion for a in combo}:
+            # Acyclic-chaining guard (Def. 2.6 read with §2.2's "acyclic
+            # graphs"): psi must not recur anywhere in Conc(Sub(A_i)), or
+            # the new argument would re-derive one of its own intermediate
+            # conclusions. Checking only the direct antecedents' conclusions
+            # is not enough -- and this guard, not the construction loop, is
+            # what bounds argument building on a cyclic theory.
+            if any(rule.consequent in a.subtree_conclusions for a in combo):
                 continue
 
             ordinary = frozenset().union(*(a.ordinary_premises for a in combo)) if combo else frozenset()

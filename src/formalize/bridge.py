@@ -1,13 +1,20 @@
+"""Computes the bridge premises of the LRC layer (`CaFa_*`/`ButFor_*`) by
+running the cause-in-fact solver -- never by authoring them. Called by
+`formalize.build` when assembling a record's second framework;
+`formalize.validate` checks the stored record against exactly this output.
+"""
+
 """The determinism boundary between the two layers of the formalization.
 
 The ICAIL 2026 legal-relevance module takes the *output* of the cause-in-fact
 evaluation as its premises. Those premises are computed here, by running the
-solver, and are never authored by the LLM: asking a model to restate which
-literals turned out to be causes would let a formalization claim legal
-relevance for something the counterfactual test never established, which is
-precisely the failure mode this pipeline exists to rule out. The model only
-supplies the doctrinal premises (`Om_*`, `Obl_*`, ...) and the instantiated
-rule schemes; the `CaFa_*`/`ButFor_*` facts are the solver's word.
+solver, and are never authored -- not by hand, not by any generator: letting
+a transcription restate which literals turned out to be causes would let a
+formalization claim legal relevance for something the counterfactual test
+never established, which is precisely the failure mode this boundary exists
+to rule out. The transcription only supplies the doctrinal premises and the
+instantiated rule schemes; the `CaFa_*`/`ButFor_*` facts are the solver's
+word.
 
 This mirrors how `tests/test_legally_relevant_causes_2026.py` hand-feeds
 `CaFa_x_y` premises for the paper's worked examples -- same literals, same

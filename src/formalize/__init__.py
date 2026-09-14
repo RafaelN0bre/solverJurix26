@@ -1,19 +1,29 @@
-"""LLM-assisted formalization of annotated legal dossiers into ASPIC+ input.
+"""Package that turns the hand-transcribed formalization record into solver
+input and keeps it honest: schema, normalization, bridge, assembly,
+validation and storage. It is the stretch of the pipeline between the
+annotated dossier and the frameworks `aspic` runs.
+"""
 
-Reads the dossiers under `data/<annotator>/`, turns them into executable
-argumentation frameworks with Google Gemini, and writes the result to
-`data/translated/` for `aspic.catalog` (and therefore the interface) to load.
+"""Deterministic formalization of annotated legal dossiers into ASPIC+ input.
 
-Submodules, in pipeline order: `dossier` (deterministic normalization),
-`prompts` (versioned prompt files), `gemini` (the model client), `stages` (the
-four LLM calls plus repair), `bridge` (cause-in-fact facts feeding the
-legal-relevance layer), `build` (record -> frameworks -> `CaseSpec`),
-`validate` (checks and the solver-vs-court table), `pipeline` (orchestration)
-and `cli`.
+No generative model is involved anywhere in this package: the executable
+record of the case study is hand-transcribed from the consolidated
+formalization document (`docs/formalizacao-caso003.md`) by
+`scripts/build_case003_final.py`, and everything here either assembles,
+checks or stores that record. Submodules:
 
-Importing this package pulls in nothing heavier than pydantic; the Gemini SDK
-is imported lazily inside `formalize.gemini`, so `formalize.build` can be used
-from `aspic.catalog` without an API key or a network dependency.
+* `schema` -- the pydantic contract of `data/translated/<case>/case.json`;
+* `dossier` -- deterministic normalization of an annotated dossier into a
+  readable, diffable brief (display and audit only);
+* `bridge` -- the cause-in-fact facts (`CaFa_*`/`ButFor_*`) that feed the
+  legal-relevance layer, always computed by the solver, never authored;
+* `build` -- record -> solver frameworks -> `cases.CaseSpec`;
+* `validate` -- deterministic checks and the solver-vs-court table;
+* `store` -- the `data/translated/` layout and its `index.json`.
+
+An earlier version of this package formalized dossiers through a staged LLM
+pipeline (Google Gemini); that machinery was removed on purpose, so that no
+object in the theory is produced by generative AI.
 """
 from .schema import SCHEMA_VERSION, FormalizedCase
 

@@ -1,4 +1,24 @@
-"""ASPIC+ argumentation solver with cause-in-fact detection."""
+"""The ASPIC+ engine package: the solver, the causal tests, the
+legal-relevance vocabulary and the preference orderings. Every other package
+builds on it -- `formalize` assembles its input, `cases` and `analysis` run
+it, `interface` renders what it computes.
+"""
+
+"""The ASPIC+ engine: argumentation solver, causal notions (NESS / but-for),
+the legal-relevance vocabulary, and preferences between arguments.
+
+This package is the reimplementation of the theory of the two papers --
+Pisano, Prakken, Sartor & Liepina (ICAIL 2025) and Pisano, Prakken & Sartor
+(ICAIL 2026) -- and nothing else: no case data (`cases`), no per-perspective
+analysis (`analysis`), no rendering (`interface`), no formalization
+machinery (`formalize`). Its four modules:
+
+* `solver` -- the ASPIC+ framework proper: arguments, attacks, defeats, the
+  grounded extension, and the two causal tests (`ness_cause`, `but_for`);
+* `sufficiency` -- sufficient sets, the *why* behind a NESS verdict;
+* `lrc` -- vocabulary and helpers for the legally-relevant-causation layer;
+* `preferences` -- argument orderings refined from doctrinal dimensions.
+"""
 from .solver import (
     ArgumentationFramework,
     Argument,
@@ -16,10 +36,7 @@ from .sufficiency import (
     sufficiency_report,
     sufficient_sets,
 )
-from .examples import CaseSpec, CausalQuery, LRCLayer, LEGAL_CASES, case_by_id
 from .preferences import Dimension, PreferenceModel, RuleProfile, resolved_conflicts
-from .graph_export import argument_status, render_to_file, render_to_string, to_dot
-from .causal_report import causal_comparison_section, ness_html_table
 
 __all__ = [
     "ArgumentationFramework",
@@ -35,19 +52,8 @@ __all__ = [
     "necessary_elements",
     "sufficiency_report",
     "sufficient_sets",
-    "CaseSpec",
-    "CausalQuery",
-    "LRCLayer",
-    "LEGAL_CASES",
-    "case_by_id",
     "Dimension",
     "PreferenceModel",
     "RuleProfile",
     "resolved_conflicts",
-    "argument_status",
-    "render_to_file",
-    "render_to_string",
-    "to_dot",
-    "causal_comparison_section",
-    "ness_html_table",
 ]

@@ -1,4 +1,15 @@
-"""Vocabulary and helpers for the legally-relevant-causation (LRC) layer of
+"""Vocabulary and helpers of the legally-relevant-causation (LRC) layer:
+its predicates, the paper's rule schemes plus this work's extensions, and
+the builders/reports for the second framework. In the pipeline it sits
+between `formalize.bridge`, which writes the `CaFa_*`/`ButFor_*` premises,
+and the LRC framework a formalized record executes.
+"""
+
+"""The vocabulary of the legally-relevant-causation (LRC) layer: its
+predicates, the paper's rule schemes plus this work's extensions, and the
+helpers that build and report on the second framework.
+
+The layer is the one defined in
 
     Pisano, Prakken & Sartor. "From Cause-in-Fact to Legally Relevant Cause
     through Argumentation." ICAIL 2026 (docs/papers/ICAIL2026causation.pdf).
@@ -12,91 +23,89 @@ derive `LeReCa(phi, psi)` or undercut it via one of the doctrinal defences.
 vocabulary for the paper's five worked examples; this module turns the naming
 convention used there into code, so the formalization pipeline
 (`formalize.bridge`) can derive the bridge premises from the solver instead of
-asking an LLM to restate them.
+restating them by hand.
 
 Naming convention (taken verbatim from the tests): a literal becomes an
 identifier fragment by dropping the negation sign and prefixing "not", so
 `¬PaCo` -> `notPaCo` and `CaFa(¬PaCo, ChDi)` -> `CaFa_notPaCo_ChDi`.
 
-O vocabulário
--------------
+The vocabulary
+--------------
 
-Doze predicados, e a divisão entre eles não é decorativa — ela diz **de onde
-cada literal pode vir**, que é a fronteira de determinismo que este pipeline
-existe para manter.
+Twelve predicates, whose grouping states **where each literal can originate**:
+the deterministic boundary this pipeline exists to preserve.
 
-**Factuais — saída do solver, nunca de uma pessoa.**
+**Factual: solver output, never supplied by a person.**
 
 ``CaFa(φ, ψ)``
-    φ é causa de fato de ψ. Escrita por `formalize.bridge` a partir de
-    `ArgumentationFramework.ness_cause`. É a ponte entre as duas camadas: a
-    segunda só raciocina sobre causas que a primeira reconheceu, e é isso que
-    impede uma formalização de alegar relevância jurídica para algo que o
-    teste contrafactual nunca estabeleceu.
+    φ is a cause in fact of ψ. Written by `formalize.bridge` from
+    `ArgumentationFramework.ness_cause`. This bridges the layers: the second
+    reasons only about causes accepted by the first, preventing claims of
+    legal relevance for causes never established by the counterfactual test.
 
 ``ButFor(φ, ψ)``
-    sem φ, ψ não teria ocorrido de jeito nenhum (Def. 3.5). Estritamente mais
-    forte que ``CaFa``: toda causa but-for é causa de fato, e a recíproca
-    falha sob sobredeterminação e preempção. Entra como antecedente da
-    caracterização da causa superveniente — o evento interposto só desloca a
-    causa anterior se ele próprio for indispensável ao dano.
+    Without φ, ψ would not have occurred at all (Def. 3.5). Strictly stronger
+    than ``CaFa``: every but-for cause is a cause in fact, but the converse
+    fails under overdetermination and preemption. Used to characterize a
+    superseding cause: a later event displaces the earlier cause only if it
+    is itself indispensable to the damage.
 
-**Conclusão — o que a camada existe para decidir.**
+**Conclusion: what the layer exists to decide.**
 
 ``LeReCa(φ, ψ)``
-    φ é causa de ψ que o direito imputa. A regra 2 a presume de ``CaFa``, e
-    as regras 3, 4, 6 e 8 a afastam por *undercut* sobre essa presunção.
+    φ is a cause of ψ to which the law attributes responsibility. Rule 2
+    presumes it from ``CaFa``; rules 3, 4, 6 and 8 undercut that presumption.
 
-**Doutrinários — leitura do acórdão.**
+**Doctrinal: readings of the judgment.**
 
 ``After(χ, φ)``
-    o evento χ ocorreu depois de φ. Antecedente da regra 5: um evento que não
-    é posterior não interrompe coisa nenhuma.
+    Event χ occurred after φ. An antecedent of rule 5: an event that is not
+    later cannot interrupt the chain.
 
 ``Unexpected(χ)``
-    χ era altamente inesperado. É o que separa uma causa superveniente de um
-    desdobramento normal do que já estava em curso — sem isto, todo elo
-    intermediário romperia o nexo.
+    χ was highly unexpected. Separates a superseding cause from a normal
+    development of ongoing events; otherwise every intermediate link would
+    break the causal connection.
 
 ``Tortious(χ)``
-    χ é conduta ilícita. Aparece **negado** na regra 3: a defesa do "não
-    estaria melhor" exige que a causa paralela seja *lícita*. Apontar uma
-    causa paralela ilícita não desculpa ninguém — desculparia os dois.
+    χ is tortious conduct. Appears **negated** in rule 3: the no-worse-off
+    defence requires a *lawful* parallel cause. An unlawful parallel cause
+    excuses neither actor; otherwise it would excuse both.
 
 ``Foreseeable(φ, ψ)``
-    ψ era previsível a partir de φ. Também aparece negado, na regra 6: é a
-    *im*previsibilidade que afasta a relevância.
+    ψ was foreseeable from φ. Also negated, in rule 6: *un*foreseeability
+    defeats legal relevance.
 
-``ForeseeableRisk(φ, χ)`` e ``Playout(χ, ψ)``
-    o par da regra 7, a exceção da exceção. O que se alega previsível não é o
-    dano exato, é o **risco**: ``ForeseeableRisk`` diz que χ é um risco
-    previsível de φ, ``Playout`` diz que o dano ψ é a concretização desse
-    risco. Juntos desfazem a alegação de imprevisibilidade — o dano é
-    justamente aquilo de que o risco era o risco.
+``ForeseeableRisk(φ, χ)`` and ``Playout(χ, ψ)``
+    The rule 7 pair, an exception to the exception. The foreseeable claim
+    concerns the **risk**, not the exact damage: ``ForeseeableRisk`` says χ
+    is a foreseeable risk of φ; ``Playout`` says damage ψ realizes that risk.
+    Together they defeat unforeseeability: the damage is precisely what the
+    risk concerned.
 
-``Om(φ)`` e ``Obl(¬φ)``
-    o par da regra 8. ``Om`` diz que a conduta é uma *omissão*; sem isso a
-    regra não se aplica, porque ela é sobre não fazer, não sobre fazer mal.
-    Repare no argumento de ``Obl``: o artigo escreve ``¬Obl(¬φ)``, porque φ é
-    a omissão e o dever recai sobre a **conduta omitida**, que é o
-    complemento dela.
+``Om(φ)`` and ``Obl(¬φ)``
+    The rule 8 pair. ``Om`` states that the conduct is an *omission*;
+    otherwise the rule does not apply, because it concerns failure to act,
+    rather than acting badly. Note ``Obl``'s argument: the paper writes
+    ``¬Obl(¬φ)`` because φ is the omission and the duty concerns the
+    **omitted conduct**, its complement.
 
-**Derivado — o único que a camada conclui em vez de receber pronto.**
+**Derived: the sole predicate concluded rather than received.**
 
 ``SupersedingCause(χ, φ, ψ)``
-    χ é causa superveniente que rompe o nexo entre φ e ψ. A regra 5 o conclui
-    (de ``CaFa``, ``ButFor``, ``After`` e ``Unexpected``) e a regra 4 o
-    consome. É por isso que ele é o único predicado com regra dos dois lados.
+    χ is a superseding cause breaking the link between φ and ψ. Rule 5
+    concludes it from ``CaFa``, ``ButFor``, ``After`` and ``Unexpected``;
+    rule 4 consumes it. Hence it alone has rules on both sides.
 
-    **Aridade.** O artigo o escreve com três argumentos (eqs. 4 e 5). Este
-    repositório sempre escreveu a forma abreviada ``SupersedingCause_χ``,
-    deixando φ e ψ implícitos na regra que consome o literal. As duas são
-    aceitas por `split_lrc_literal`, e `PREDICATES` declara a do artigo
-    primeiro; ver `docs/auditoria-icail2026.md`, D-3.
+    **Arity.** The paper uses three arguments (equations 4 and 5). This
+    repository historically used abbreviated ``SupersedingCause_χ``, leaving
+    φ and ψ implicit in the consuming rule. `split_lrc_literal` accepts both,
+    and `PREDICATES` declares the paper's form first. See
+    `docs/auditoria-icail2026.md`, D-3.
 
-A tabela executável está em `PREDICATES`, e `predicate_reference()` a devolve
-pronta para renderizar — de propósito, para que a explicação que o leitor vê
-e o registro que o parser usa não possam divergir.
+The executable table lives in `PREDICATES`; `predicate_reference()` returns
+it ready to render, keeping the reader's explanation and parser's record
+consistent.
 """
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Tuple
@@ -162,7 +171,7 @@ class Predicate:
 
     @property
     def arity(self) -> int:
-        """A aridade canônica, a do artigo."""
+        """Canonical arity, as used in the paper."""
         return self.arities[0]
 
 
@@ -170,15 +179,15 @@ class Predicate:
 #:
 #: Two families, and the difference decides where a literal may come from:
 #:
-#: * **factuais** (`CaFa`, `ButFor`) -- saída do solver da camada de causa de
-#:   fato, escritas por `formalize.bridge` e nunca por uma pessoa. São a
-#:   ponte entre as duas camadas: a segunda só raciocina sobre causas que a
-#:   primeira reconheceu;
-#: * **doutrinárias** (todas as demais) -- leitura do acórdão. Dizem o que o
-#:   direito qualifica: houve dever de agir, o evento era inesperado, a
-#:   conduta era ilícita.
+#: * **factual** (`CaFa`, `ButFor`): output of the cause-in-fact
+#:   solver, written by `formalize.bridge`, never by a person. They form the
+#:   bridge between layers: the second reasons only about causes that the
+#:   first accepted;
+#: * **doctrinal** (all others): readings of the judgment. They state what the
+#:   law qualifies: a duty to act existed, the event was unexpected, the
+#:   conduct was tortious.
 #:
-#: `LeReCa` é a única *conclusão*: é o que a camada existe para decidir.
+#: `LeReCa` is the sole *conclusion*: what the layer exists to decide.
 PREDICATES: Tuple[Predicate, ...] = (
     Predicate(
         "CaFa", (2,), ("φ", "ψ"), "causa de fato",
@@ -242,11 +251,11 @@ PREDICATES: Tuple[Predicate, ...] = (
         "superveniente de um desdobramento normal do que já estava em curso.",
         "eq. (5)"),
     Predicate(
-        # O artigo escreve `SupersedingCause(χ, φ, ψ)` (eqs. 4 e 5): o evento
-        # que rompe, a causa que ele desloca e o dano. Este repositório sempre
-        # escreveu só `SupersedingCause_χ`, deixando φ e ψ implícitos na regra
-        # que consome o literal. As duas formas são aceitas, e a do artigo vem
-        # primeiro porque é a que um leitor do artigo espera.
+        # The paper writes `SupersedingCause(χ, φ, ψ)` (eqs. 4 and 5): the event, the link
+        # it breaks, the cause it displaces and the damage. This repository historically
+        # wrote only `SupersedingCause_χ`, leaving φ and ψ implicit in the rule
+        # consuming the literal. Both forms are accepted; the paper's comes
+        # first because it is what readers of the paper expect.
         "SupersedingCause", (3, 1), ("χ", "φ", "ψ"), "causa superveniente",
         "χ é causa superveniente que rompe o nexo entre φ e ψ. Concluída pela "
         "regra 5 e consumida pela regra 4 — é o único predicado que a camada "
@@ -393,10 +402,10 @@ def relevance_report(af: ArgumentationFramework, targets: List[str]) -> List[Dic
 
     Three outcomes, not two, and the distinction is the whole point:
 
-    * **reconhecida** -- the target is a justified conclusion;
-    * **afastada** -- some argument for it was built and an accepted argument
+    * **recognized** -- the target is a justified conclusion;
+    * **defeated** -- some argument for it was built and an accepted argument
       defeated it. `blocked_by` names them, with the doctrinal scheme;
-    * **não formulada** -- *no argument for it exists at all*, because the
+    * **not formulated** -- *no argument for it exists at all*, because the
       rule that would derive it never fired. Nothing blocked it; the claim
       was never made.
 
