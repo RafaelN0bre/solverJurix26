@@ -151,36 +151,6 @@ def _rules_table(record, passages) -> str:
     )
 
 
-ORDER_LABELS = {
-    "cif_first": ("CIF → LRC", "a ordem do ICAIL 2026: o CIF resolve primeiro, e "
-                  "cada <code>CaFa(φ,ψ)</code> justificado entra na LRC como "
-                  "axioma (equação 1). Nada corre no sentido inverso."),
-    "lrc_first": ("LRC → CIF → LRC", "as regras de qualificação da LRC correm "
-                  "antes e entregam o quadro jurídico ao CIF como axioma; só a "
-                  "ponte <code>cf2lrc</code>, que lê <code>CaFa</code>, espera "
-                  "os fatos."),
-}
-
-
-def _order_block(record) -> str:
-    """Layer execution order and the axioms received by each layer."""
-    label, explain = ORDER_LABELS.get(record.layer_order, (record.layer_order, ""))
-    cif_axioms = list(record.knowledge_base.get("axioms", []))
-    lrc_axioms = list(record.lrc.knowledge_base.get("axioms", [])) if record.lrc else []
-
-    def items(literals):
-        return "".join(f"<li><code>{_esc(x)}</code></li>" for x in literals) or "<li>nenhum</li>"
-
-    return f"""
-  <h4>Ordem das camadas</h4>
-  <p class="lead"><strong>{_esc(label)}</strong> — {explain}</p>
-  <p><strong>Axiomas do CIF</strong> (o que a camada de relevância entregou):</p>
-  <ul class="mono">{items(cif_axioms)}</ul>
-  <p><strong>Axiomas da LRC</strong> (o que a camada de causa de fato entregou):</p>
-  <ul class="mono">{items(lrc_axioms)}</ul>
-"""
-
-
 def _lrc_block(record, passages) -> str:
     layer = record.lrc
     if layer is None or not layer.scheme_rules:
@@ -328,7 +298,6 @@ def render_formalization_fiche(record, validation: Optional[dict] = None) -> str
   <h4>Regras do framework</h4>
   {_rules_table(record, passages)}
   {_lrc_block(record, passages)}
-  {_order_block(record)}
   {notes}
   {open_questions}
   {_provenance_block(record)}

@@ -313,7 +313,7 @@ QUERIES = [
 
 MODELLING_NOTES = (
     "Transcrição de `docs/formalizacao-caso003.md`, com as escolhas de "
-    "transcrição documentadas em `scripts/build_case003_final.py`. Três delas "
+    "transcrição documentadas em `scripts/build_case003_final.py`. Duas delas "
     "mudam o que se lê no resultado.\n\n"
     "Primeiro, `FugaPreso` e `Latrocinio` não entram como premissas globais, "
     "embora o Recorrente os tome por postos: como r3 é regra de todos, "
@@ -326,29 +326,11 @@ MODELLING_NOTES = (
     "afastada, `OmiEstatal` deixava de ser causa de fato e `cf2lrc_q5` ficava "
     "sem antecedente, de modo que a relevância decidia sobre uma pretensão "
     "que os fatos já haviam derrubado. Agora `caFa(OmiEstatal, Danos)` sai "
-    "verdadeira e a imputação é decidida onde se decide imputação.\n\n"
-    "Terceiro, este registro corre na ordem invertida, `lrc_first`: as dez "
-    "regras de qualificação da LRC — dever, ato de terceiro, omissão "
-    "genérica, ônus das cautelas — não leem nenhum literal de ponte, então "
-    "correm antes e entregam `DeverEspec`, `AtoTerceiro` e `OmissaoGen` ao "
-    "CIF como axiomas. Só `cf2lrc_q5`, que lê `CaFa`, espera os fatos. Os "
-    "casos do ICAIL 2025/2026 ficam na ordem do artigo, `cif_first`. Ver o "
-    "bloco \"Ordem das camadas\" adiante."
+    "verdadeira e a imputação é decidida onde se decide imputação."
 )
 
 
-#: `order -> (id suffix, variant name)`. The same document is
-#: transcribed twice, changing only the order of the layers, so
-#: both readings can be compared side by side. This is the sole difference
-#: between records; any difference in results is an effect of the
-#: execution order alone.
-ORDERS = {
-    "lrc_first": ("", "qualificação antes dos fatos: LRC → CIF → LRC"),
-    "cif_first": ("-cif", "a ordem do ICAIL 2026: CIF → LRC"),
-}
-
-
-def build_record(directory: Path, layer_order: str = "lrc_first") -> FormalizedCase:
+def build_record(directory: Path) -> FormalizedCase:
     evidence = carried_evidence(directory)
 
     atoms = [
@@ -400,10 +382,9 @@ def build_record(directory: Path, layer_order: str = "lrc_first") -> FormalizedC
 
     record = FormalizedCase(
         case=CaseMeta(
-            id=CASE_ID + ORDERS[layer_order][0],
+            id=CASE_ID,
             title="Caso 003 — Responsabilidade do Estado por crime de foragido "
-                  "(formalização final, por votos; "
-                  + ORDERS[layer_order][1] + ")",
+                  "(formalização final, por votos)",
             annotator="izabela-melo",
             source_file=SOURCE_DOC.name,
             source_sha256=hashlib.sha256(SOURCE_DOC.read_bytes()).hexdigest(),
@@ -424,7 +405,6 @@ def build_record(directory: Path, layer_order: str = "lrc_first") -> FormalizedC
                  for phi, psi, question, verdict, rationale in QUERIES],
         lrc=lrc,
         preferences=preferences,
-        layer_order=layer_order,
         open_questions=[
             "O documento não traz uma posição final da corte separada dos "
             "votos, então o registro não a inventa: `stf_final` não aparece "
@@ -446,37 +426,29 @@ def main(argv=None) -> int:
     parser.add_argument("--dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument("--check", action="store_true",
                         help="Não regrava nada; sai com 1 se houver erro.")
-    parser.add_argument("--order", choices=sorted(ORDERS),
-                        help="Gera só uma das variantes (padrão: as duas).")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.WARNING,
                         format="%(levelname)s %(name)s: %(message)s")
     logging.getLogger("ASPIC+").setLevel(logging.WARNING)
 
-    ok = True
-    for layer_order, (suffix, label) in ORDERS.items():
-        if args.order and layer_order != args.order:
-            continue
-        record = build.annotate(build_record(args.dir, layer_order))
-        report = validate_case(record)
-        print(f"=== {record.case.id} — {label} ===")
-        print_report(report)
-        ok = ok and report.ok
+    record = build.annotate(build_record(args.dir))
+    report = validate_case(record)
+    print(f"=== {record.case.id} ===")
+    print_report(report)
 
-        if not args.check:
-            out = args.dir / (CASE_ID + suffix)
-            out.mkdir(parents=True, exist_ok=True)
-            (out / "case.json").write_text(
-                json.dumps(record.model_dump(), ensure_ascii=False, indent=2),
-                encoding="utf-8")
-            (out / "validation.json").write_text(
-                json.dumps(report.as_dict(), ensure_ascii=False, indent=2),
-                encoding="utf-8")
-            print(f"Gravado em {out}\n")
     if not args.check:
+        out = args.dir / CASE_ID
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "case.json").write_text(
+            json.dumps(record.model_dump(), ensure_ascii=False, indent=2),
+            encoding="utf-8")
+        (out / "validation.json").write_text(
+            json.dumps(report.as_dict(), ensure_ascii=False, indent=2),
+            encoding="utf-8")
+        print(f"Gravado em {out}\n")
         update_index(args.dir)
-    return 0 if ok else 1
+    return 0 if report.ok else 1
 
 
 if __name__ == "__main__":

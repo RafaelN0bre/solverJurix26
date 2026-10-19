@@ -87,74 +87,13 @@ def preference_model(case: FormalizedCase):
     return case.preferences.model() if case.preferences is not None else None
 
 
-def _reads_bridge(rule: str) -> bool:
-    """True for an LRC rule whose antecedent reads a cause-in-fact literal."""
-    antecedent = rule.split(":", 1)[-1].split("=>")[0]
-    return "CaFa_" in antecedent or "ButFor_" in antecedent
-
-
-def qualification_framework(case: FormalizedCase) -> Optional[ArgumentationFramework]:
-    """The LRC *before* the bridge: the qualification rules alone.
-
-    Only `cf2lrc` reads a cause-in-fact literal; every other scheme of the
-    layer -- the duty, the third-party act, the generic omission -- stands on
-    the doctrinal premises by itself. So the legal frame can be fixed first,
-    which is the order a judgment actually runs in: what duty was owed and
-    what counts as an intervening act are settled before one asks whether the
-    conduct produced the harm.
-    """
-    if case.lrc is None or not case.lrc.scheme_rules:
-        return None
-    rules = [r.rule for r in case.lrc.scheme_rules if not _reads_bridge(r.rule)]
-    if not rules:
-        return None
-    base = {"premises": [p.literal for p in case.lrc.doctrinal_premises], "axioms": []}
-    return lrc_vocab.build_framework(base, {"strict_rules": [], "defeasible_rules": rules},
-                                     preferences=preference_model(case))
-
-
-def qualifications(case: FormalizedCase) -> List[str]:
-    """The qualifications the LRC settles on its own, to be fed to the CIF.
-
-    Rule-name literals (`¬sc_q6`) are dropped: they are moves inside the LRC,
-    not facts of the world, and the cause-in-fact layer has no rule of that
-    name to undercut.
-    """
-    af = qualification_framework(case)
-    if af is None:
-        return []
-    names = {r.rule.split(":", 1)[0].strip() for r in case.lrc.scheme_rules}
-    given = {p.literal for p in case.lrc.doctrinal_premises}
-    derived = {r.rule.split("=>")[-1].strip()
-               for r in case.lrc.scheme_rules if not _reads_bridge(r.rule)}
-    out = []
-    for literal in af.justified_conclusions():
-        text = str(literal)
-        # Only what the layer *derives*: neither its received premise (an ordinary
-        # premise in CIF, which would prevent interventions if made an axiom,
-        # killing but-for and NESS) nor the rule name it
-        # undercuts, which is not a fact about the world.
-        if text in given or text.lstrip("¬") in names or text not in derived:
-            continue
-        out.append(text)
-    return sorted(out)
-
-
 def cif_framework(case: FormalizedCase) -> ArgumentationFramework:
-    """The cause-in-fact layer, with the LRC's qualifications as axioms.
+    """The cause-in-fact layer.
 
-    Only when the record declares `layer_order = "lrc_first"`. The default is
-    the paper's order: the CIF runs first and `CaFa` enters the LRC as an axiom
-    (eq. 1), with nothing flowing the other way. A record that opts in gets the
-    legal frame fixed first, entering the causal layer the same way -- as
-    axioms, not as attackable premises -- and only the bridge waits for facts.
+    The paper's order: the CIF runs first and `CaFa` enters the LRC as an
+    axiom (eq. 1), with nothing flowing the other way.
     """
-    base = dict(case.knowledge_base)
-    frame = qualifications(case) if case.layer_order == "lrc_first" else []
-    if frame:
-        base = {"premises": list(base.get("premises", [])),
-                "axioms": list(dict.fromkeys([*base.get("axioms", []), *frame]))}
-    return ArgumentationFramework(base, case.causal_model,
+    return ArgumentationFramework(dict(case.knowledge_base), case.causal_model,
                                   preferences=preference_model(case))
 
 
@@ -192,16 +131,6 @@ def annotate(case: FormalizedCase) -> FormalizedCase:
     per-query NESS/but-for, per-query legal relevance, and the LRC
     layer's relevance report."""
     annotated = case.model_copy(deep=True)
-    # Store the legal context delivered by LRC to CIF in the knowledge base,
-    # so the record alone states its execution order. A reader sees the
-    # axioms rather than an `axioms: []` hiding the injection.
-    frame = qualifications(annotated) if annotated.layer_order == "lrc_first" else []
-    if frame:
-        annotated.knowledge_base = {
-            "premises": list(annotated.knowledge_base.get("premises", [])),
-            "axioms": list(dict.fromkeys([*annotated.knowledge_base.get("axioms", []),
-                                          *frame])),
-        }
     af = cif_framework(annotated)
 
     for query in annotated.queries:

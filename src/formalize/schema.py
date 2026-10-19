@@ -46,17 +46,6 @@ FactorSide = Literal["responsabilizacao", "exclusao", "neutro"]
 AtomStatus = Literal["incontroverso", "controvertido", "rejeitado"]
 RuleKind = Literal["causal", "excecao", "undercut", "rebut"]
 CourtVerdict = Literal["acolhida", "rejeitada", "nao_decidida"]
-#: Execution order of the two layers.
-#:
-#: `cif_first` follows ICAIL 2026: CIF resolves, then `CaFa(φ,ψ)` enters
-#: LRC as an axiom (equation 1). This is the default used by the paper's cases.
-#:
-#: `lrc_first` reverses what can be reversed: LRC qualification rules
-#: that do not read bridge literals run first and deliver the legal
-#: context to CIF as axioms; only the bridge waits for facts. The order is
-#: LRC qualification → CIF → LRC bridge. Opt-in per record because it departs
-#: from the paper.
-LayerOrder = Literal["cif_first", "lrc_first"]
 #: Schemes 2-8 of ICAIL 2026, then the duty-qualification extensions of
 #: `aspic.lrc.EXTENSION_SCHEMES`.
 LrcScheme = Literal["cf2lrc", "nwo", "sc", "suca", "nofor", "rpl", "unom",
@@ -323,7 +312,6 @@ class FormalizedCase(BaseModel):
     effect: str = ""
     queries: List[Query] = Field(default_factory=list)
     lrc: Optional[LRCBlock] = None
-    layer_order: LayerOrder = "cif_first"
     preferences: Optional[PreferenceBlock] = None
     open_questions: List[str] = Field(default_factory=list)
     modelling_notes_pt: str = ""

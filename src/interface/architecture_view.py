@@ -7,18 +7,16 @@ report.
 """The case's architecture at a high level: the blocks, and what passes
 between them.
 
-Two layers, and the order they run in is not decorative: what one hands the
-other enters as an **axiom**, not as an attackable premise, and that is what
-fixes the boundary between qualifying and fact-finding. The ICAIL 2026 runs
-`CIF → LRC` (equation 1: `CaFa(φ,ψ) ∈ K𝑛(LRC)`); a record may declare
-`lrc_first` and invert what is invertible -- the qualification rules, which
-read no bridge literal -- yielding `LRC → CIF → LRC`.
+Two layers, run in the ICAIL 2026 order `CIF → LRC`: what the first hands
+the second enters as an **axiom** (equation 1: `CaFa(φ,ψ) ∈ K𝑛(LRC)`), not as
+an attackable premise, and that is what fixes the boundary between
+fact-finding and qualifying.
 
 The drawing is generated from the record, not written by hand: each block's
 rules, the literals that cross and the final verdict come from `case.json`
 itself, so an out-of-date diagram is impossible.
 """
-from typing import List, Optional
+from typing import List
 
 #: Geometry. One box per phase, stacked, with the labelled arrow in between.
 BOX_W, BOX_H, GAP, PAD = 640, 96, 74, 16
@@ -45,20 +43,12 @@ def _wrap(items: List[str], width: int = 74) -> List[str]:
     return lines or ["—"]
 
 
-def _rule_ids(rules, reads_bridge: Optional[bool]) -> List[str]:
-    from formalize.build import _reads_bridge
-    out = []
-    for rule in rules:
-        rule_id = rule.rule.split(":", 1)[0].strip()
-        if reads_bridge is None or _reads_bridge(rule.rule) is reads_bridge:
-            out.append(rule_id)
-    return out
+def _rule_ids(rules) -> List[str]:
+    return [rule.rule.split(":", 1)[0].strip() for rule in rules]
 
 
 def _phases(record) -> List[dict]:
     """The phases, in execution order, with what each hands to the next."""
-    from formalize.build import qualifications
-
     cif_ids = [meta.id for meta in record.rules_meta]
     cif = {
         "tag": "CIF",
@@ -75,26 +65,11 @@ def _phases(record) -> List[dict]:
         "tag": "LRC",
         "title": "ponte e imputação",
         "sub": "a presunção de relevância e suas exceções",
-        "rules": _rule_ids(record.lrc.scheme_rules, True),
-    }
-
-    if record.layer_order != "lrc_first":
-        cif["hands"] = bridge_axioms
-        cif["hands_note"] = "equação (1) do ICAIL 2026"
-        lrc_bridge["rules"] = _rule_ids(record.lrc.scheme_rules, None)
-        return [cif, lrc_bridge]
-
-    qualify = {
-        "tag": "LRC",
-        "title": "qualificação",
-        "sub": "dever, ato de terceiro, omissão genérica, ônus",
-        "rules": _rule_ids(record.lrc.scheme_rules, False),
-        "hands": qualifications(record),
-        "hands_note": "o quadro jurídico, fixado antes dos fatos",
+        "rules": _rule_ids(record.lrc.scheme_rules),
     }
     cif["hands"] = bridge_axioms
     cif["hands_note"] = "equação (1) do ICAIL 2026"
-    return [qualify, cif, lrc_bridge]
+    return [cif, lrc_bridge]
 
 
 def _verdict(record) -> str:
@@ -168,26 +143,17 @@ def render_architecture(record) -> str:
         )
     svg.append("</svg>")
 
-    if record.layer_order == "lrc_first":
-        lead = (
-            "As regras de qualificação da camada de relevância não leem nenhum "
-            "literal de ponte, então correm <strong>antes</strong> e entregam o "
-            "quadro jurídico ao mecanismo causal. Só a ponte "
-            "<code>cf2lrc</code>, que lê <code>CaFa</code>, espera os fatos — "
-            "por isso a camada de relevância aparece duas vezes."
-        )
-    else:
-        lead = (
-            "A ordem do ICAIL 2026: o mecanismo causal resolve, e cada "
-            "<code>CaFa(φ,ψ)</code> justificado entra na camada de relevância "
-            "como axioma (equação 1). Nada corre no sentido inverso."
-        )
+    lead = (
+        "A ordem do ICAIL 2026: o mecanismo causal resolve, e cada "
+        "<code>CaFa(φ,ψ)</code> justificado entra na camada de relevância "
+        "como <strong>axioma</strong> (equação 1), não como premissa: axioma "
+        "não sofre undermining, e é isso que impede a camada de relevância de "
+        "relitigar o que a causa de fato decidiu."
+    )
     return f"""
 <section class="architecture">
   <h3>Arquitetura — {_esc(order)}</h3>
-  <p class="lead">{lead} O que uma camada entrega à outra entra como
-  <strong>axioma</strong>, não como premissa: axioma não sofre undermining, e é
-  isso que impede uma camada de relitigar o que a outra decidiu.</p>
+  <p class="lead">{lead}</p>
   {''.join(svg)}
 </section>
 """

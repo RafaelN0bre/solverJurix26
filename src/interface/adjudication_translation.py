@@ -55,10 +55,8 @@ _GLOSSES = {
 _TEXT = {
     "Barra: aplicação da regra contestada.": "Bar: rule applicability challenged.",
     "Pontilhado: ataque potencial, sem argumento.": "Dotted: potential attack; no argument instantiated.",
-    "Caso 003 — Responsabilidade do Estado por crime de foragido (formalização final, por votos; qualificação antes dos fatos: LRC → CIF → LRC)":
-        "Case 003 — State liability for a fugitive's crime (qualification before facts: LRC → CIF → LRC)",
-    "Caso 003 — Responsabilidade do Estado por crime de foragido (formalização final, por votos; a ordem do ICAIL 2026: CIF → LRC)":
-        "Case 003 — State liability for a fugitive's crime (ICAIL 2026 order: CIF → LRC)",
+    "Caso 003 — Responsabilidade do Estado por crime de foragido (formalização final, por votos)":
+        "Case 003 — State liability for a fugitive's crime",
     "LEGENDA — OS ATAQUES E O DESFECHO": "LEGEND — ATTACKS AND OUTCOMES",
     "ADJUDICADORES": "ADJUDICATORS", "PARTES": "PARTIES",
     "INCONTROVERSO": "UNDISPUTED",

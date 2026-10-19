@@ -1,4 +1,4 @@
-"""Checks the transcribed Case 003 records and their pipeline results.
+"""Checks the transcribed Case 003 record and its pipeline results.
 Exercises layer ordering, legal-relevance resolution and architecture rendering.
 """
 
@@ -16,9 +16,8 @@ voices (the two parties and three adjudicators);
 2. **Resolution** — the record, when run, arrives where the judgment
    arrived, and arrives along the path the winning vote takes.
 
-The layer order here is `lrc_first`, unlike the paper's cases: the LRC
-qualification rules run first and hand the legal frame to the CIF as an
-axiom. See `formalize.build.qualification_framework`.
+The layer order is the paper's, `CIF → LRC`: the cause-in-fact layer runs
+first and its verdicts enter the legal-relevance layer as axioms (eq. 1).
 """
 import re
 
@@ -126,29 +125,15 @@ def test_every_atom_of_the_document_exists_in_the_record(record, document):
 # ----------------------------------------------------------------------
 # 2. Layer execution order
 # ----------------------------------------------------------------------
-def test_the_record_declares_the_inverted_order(record):
-    assert record.layer_order == "lrc_first"
+def test_nothing_flows_from_relevance_to_cause_in_fact(record):
+    """The CIF runs first: its knowledge base is the case's own, with no
+    axiom handed down by the LRC."""
+    assert record.knowledge_base["axioms"] == []
+    assert not {str(a) for a in build.cif_framework(record).axioms}
 
 
-def test_the_legal_frame_reaches_the_cause_in_fact_layer_as_axioms(record):
-    """Qualifications established independently by LRC enter CIF in K𝑛 and
-    remain in the record: loading it exposes the injection, not `axioms: []`."""
-    frame = build.qualifications(record)
-    assert frame == ["AtoTerceiro", "DeverEspec", "OmissaoGen"]
-    assert set(frame) <= set(record.knowledge_base["axioms"])
-    assert {str(a) for a in build.cif_framework(record).axioms} >= set(frame)
-
-
-def test_only_the_bridge_waits_for_the_facts(record):
-    """Inversion applies to the ten autonomous rules; `cf2lrc` reads `CaFa`
-    and therefore still runs after CIF."""
-    waits = [r.rule.split(":", 1)[0].strip() for r in record.lrc.scheme_rules
-             if build._reads_bridge(r.rule)]
-    assert waits == ["cf2lrc_q5"]
-
-
-def test_the_bridge_still_enters_the_relevance_layer_as_an_axiom(record):
-    """Inversion preserves equation (1): the bridge remains an LRC axiom."""
+def test_the_bridge_enters_the_relevance_layer_as_an_axiom(record):
+    """Equation (1): the bridge is an LRC axiom, not an attackable premise."""
     axioms = record.lrc.knowledge_base["axioms"]
     assert "CaFa_OmiEstatal_Danos" in axioms
     assert not [p for p in record.lrc.knowledge_base["premises"]
@@ -212,71 +197,17 @@ def test_the_state_is_not_liable(record):
 # 4. Architecture section
 # ----------------------------------------------------------------------
 def test_the_architecture_section_is_drawn_from_the_record(record):
-    """The high-level diagram is generated from the record: its three blocks,
-    boundary outputs and verdict all come from `case.json`. This prevents
-    the diagram from becoming stale."""
+    """The high-level diagram is generated from the record: its two blocks,
+    the boundary output and the verdict all come from `case.json`. This
+    prevents the diagram from becoming stale."""
     from interface.architecture_view import render_architecture
 
     html = render_architecture(record)
-    assert "Arquitetura — LRC → CIF → LRC" in html
-    assert "1. LRC — qualificação" in html
-    assert "2. CIF — causa de fato" in html
-    assert "3. LRC — ponte e imputação" in html
-    # What each boundary delivers, and where the bridge crosses.
-    for literal in ("AtoTerceiro", "DeverEspec", "OmissaoGen",
-                    "CaFa_OmiEstatal_Danos", "cf2lrc_q5"):
-        assert literal in html, literal
-    assert "afastada" in html
-
-
-def test_the_paper_order_draws_two_blocks(record):
-    """A `cif_first` record, as in the ICAIL 2025/2026 cases, has no prior
-    qualification phase: two blocks, crossed only by equation (1)."""
-    import copy
-
-    from interface.architecture_view import render_architecture
-
-    paper = copy.deepcopy(record)
-    paper.layer_order = "cif_first"
-    html = render_architecture(paper)
     assert "Arquitetura — CIF → LRC" in html
     assert "1. CIF — causa de fato" in html
     assert "2. LRC — ponte e imputação" in html
     assert "qualificação" not in html
-
-
-# ----------------------------------------------------------------------
-# 5. Both execution-order variants, side by side
-# ----------------------------------------------------------------------
-def test_both_orderings_are_published_from_the_same_document(record):
-    """`case-003-final` and `case-003-final-cif` come from the same
-    `formalizacao-caso003.md`, changing only layer execution order. This pair
-    measures the order's effect: any result difference is due solely to it."""
-    other = catalog.formalized_records()["case-003-final-cif"]
-    assert record.layer_order == "lrc_first"
-    assert other.layer_order == "cif_first"
-    assert record.case.source_sha256 == other.case.source_sha256
-
-    # Same rules, same premises, same document.
-    assert ([m.rule for m in record.rules_meta]
-            == [m.rule for m in other.rules_meta])
-    assert ([r.rule for r in record.lrc.scheme_rules]
-            == [r.rule for r in other.lrc.scheme_rules])
-    assert record.knowledge_base["premises"] == other.knowledge_base["premises"]
-
-    # The only difference is what LRC delivers to CIF.
-    assert record.knowledge_base["axioms"] == ["AtoTerceiro", "DeverEspec",
-                                               "OmissaoGen"]
-    assert other.knowledge_base["axioms"] == []
-
-
-def test_the_ordering_does_not_change_the_verdicts(record):
-    """Legal context enters CIF as axioms, but no r0–r4 rule reads it, so both
-    orders answer alike. For order to matter, the causal mechanism needs a
-    rule consuming a qualification."""
-    other = catalog.formalized_records()["case-003-final-cif"]
-    for mine, theirs in zip(record.queries, other.queries):
-        assert (mine.solver.ness, mine.solver.but_for, mine.legally_relevant) == \
-               (theirs.solver.ness, theirs.solver.but_for, theirs.legally_relevant)
-    assert ([r["status"] for r in record.lrc.relevance]
-            == [r["status"] for r in other.lrc.relevance])
+    # What the boundary delivers, and where the bridge crosses.
+    for literal in ("CaFa_OmiEstatal_Danos", "cf2lrc_q5"):
+        assert literal in html, literal
+    assert "afastada" in html
